@@ -13,4 +13,11 @@ O sirve la carpeta: `python3 -m http.server` y entra en http://localhost:8000.
 - Tabla de tipos de la 6ª gen (con Hada), STAB, críticos, precisión, prioridad,
   estados (quemadura, parálisis, veneno, sueño, congelación), mejoras de estadísticas,
   retroceso, drenaje y curación. Todos los Pokémon a nivel 50.
+- **Mega evoluciones** (32 formas, una por combate): equipa la mega piedra en el constructor y activa
+  «✦ Mega» en el panel de movimientos. Los rivales también megaevolucionan.
+- **Habilidades** (Intimidación, Levitación, Absorbe Fuego, Impulso, Robustez, Agallas…) y **clima**
+  (lluvia, sol, tormenta de arena).
+- **Objetos**: Restos, Vidasfera, objetos Elección, Cinta Focus y Baya Zidra.
+- **Desafío de la Liga**: Sidney, Phoebe, Glacia, Drake y el campeón Máximo seguidos (tu equipo se cura entre combates).
+- 100+ Pokémon, incluidos Kyogre, Groudon y los pájaros legendarios.
 - El equipo y las medallas se guardan en `localStorage`.
