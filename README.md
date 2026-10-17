@@ -23,7 +23,9 @@ Hay que mantener junta la carpeta del proyecto: `index.html` carga `lib/pkmn.bun
 ## Gráficos y animaciones (estilo 9.ª gen)
 Por defecto el juego usa el estilo **Escarlata/Púrpura** (el botón 🎨 de la pantalla de inicio cambia al de
 **Zafiro Alfa**; se recuerda entre sesiones):
-- **Pokémon:** renders 3D de Pokémon HOME (los modelos de 8.ª/9.ª gen) desde el repositorio
+- **Tus Pokémon se ven de espaldas** (sprites 3D animados de Showdown, que sí tienen vista trasera) y los del
+  rival de frente en HD. Con el botón 👀 de la pantalla de inicio puedes ver los tuyos también de frente en HD.
+- **Rival:** renders 3D de Pokémon HOME (los modelos de 8.ª/9.ª gen) desde el repositorio
   [PokeAPI/sprites](https://github.com/PokeAPI/sprites), recortados y escalados según la altura de cada especie,
   con perspectiva (el tuyo más cerca), sombra y animación de respiración. Si no cargan, se usan los sprites
   animados de Showdown. El estilo Zafiro Alfa usa los sprites animados de 6.ª gen.

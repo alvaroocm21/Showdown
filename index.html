@@ -782,16 +782,22 @@ function trimHome(im){
     const w=x1-x0+2,h=y1-y0+2,o=document.createElement('canvas');o.width=w;o.height=h;o.getContext('2d').drawImage(c,x0,y0,w,h,0,0,w,h);
     return {el:o,full:false}}
   catch(e){return {el:im,full:true}}}
+const backUrls=sp=>{const ids=[homeId(sp)],b=Dex.species.get(sp.baseSpecies);if(b.num>0&&b.num<=1025&&b.num!==ids[0])ids.push(b.num);return ids.filter(Boolean).map(i=>`${PAPI}other/showdown/back/${i}.gif`)};
 function loadBattleSprite(sp,back,cb){
-  const all=[...(isSV()?homeUrls(sp):[]),...sprSrcs(sp,back)];let i=0;
-  const im=new Image(),isHome=u=>/other\/home/.test(u);
-  const next=()=>{if(i>=all.length){cb(null);return}const u=all[i++];if(isHome(u))im.crossOrigin='anonymous';else im.removeAttribute('crossorigin');im.src=u};
+  // jugador: sprite 3D de espaldas; rival: render HOME de frente (en el estilo Zafiro Alfa, siempre sprites animados)
+  const all=isSV()?(back?(VIEW==='back'?[...backUrls(sp),...sprSrcs(sp,true),...homeUrls(sp)]:[...homeUrls(sp),...backUrls(sp),...sprSrcs(sp,true)]):[...homeUrls(sp),...sprSrcs(sp,false)]):sprSrcs(sp,back);let i=0;
+  const im=new Image(),isHome=u=>/other\/home/.test(u),cors=u=>/PokeAPI\/sprites/.test(u);
+  const next=()=>{if(i>=all.length){cb(null);return}const u=all[i++];if(cors(u))im.crossOrigin='anonymous';else im.removeAttribute('crossorigin');im.src=u};
   im.onerror=next;
   im.onload=()=>{if(isHome(im.src)){const t=trimHome(im);cb(t.el,'home',t.full)}else cb(im,'ani')};
   next()}
+function maskUrl(el){
+  try{if(el.toDataURL)return el.toDataURL();
+    if(el.crossOrigin==='anonymous'){const c=document.createElement('canvas');c.width=el.naturalWidth;c.height=el.naturalHeight;c.getContext('2d').drawImage(el,0,0);return c.toDataURL()}}catch(e){}
+  return null}
 function addTera(body,wob,h,type,el){
   const c=tCol(type);addCrown(wob,h,type);
-  if(el&&el.toDataURL){let url=null;try{url=el.toDataURL()}catch(e){}
+  if(el){const url=maskUrl(el);
     if(url){const cr=document.createElement('div');cr.className='crystal';cr.style.cssText=`-webkit-mask:url(${url}) center/100% 100% no-repeat;mask:url(${url}) center/100% 100% no-repeat;--tc:${c}`;body.append(cr)}}
   body.style.filter=`drop-shadow(0 0 14px ${c}) drop-shadow(0 8px 5px #0005)`}
 function setSprite(side){
@@ -815,10 +821,10 @@ function setSprite(side){
         else{el.style.width=W+'px';el.style.height=H+'px'}
         body.append(el)}
       else{
-        const k=back?2:1.55,maxH=back?270:210,sc=Math.min(k,maxH/el.naturalHeight);
+        const k=back?2.4:1.55,maxH=back?290:210,sc=Math.min(k,maxH/el.naturalHeight);
         W=el.naturalWidth*sc;H=el.naturalHeight*sc;el.style.width=W+'px';el.style.height=H+'px';body.append(el)}
       sh.style.width=Math.max(100,W*.8)+'px';
-      if(s.tera)addTera(body,wob,H,s.tera,kind==='home'?el:null);
+      if(s.tera)addTera(body,wob,H,s.tera,el);
       res()})});
   return A._ready}
 function fxEl(cls,x,y){const e=document.createElement('div');e.className=cls;e.style.left=x+'px';e.style.top=y+'px';$('#fx').append(e);return e}
@@ -1493,12 +1499,14 @@ function pickProfile(id){
   MY=store.get(pk('team'),[]).filter(s=>s&&Dex.species.get(s.species).exists).map(s=>({...s,item:s.item===undefined?'':s.item}));
   sel=0;run=store.get(pk('run'),null);
   show('title')}
+let VIEW=store.get('zaf3.view','back');
 function setTheme(sv){document.body.classList.toggle('sv',sv);store.set('zaf3.theme',sv?'sv':'oras')}
 function renderWho(){
   const p=curProfile();if(!p){$('#whoami').innerHTML='';return}
-  $('#whoami').innerHTML=`<div class="pav" style="background:${p.color}">${p.emoji}</div><b>${esc(p.name)}</b><button class="btn sm ghost" id="chgUser">Cambiar jugador</button><button class="btn sm ghost" id="themeBtn">🎨 Estilo: ${isSV()?'Escarlata/Púrpura (9.ª gen)':'Zafiro Alfa (6.ª gen)'}</button>`;
+  $('#whoami').innerHTML=`<div class="pav" style="background:${p.color}">${p.emoji}</div><b>${esc(p.name)}</b><button class="btn sm ghost" id="chgUser">Cambiar jugador</button><button class="btn sm ghost" id="themeBtn">🎨 Estilo: ${isSV()?'Escarlata/Púrpura (9.ª gen)':'Zafiro Alfa (6.ª gen)'}</button>${isSV()?`<button class="btn sm ghost" id="viewBtn">👀 Mis Pokémon: ${VIEW==='back'?'de espaldas (animados)':'de frente (HD)'}</button>`:''}`;
   $('#chgUser').onclick=showProfiles;
-  $('#themeBtn').onclick=()=>{setTheme(!isSV());renderWho()}}
+  $('#themeBtn').onclick=()=>{setTheme(!isSV());renderWho()};
+  const vb=$('#viewBtn');if(vb)vb.onclick=()=>{VIEW=VIEW==='back'?'front':'back';store.set('zaf3.view',VIEW);renderWho()}}
 setTheme(store.get('zaf3.theme','sv')==='sv');
 
 /* ================= RANDOMLOCKE ================= */
