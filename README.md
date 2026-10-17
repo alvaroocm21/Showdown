@@ -21,17 +21,22 @@ Hay que mantener junta la carpeta del proyecto: `index.html` carga `lib/pkmn.bun
   solo, se cura tras cada combate y, con la opción de **muerte permanente**, los debilitados se pierden.
 
 ## Gráficos y animaciones (estilo 9.ª gen)
-Por defecto el juego usa el estilo **Escarlata/Púrpura** (se puede volver al de **Zafiro Alfa** desde el
-botón 🎨 de la pantalla de inicio; se recuerda entre sesiones):
-- Escenarios dibujados por código: pradera de Paldea (día o atardecer, con la Academia al fondo) y
-  **estadios de gimnasio** con público, focos y suelo luminoso del color del tipo del líder.
-- Interfaz de combate nueva: paneles con barra de PS con estela de daño, sexo, estado, Teracristal y
-  chips de mejoras/bajadas de estadísticas; menú de movimientos con icono de tipo y efectividad.
-- Animaciones: lanzamiento de Poké Ball, recogida en luz roja, aparición salvaje, desvanecimiento al
-  debilitarse, respiración en reposo, sombra, cámara con balanceo y temblor al golpear.
-- Efectos de partículas por tipo (fuego, agua, rayo, planta, hielo, psíquico, fantasma, siniestro,
-  dragón, hada, acero, roca…), efectos de estado, subidas/bajadas de estadísticas, curación,
-  Megaevolución y **Teracristalización** (cristales, brillo y corona sobre el Pokémon).
+Por defecto el juego usa el estilo **Escarlata/Púrpura** (el botón 🎨 de la pantalla de inicio cambia al de
+**Zafiro Alfa**; se recuerda entre sesiones):
+- **Pokémon:** renders 3D de Pokémon HOME (los modelos de 8.ª/9.ª gen) desde el repositorio
+  [PokeAPI/sprites](https://github.com/PokeAPI/sprites), recortados y escalados según la altura de cada especie,
+  con perspectiva (el tuyo más cerca), sombra y animación de respiración. Si no cargan, se usan los sprites
+  animados de Showdown. El estilo Zafiro Alfa usa los sprites animados de 6.ª gen.
+- **Escenarios** dibujados por código: pradera de Paldea (día o atardecer) y **estadios de gimnasio** con
+  público, focos y suelo luminoso del tipo del líder.
+- **Animaciones de movimientos** que dependen de cada movimiento: carga de energía, rayos continuos
+  (Lanzallamas, Rayo Hielo, Hiperrayo…), esferas (Bola Sombra…), rayos del cielo, lluvia de meteoros o rocas
+  (Cometa Draco, Avalancha…), ondas por el suelo y olas (Terremoto, Surf), arañazos, mordiscos, puñetazos,
+  patadas con postimágenes, ondas de sonido, viento, explosiones, espirales de mejora y escudos (Protección).
+  Los impactos añaden destello de pantalla, anillos, líneas de velocidad, partículas del tipo, zoom y temblor.
+- **Interfaz:** paneles con barra de PS con estela de daño, estado, Teracristal y mejoras de estadísticas;
+  menú de movimientos con iconos de tipo.
+- **Teracristalización** con cristales, estallido, brillo facetado sobre el modelo y corona del tipo.
 
 ## Motor de combate
 Las reglas las pone el simulador oficial de Pokémon Showdown (`@pkmn/sim`, formato *Custom Game* de 9ª gen),
