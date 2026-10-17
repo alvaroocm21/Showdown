@@ -20,6 +20,19 @@ Hay que mantener junta la carpeta del proyecto: `index.html` carga `lib/pkmn.bun
   **tienda con objetos aleatorios** (dinero ganado en los combates). Tu equipo sube de nivel y evoluciona
   solo, se cura tras cada combate y, con la opción de **muerte permanente**, los debilitados se pierden.
 
+## Gráficos y animaciones (estilo 9.ª gen)
+Por defecto el juego usa el estilo **Escarlata/Púrpura** (se puede volver al de **Zafiro Alfa** desde el
+botón 🎨 de la pantalla de inicio; se recuerda entre sesiones):
+- Escenarios dibujados por código: pradera de Paldea (día o atardecer, con la Academia al fondo) y
+  **estadios de gimnasio** con público, focos y suelo luminoso del color del tipo del líder.
+- Interfaz de combate nueva: paneles con barra de PS con estela de daño, sexo, estado, Teracristal y
+  chips de mejoras/bajadas de estadísticas; menú de movimientos con icono de tipo y efectividad.
+- Animaciones: lanzamiento de Poké Ball, recogida en luz roja, aparición salvaje, desvanecimiento al
+  debilitarse, respiración en reposo, sombra, cámara con balanceo y temblor al golpear.
+- Efectos de partículas por tipo (fuego, agua, rayo, planta, hielo, psíquico, fantasma, siniestro,
+  dragón, hada, acero, roca…), efectos de estado, subidas/bajadas de estadísticas, curación,
+  Megaevolución y **Teracristalización** (cristales, brillo y corona sobre el Pokémon).
+
 ## Motor de combate
 Las reglas las pone el simulador oficial de Pokémon Showdown (`@pkmn/sim`, formato *Custom Game* de 9ª gen),
 así que están implementadas todas las mecánicas reales: ~320 habilidades, ~550 objetos, ~860 movimientos,
