@@ -5,10 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pokémon Zafiro Alfa · Duelos</title>
 <style>
-:root{--navy:#0d1b3a;--navy2:#162a55;--sap:#2f7bff;--sky:#8fd0ff;--ink:#eaf3ff;--gold:#ffd24a}
+:root{--navy:#0d1b3a;--sap:#2f7bff;--sky:#8fd0ff;--ink:#eaf3ff;--gold:#ffd24a}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;background:#06122b;color:var(--ink);font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;user-select:none}
 button{font:inherit;color:inherit;cursor:pointer;border:0}
+input,select,textarea{font:inherit}
 .screen{position:absolute;inset:0;display:none;overflow:auto;background:
   radial-gradient(1200px 500px at 80% -10%,#3b8cff55,transparent 60%),
   linear-gradient(180deg,#0a2a6b 0%,#0b3c8f 45%,#06265e 100%)}
@@ -16,57 +17,69 @@ button{font:inherit;color:inherit;cursor:pointer;border:0}
 .waves{z-index:0;position:fixed;left:0;right:0;bottom:0;height:90px;pointer-events:none;opacity:.35;
   background:repeating-radial-gradient(circle at 50% 160%,transparent 0 22px,#9fd4ff 23px 25px);animation:wv 9s linear infinite;background-size:240px 100%}
 @keyframes wv{to{background-position:240px 0}}
-h1,h2{letter-spacing:.04em}
 .btn{background:linear-gradient(#3d8bff,#1f5fd6);border:2px solid #bfe0ff;border-radius:12px;padding:10px 22px;font-weight:700;box-shadow:0 4px 0 #0b2f78;transition:.1s}
 .btn:hover{filter:brightness(1.12)}.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #0b2f78}
 .btn.gold{background:linear-gradient(#ffd95e,#e8a417);color:#3a2600;border-color:#fff3b8;box-shadow:0 4px 0 #8a5a00}
 .btn.ghost{background:#ffffff18;box-shadow:none;border-color:#ffffff55}
+.btn.sm{padding:5px 12px;font-size:13px;box-shadow:0 2px 0 #0b2f78;border-radius:9px}
 .btn[disabled]{opacity:.4;pointer-events:none}
 .tchip{display:inline-block;padding:1px 8px;border-radius:9px;font-size:11px;font-weight:700;color:#fff;text-shadow:0 1px 1px #0006;margin-right:3px}
+#loading{position:fixed;inset:0;z-index:100;background:#06122b;display:flex;align-items:center;justify-content:center;font-size:22px;text-align:center;padding:20px}
 
 /* TITLE */
-#scr-title{display:none;text-align:center}
-#scr-title.on{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+#scr-title.on{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center}
 .logo{font-size:clamp(34px,7vw,76px);font-weight:900;line-height:1;background:linear-gradient(#fff,#8fd0ff 60%,#2f7bff);-webkit-background-clip:text;color:transparent;filter:drop-shadow(0 4px 0 #04204f) drop-shadow(0 0 18px #4aa0ff)}
 .logo small{display:block;font-size:.38em;letter-spacing:.5em;color:#ffd24a;-webkit-text-fill-color:#ffd24a;margin-top:6px}
-.tag{opacity:.8;max-width:520px;padding:0 16px}
+.tag{opacity:.8;max-width:560px;padding:0 16px}
 .titlebtns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
 .gem{width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#7cc0ff 30%,#1c5fe0 70%,#06265e);box-shadow:0 0 40px #4aa0ff,inset 0 -8px 16px #0006;animation:fl 3s ease-in-out infinite}
 @keyframes fl{50%{transform:translateY(-10px)}}
+.stats-line{font-size:12px;opacity:.65}
 
 /* TEAM */
-.wrap{max-width:1180px;margin:0 auto;padding:18px 16px 40px;position:relative;z-index:1}
+.wrap{max-width:1380px;margin:0 auto;padding:18px 16px 40px;position:relative;z-index:1}
 .topbar{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
 .topbar h2{flex:1;font-size:26px}
-.team-layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px}
-@media(max-width:860px){.team-layout{grid-template-columns:1fr}}
+.team-layout{display:grid;grid-template-columns:minmax(0,1fr) 470px;gap:16px}
+@media(max-width:980px){.team-layout{grid-template-columns:1fr}}
 .panel{background:#0b1d44cc;border:2px solid #5aa6ff88;border-radius:14px;padding:12px;backdrop-filter:blur(4px)}
-.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
-.filters input{background:#04122f;border:2px solid #5aa6ff88;border-radius:8px;color:#fff;padding:6px 10px;width:150px}
-.fchip{padding:2px 9px;border-radius:9px;font-size:11px;font-weight:700;color:#fff;opacity:.55;border:2px solid transparent}
+.team-layout>.panel:last-child{position:sticky;top:10px;align-self:start;max-height:calc(100vh - 20px);overflow:auto}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center}
+.filters input[type=text]{background:#04122f;border:2px solid #5aa6ff88;border-radius:8px;color:#fff;padding:6px 10px;width:170px;user-select:text}
+.fchip{padding:2px 9px;border-radius:9px;font-size:11px;font-weight:700;color:#fff;opacity:.55;border:2px solid transparent;cursor:pointer}
 .fchip.on{opacity:1;border-color:#fff}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;max-height:calc(100vh - 210px);overflow:auto;padding-right:4px}
+.fchip.g{background:#3b5fa8}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:8px;max-height:calc(100vh - 230px);overflow:auto;padding-right:4px}
 .card{position:relative;background:linear-gradient(#17356f,#0c2150);border:2px solid #3c76d4;border-radius:10px;text-align:center;padding:4px 2px 6px;cursor:pointer;transition:.1s}
 .card:hover{transform:translateY(-2px);border-color:#bfe0ff}
-.card.sel{border-color:var(--gold);box-shadow:0 0 12px #ffd24a88}
 .card .ic{height:64px;display:flex;align-items:center;justify-content:center}
 .card .ic img{max-height:64px;max-width:80px}
-.card b{font-size:12px;display:block}
-.team-layout>.panel:last-child{position:sticky;top:10px;align-self:start;max-height:calc(100vh - 20px);overflow:auto}
-.slots{display:grid;gap:8px}
-.slot{display:flex;align-items:center;gap:8px;background:#102a5e;border:2px solid #3c76d4;border-radius:10px;padding:4px 8px;cursor:pointer;min-height:62px}
+.card b{font-size:12px;line-height:1.15;min-height:28px;display:flex;align-items:center;justify-content:center}
+.card small{position:absolute;left:5px;top:3px;font-size:10px;opacity:.6}
+.slots{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.slot{display:flex;align-items:center;gap:6px;background:#102a5e;border:2px solid #3c76d4;border-radius:10px;padding:3px 6px;cursor:pointer;min-height:54px;position:relative}
 .slot.act{border-color:var(--gold);box-shadow:0 0 10px #ffd24a77}
-.slot .ic{width:56px;height:52px;display:flex;align-items:center;justify-content:center}
-.slot .ic img{max-width:56px;max-height:52px}
-.slot .x{margin-left:auto;background:#ff4d5e;border-radius:50%;width:22px;height:22px;font-weight:900;line-height:20px}
-.slot.empty{opacity:.45;justify-content:center;font-size:13px}
-.detail{margin-top:10px;font-size:13px}
-.stat{display:flex;align-items:center;gap:6px;margin:2px 0}.stat span{width:34px;opacity:.8}
-.stat i{display:block;height:8px;border-radius:4px;background:linear-gradient(90deg,#4ade80,#facc15,#fb7185)}
-.mvgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
-.mvb{border-radius:8px;padding:5px 7px;font-size:12px;font-weight:700;color:#fff;text-shadow:0 1px 1px #0008;opacity:.45;border:2px solid transparent;text-align:left}
-.mvb.on{opacity:1;border-color:#fff}
-.mvb small{display:block;font-weight:400;opacity:.9}
+.slot .ic{width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+.slot .ic img{max-width:44px;max-height:44px}
+.slot b{font-size:12px;line-height:1.1;display:block}
+.slot .x{position:absolute;right:3px;top:3px;background:#ff4d5e;border-radius:50%;width:18px;height:18px;font-weight:900;line-height:16px;font-size:12px}
+.slot.empty{opacity:.45;justify-content:center;font-size:12px}
+.ed{margin-top:10px;font-size:13px}
+.ed h3{font-size:16px;margin-bottom:4px}
+.ed .row{display:flex;gap:8px;margin:6px 0;align-items:flex-end;flex-wrap:wrap}
+.ed label{display:flex;flex-direction:column;font-size:11px;opacity:.95;gap:2px;flex:1;min-width:90px}
+.ed input,.ed select{background:#04122f;color:#fff;border:2px solid #5aa6ff88;border-radius:8px;padding:5px 7px;width:100%;user-select:text}
+.ed input.bad{border-color:#ff5d6c}
+.ed .desc{font-size:11px;opacity:.8;margin-top:2px;min-height:14px}
+.mvrow{margin:5px 0}
+.mvrow .tags{font-size:11px;opacity:.9;margin-top:2px;min-height:15px}
+.evgrid{display:grid;grid-template-columns:34px repeat(6,1fr);gap:3px;align-items:center;text-align:center;font-size:11px}
+.evgrid input{padding:3px 2px;text-align:center}
+.evgrid .hd{opacity:.7}
+.toggle{display:flex;align-items:center;gap:6px;font-size:12px;margin:4px 0}
+.toggle input{width:auto}
+#ieBox{display:none;margin-top:8px}
+#ieBox textarea{width:100%;height:170px;background:#04122f;color:#fff;border:2px solid #5aa6ff88;border-radius:8px;padding:6px;font-size:12px;user-select:text}
 
 /* TRAINERS */
 .tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
@@ -90,30 +103,29 @@ h1,h2{letter-spacing:.04em}
 #fx{position:absolute;inset:0;pointer-events:none;z-index:9}
 .proj{position:absolute;width:42px;height:42px;margin:-21px 0 0 -21px;border-radius:50%}
 .ring{position:absolute;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:6px solid #fff}
-.float{position:absolute;font-weight:900;font-size:22px;color:#fff;text-shadow:0 0 4px #000,0 2px 0 #000;transform:translate(-50%,-50%)}
 .hud{position:absolute;z-index:8;width:330px;padding:7px 14px 8px;border-radius:8px 26px 8px 26px;background:linear-gradient(#26407a,#101d3e);border:3px solid #9fd0ff;box-shadow:0 4px 12px #0007}
-.hud .r1{display:flex;justify-content:space-between;align-items:baseline;font-weight:800;font-size:19px}
-.hud .lv{font-size:14px;color:#ffe08a}
+.hud .r1{display:flex;justify-content:space-between;align-items:baseline;font-weight:800;font-size:19px;gap:6px}
+.hud .r1 .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hud .lv{font-size:14px;color:#ffe08a;white-space:nowrap}
 .hud .hp{display:flex;align-items:center;gap:6px;margin-top:3px}
 .hud .ps{font-size:11px;font-weight:900;color:#ffb347;background:#0008;padding:0 5px;border-radius:5px}
 .hud .bar{flex:1;height:11px;border-radius:6px;background:#050a18;border:2px solid #c8dcff;overflow:hidden}
 .hud .bar i{display:block;height:100%;width:100%;background:#3ddc6b;transition:width .9s linear,background .3s}
 .hud .bar i.y{background:#f5c518}.hud .bar i.r{background:#f2453d}
-.hud .r3{display:flex;justify-content:space-between;align-items:center;margin-top:3px;min-height:18px;font-size:13px}
-.hud .st{font-size:11px;font-weight:900;padding:1px 8px;border-radius:6px;color:#fff}
+.hud .r3{display:flex;justify-content:space-between;align-items:center;margin-top:3px;min-height:18px;font-size:13px;gap:6px}
+.hud .st{font-size:11px;font-weight:900;padding:1px 8px;border-radius:6px;color:#fff;margin-right:4px}
 .balls i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-left:3px;border:2px solid #fff;background:linear-gradient(#e63946 50%,#fff 50%)}
-.balls i.dead{background:#555;border-color:#999}.balls i.none{background:transparent;border-color:#fff4}
+.balls i.dead{background:#555;border-color:#999}
 #foeHud{left:22px;top:22px}
 #plHud{left:600px;top:306px}
 #textbox{position:absolute;left:0;right:0;bottom:0;height:112px;z-index:12;background:linear-gradient(#142a5c,#07122b);border-top:4px solid #9fd0ff;display:flex}
-#msg{flex:1;padding:16px 26px;font-size:25px;line-height:1.3;text-shadow:0 2px 0 #000a}
+#msg{flex:1;padding:16px 26px;font-size:25px;line-height:1.3;text-shadow:0 2px 0 #000a;overflow:hidden}
 #cmd{display:none;width:480px;padding:8px 12px 8px 0;gap:6px;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
 #cmd.on{display:grid}
 .cbtn{border-radius:10px;font-weight:800;font-size:17px;line-height:1.1;border:3px solid #fff;color:#fff;text-shadow:0 2px 0 #0008;box-shadow:inset 0 -6px 0 #0004,0 3px 0 #0006;position:relative;text-align:left;padding:1px 12px;min-height:0;overflow:hidden}
 .cbtn:hover{filter:brightness(1.15)}
 .cbtn small{display:block;font-size:10px;font-weight:600;opacity:.95}
 .cbtn .ef{position:absolute;right:8px;top:6px;font-size:12px;font-weight:900;background:#000a;padding:0 6px;border-radius:6px}
-.cbtn.back{background:#555d6e}
 .cbtn[disabled]{opacity:.4;pointer-events:none}
 #switch{position:absolute;inset:0;z-index:20;background:#041030ee;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px}
 #switch.on{display:flex}
@@ -121,7 +133,7 @@ h1,h2{letter-spacing:.04em}
 .sgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;width:880px}
 .sc{display:flex;align-items:center;gap:8px;background:linear-gradient(#1d438d,#0e2556);border:3px solid #6fb1ff;border-radius:12px;padding:6px 10px;height:84px;text-align:left}
 .sc:hover{border-color:var(--gold)}
-.sc.cur{border-color:var(--gold)}.sc.dead{filter:grayscale(1);opacity:.5;pointer-events:none}
+.sc.dead{filter:grayscale(1);opacity:.5;pointer-events:none}
 .sc .ic{width:56px;height:56px;display:flex;align-items:center;justify-content:center}
 .sc .ic img{max-width:56px;max-height:56px}
 .sc b{font-size:15px}.sc .mini{height:8px;width:120px;background:#050a18;border-radius:4px;overflow:hidden;margin-top:3px}
@@ -143,27 +155,30 @@ h1,h2{letter-spacing:.04em}
 @keyframes rain{to{background-position:-30px 60px,0 0}}
 #wx.sun{opacity:1;background:radial-gradient(circle at 85% 0,#ffd76acc,#ffb34733 45%,transparent 72%)}
 #wx.sand{opacity:1;background:repeating-linear-gradient(170deg,#e0b86a22 0 6px,#c9974a33 6px 9px),#c9974a33;animation:sand 1s linear infinite}
+#wx.snow{opacity:1;background:repeating-linear-gradient(100deg,transparent 0 22px,#ffffff88 22px 24px),#cfe9ff33;animation:rain .9s linear infinite}
 @keyframes sand{to{background-position:60px 0,0 0}}
 #wlabel{position:absolute;left:26px;top:134px;z-index:8;font-weight:800;font-size:15px;text-shadow:0 2px 2px #000}
 .tbtn{position:absolute;z-index:3;background:#0009;border:2px solid #fff8;border-radius:8px;padding:4px 10px;font-weight:700;font-size:14px;color:#fff}
-.tbtn.mega{background:#5a2bb8;border-color:#d9c2ff}
-.tbtn.mega.on{background:linear-gradient(#ff8ad8,#8a4bff);box-shadow:0 0 12px #ff8ad8}
-#textbox.mv #msg{padding-left:170px;font-size:19px}
-.isel{background:#04122f;color:#fff;border:2px solid #5aa6ff88;border-radius:8px;padding:5px;width:100%;margin:4px 0}
-.abx{font-size:12px;opacity:.95;margin:6px 0}
+.tbtn.ext{background:#5a2bb8;border-color:#d9c2ff;font-size:12px;padding:3px 8px}
+.tbtn.ext.on{background:linear-gradient(#ff8ad8,#8a4bff);box-shadow:0 0 12px #ff8ad8}
+#textbox.mv #msg{padding-left:190px;font-size:19px}
 </style>
 </head>
 <body>
+<div id="loading">Cargando datos de Pokémon…</div>
+<datalist id="dl-moves"></datalist>
+<datalist id="dl-items"></datalist>
 
 <section id="scr-title" class="screen on">
   <div class="gem"></div>
   <div class="logo">POKÉMON<small>ZAFIRO ALFA · DUELOS</small></div>
-  <p class="tag">Elige tu equipo de hasta 6 Pokémon y enfréntate a los líderes de gimnasio, a la Liga y a los villanos de Hoenn con gráficos 3D de sexta generación.</p>
+  <p class="tag">Forma tu equipo con cualquier Pokémon de cualquier generación, con cualquier movimiento, habilidad y objeto, y combate con las reglas completas del simulador de Pokémon Showdown.</p>
   <div class="titlebtns">
     <button class="btn gold" id="goTeam">⚔ Elegir equipo</button>
     <button class="btn" id="goTrainers">Ir a combatir</button>
     <button class="btn gold" data-league>🏆 Desafío de la Liga</button>
   </div>
+  <div class="stats-line" id="dataStats"></div>
   <div class="waves"></div>
 </section>
 
@@ -173,16 +188,19 @@ h1,h2{letter-spacing:.04em}
       <button class="btn ghost" data-go="title">← Inicio</button>
       <h2>Tu equipo</h2>
       <button class="btn ghost" id="randTeam">🎲 Aleatorio</button>
+      <button class="btn ghost" id="ieBtn">📋 Importar / Exportar</button>
       <button class="btn gold" id="teamOk" disabled>Elegir rival →</button>
     </div>
     <div class="team-layout">
       <div class="panel">
-        <div class="filters"><input id="q" placeholder="Buscar…"><span id="tf"></span></div>
+        <div class="filters"><input type="text" id="q" placeholder="Buscar Pokémon o nº…"><span id="gf"></span></div>
+        <div class="filters" id="tf"></div>
         <div class="grid" id="roster"></div>
       </div>
       <div class="panel">
         <div class="slots" id="slots"></div>
-        <div class="detail" id="detail"></div>
+        <div id="ieBox"><textarea id="ieText" spellcheck="false" placeholder="Pega aquí un equipo en formato Showdown (en inglés)"></textarea><div style="display:flex;gap:8px;margin-top:6px"><button class="btn sm" id="ieImport">Importar</button><button class="btn sm ghost" id="ieExport">Exportar mi equipo</button></div></div>
+        <div class="ed" id="editor"></div>
       </div>
     </div>
   </div>
@@ -194,6 +212,7 @@ h1,h2{letter-spacing:.04em}
     <div class="topbar">
       <button class="btn ghost" data-go="team">← Equipo</button>
       <h2>Elige a tu rival</h2>
+      <button class="btn ghost" id="randBattle">🎲 Rival aleatorio</button>
       <button class="btn gold" data-league>🏆 Desafío de la Liga</button>
       <span id="myTeamPrev"></span>
     </div>
@@ -220,446 +239,265 @@ h1,h2{letter-spacing:.04em}
   </div>
 </section>
 
+<script src="lib/pkmn.bundle.js"></script>
 <script>
-/* ================= DATOS ================= */
-const TYPES={normal:['Normal','#a8a878'],fire:['Fuego','#f08030'],water:['Agua','#6890f0'],electric:['Eléctrico','#e8b800'],grass:['Planta','#78c850'],ice:['Hielo','#7cc8c8'],fighting:['Lucha','#c03028'],poison:['Veneno','#a040a0'],ground:['Tierra','#c8a040'],flying:['Volador','#8f78e8'],psychic:['Psíquico','#f85888'],bug:['Bicho','#a8b820'],rock:['Roca','#b8a038'],ghost:['Fantasma','#705898'],dragon:['Dragón','#7038f8'],dark:['Siniestro','#705848'],steel:['Acero','#8a8aa8'],fairy:['Hada','#e87a95']};
-// [superefectivo, poco eficaz, inmune]
-const CH={normal:['','rock steel','ghost'],fire:['grass ice bug steel','fire water rock dragon',''],water:['fire ground rock','water grass dragon',''],electric:['water flying','electric grass dragon','ground'],grass:['water ground rock','fire grass poison flying bug dragon steel',''],ice:['grass ground flying dragon','fire water ice steel',''],fighting:['normal ice rock dark steel','poison flying psychic bug fairy','ghost'],poison:['grass fairy','poison ground rock ghost','steel'],ground:['fire electric poison rock steel','grass bug','flying'],flying:['grass fighting bug','electric rock steel',''],psychic:['fighting poison','psychic steel','dark'],bug:['grass psychic dark','fire fighting poison flying ghost steel fairy',''],rock:['fire ice flying bug','fighting ground steel',''],ghost:['psychic ghost','dark','normal'],dragon:['dragon','steel','fairy'],dark:['psychic ghost','fighting dark fairy',''],steel:['ice rock fairy','fire water electric steel',''],fairy:['fighting dragon dark','fire poison steel','']};
-function eff(t,def){let m=1;for(const d of def){const c=CH[t];if(c[2].split(' ').includes(d))return 0;if(c[0].split(' ').includes(d))m*=2;else if(c[1].split(' ').includes(d))m*=.5}return m}
+'use strict';
+if(typeof PKMN==='undefined'){document.getElementById('loading').innerHTML='No se pudo cargar <b>lib/pkmn.bundle.js</b>.<br>Abre la carpeta completa del proyecto (no solo index.html).'}
+else main();
+function main(){
+const {Dex,Teams,BattleStreams,toID,LogFormatter,Protocol,NAMES}=PKMN;
+const {BattleStream,getPlayerStreams}=BattleStreams;
+const CUR={"Blaziken":["flareblitz","closecombat","bravebird","swordsdance","stoneedge","flamethrower"],"Swampert":["waterfall","earthquake","icepunch","stoneedge","surf","toxic"],"Sceptile":["leafblade","dragonpulse","gigadrain","earthquake","focusblast","energyball"],"Gardevoir":["moonblast","psychic","shadowball","thunderbolt","calmmind","willowisp"],"Salamence":["dragonclaw","bravebird","earthquake","flamethrower","dragondance","fireblast"],"Metagross":["ironhead","zenheadbutt","earthquake","icepunch","bulletpunch","stoneedge"],"Aggron":["ironhead","stoneedge","earthquake","rockslide","icepunch","firepunch"],"Flygon":["earthquake","dragonclaw","firepunch","rockslide","aerialace","dragondance"],"Milotic":["surf","icebeam","recover","toxic","hydropump","dragonpulse"],"Absol":["nightslash","suckerpunch","swordsdance","closecombat","stoneedge","aerialace"],"Gengar":["shadowball","sludgebomb","thunderbolt","focusblast","willowisp","darkpulse"],"Charizard":["flamethrower","airslash","dragonpulse","roost","fireblast","focusblast"],"Garchomp":["dragonclaw","earthquake","stoneedge","swordsdance","firepunch","ironhead"],"Lucario":["aurasphere","flashcannon","closecombat","dragonpulse","swordsdance","extremespeed"],"Pikachu":["thunderbolt","quickattack","ironhead","thunderwave","wildcharge","thunder"],"Tyranitar":["stoneedge","crunch","earthquake","fireblast","icepunch","darkpulse"],"Gyarados":["waterfall","crunch","earthquake","stoneedge","dragondance","icepunch"],"Alakazam":["psychic","shadowball","focusblast","recover","calmmind","energyball"],"Scizor":["bulletpunch","xscissor","swordsdance","ironhead","aerialace","roost"],"Heracross":["megahorn","closecombat","stoneedge","earthquake","swordsdance","rockslide"],"Togekiss":["airslash","moonblast","aurasphere","roost","thunderwave","flamethrower"],"Greninja":["hydropump","darkpulse","icebeam","surf","nightslash","gigadrain"],"Sylveon":["moonblast","hypervoice","shadowball","calmmind","quickattack","psychic"],"Arcanine":["flareblitz","extremespeed","closecombat","crunch","flamethrower","wildcharge"],"Snorlax":["bodyslam","earthquake","crunch","icepunch","firepunch"],"Blastoise":["hydropump","icebeam","flashcannon","darkpulse","surf","toxic"],"Venusaur":["gigadrain","sludgebomb","earthquake","sleeppowder","energyball","toxic"],"Dragonite":["dragonclaw","firepunch","earthquake","extremespeed","dragondance","bravebird"],"Latios":["dragonpulse","psychic","surf","thunderbolt","calmmind","shadowball"],"Latias":["dragonpulse","psychic","surf","thunderbolt","calmmind","recover"],"Mewtwo":["psychic","aurasphere","icebeam","fireblast","calmmind","shadowball"],"Rayquaza":["dragonclaw","earthquake","extremespeed","flamethrower","dragondance","airslash"],"Probopass":["flashcannon","stoneedge","thunderwave","earthquake"],"Golem":["earthquake","stoneedge","rockslide","firepunch","icepunch"],"Rhyperior":["earthquake","stoneedge","megahorn","icepunch","rockslide","firepunch"],"Aerodactyl":["stoneedge","earthquake","bravebird","firepunch","aerialace"],"Hariyama":["closecombat","icepunch","stoneedge","bulletpunch","earthquake","firepunch"],"Medicham":["closecombat","zenheadbutt","icepunch","firepunch","bulletpunch"],"Machamp":["closecombat","stoneedge","earthquake","icepunch","firepunch","bulletpunch"],"Manectric":["thunderbolt","flamethrower","thunderwave","energyball","thunder"],"Electivire":["wildcharge","icepunch","earthquake","firepunch","thunderbolt"],"Raichu":["thunderbolt","surf","quickattack","thunderwave","focusblast"],"Magnezone":["thunderbolt","flashcannon","thunderwave","thunder"],"Jolteon":["thunderbolt","shadowball","energyball","thunderwave","quickattack"],"Torkoal":["flamethrower","fireblast","earthquake","toxic","willowisp"],"Camerupt":["earthquake","fireblast","stoneedge","flamethrower"],"Ninetales":["flamethrower","willowisp","energyball","shadowball"],"Typhlosion":["flamethrower","fireblast","focusblast","earthquake"],"Slaking":["bodyslam","earthquake","firepunch","closecombat"],"Kangaskhan":["bodyslam","earthquake","crunch","firepunch","icepunch"],"Staraptor":["bravebird","closecombat","quickattack","earthquake"],"Altaria":["dragonpulse","airslash","flamethrower","roost","dragondance","earthquake"],"Skarmory":["bravebird","ironhead","roost","toxic","stoneedge"],"Swellow":["bravebird","bodyslam","quickattack","aerialace","swordsdance"],"Pelipper":["hydropump","surf","airslash","icebeam","roost"],"Lunatone":["psychic","rockslide","shadowball","calmmind","icebeam"],"Solrock":["stoneedge","zenheadbutt","earthquake","firepunch","rockslide"],"Claydol":["earthquake","psychic","icebeam","stoneedge","energyball"],"Ludicolo":["surf","gigadrain","icebeam","energyball","hydropump"],"Whiscash":["earthquake","waterfall","icebeam","stoneedge","surf"],"Cradily":["gigadrain","stoneedge","earthquake","rockslide","energyball","toxic"],"Armaldo":["stoneedge","xscissor","earthquake","swordsdance","rockslide","aerialace"],"Crobat":["bravebird","airslash","sludgebomb","toxic","roost","crunch"],"Houndoom":["darkpulse","flamethrower","sludgebomb","fireblast"],"Sharpedo":["waterfall","crunch","icebeam","earthquake"],"Mightyena":["crunch","suckerpunch","firepunch","earthquake","icepunch"],"Breloom":["seedbomb","machpunch","closecombat","swordsdance","stoneedge","spore"],"Shiftry":["leafblade","nightslash","suckerpunch","swordsdance","leafstorm","iceshard"],"Mawile":["ironhead","playrough","suckerpunch","firepunch","swordsdance","icepunch"],"Starmie":["hydropump","psychic","icebeam","thunderbolt","scald","recover"],"Gallade":["closecombat","zenheadbutt","nightslash","swordsdance","xscissor","stoneedge"],"Infernape":["flareblitz","closecombat","machpunch","earthquake","overheat","stoneedge"],"Empoleon":["hydropump","flashcannon","icebeam","scald","surf","toxic"],"Torterra":["earthquake","seedbomb","stoneedge","swordsdance"],"Luxray":["wildcharge","crunch","icepunch","firepunch","thunderpunch"],"Roserade":["energyball","sludgebomb","leafstorm","sleeppowder","shadowball"],"Weavile":["iceshard","icepunch","knockoff","suckerpunch","swordsdance","nightslash"],"Mamoswine":["earthquake","iceshard","icepunch","stoneedge","knockoff"],"Vaporeon":["scald","icebeam","recover","hydropump","surf"],"Flareon":["flareblitz","bodyslam","quickattack","firepunch","superpower"],"Espeon":["psychic","shadowball","calmmind","thunderbolt","energyball"],"Umbreon":["darkpulse","toxic","recover","willowisp","suckerpunch"],"Hydreigon":["darkpulse","dracometeor","flamethrower","earthpower","dragonpulse","focusblast"],"Volcarona":["bugbuzz","fireblast","gigadrain","hurricane","calmmind","flamethrower"],"Excadrill":["earthquake","ironhead","rockslide","swordsdance","stoneedge"],"Conkeldurr":["closecombat","machpunch","stoneedge","icepunch","firepunch","earthquake"],"Chandelure":["shadowball","fireblast","energyball","flamethrower","darkpulse","psychic"],"Haxorus":["dragonclaw","earthquake","swordsdance","superpower","stoneedge","firepunch"],"Serperior":["leafstorm","gigadrain","dragonpulse","hurricane","energyball","sleeppowder"],"Goodra":["dragonpulse","dracometeor","thunderbolt","fireblast","icebeam","sludgebomb"],"Talonflame":["bravebird","flareblitz","roost","swordsdance","flamethrower","hurricane"],"Bisharp":["suckerpunch","ironhead","knockoff","swordsdance","closecombat"],"Ferrothorn":["seedbomb","ironhead","gigadrain","toxic","leafstorm"],"Kyogre":["originpulse","icebeam","thunder","calmmind","surf"],"Groudon":["precipiceblades","firepunch","stoneedge","swordsdance","earthquake"],"Lugia":["aeroblast","psychic","icebeam","recover","surf"],"Ho-Oh":["sacredfire","bravebird","earthquake","recover","stoneedge"],"Zapdos":["thunderbolt","hurricane","roost","thunder","flamethrower"],"Moltres":["flamethrower","hurricane","roost","fireblast"],"Articuno":["icebeam","hurricane","roost","airslash","blizzard"],"Suicune":["surf","icebeam","calmmind","recover","scald"],"Raikou":["thunderbolt","shadowball","calmmind","aurasphere"],"Banette":["shadowclaw","suckerpunch","willowisp","swordsdance","icepunch","firepunch"],"Mismagius":["shadowball","thunderbolt","psychic","willowisp","darkpulse","energyball"],"Dusknoir":["shadowclaw","earthquake","icepunch","firepunch","willowisp"],"Glalie":["icebeam","earthquake","iceshard","crunch","shadowball"],"Walrein":["icebeam","surf","earthquake","toxic","recover"],"Froslass":["icebeam","shadowball","willowisp","iceshard"]};
 
-const MV={};
-function M(k,n,t,c,p,a,pp,o={}){MV[k]={k,n,t,c,p,a,pp,...o}}
-// c: p físico, s especial, x estado
-M('flamethrower','Lanzallamas','fire','s',90,100,15,{st:['brn',10]});
-M('fireblast','Llamarada','fire','s',110,85,5,{st:['brn',10]});
-M('flareblitz','Envite Ígneo','fire','p',120,100,15,{recoil:1/3,st:['brn',10]});
-M('firepunch','Puño Fuego','fire','p',75,100,15,{st:['brn',10]});
-M('willowisp','Fuego Fatuo','fire','x',0,85,15,{inf:'brn'});
-M('surf','Surf','water','s',90,100,15);
-M('hydropump','Hidrobomba','water','s',110,80,5);
-M('waterfall','Cascada','water','p',80,100,15);
-M('icebeam','Rayo Hielo','ice','s',90,100,10,{st:['frz',10]});
-M('icepunch','Puño Hielo','ice','p',75,100,15,{st:['frz',10]});
-M('thunderbolt','Rayo','electric','s',90,100,15,{st:['par',10]});
-M('thunder','Trueno','electric','s',110,70,10,{st:['par',30]});
-M('thunderwave','Onda Trueno','electric','x',0,90,20,{inf:'par'});
-M('wildcharge','Voltio Cruel','electric','p',90,100,15,{recoil:.25});
-M('gigadrain','Gigadrenado','grass','s',75,100,10,{drain:.5});
-M('energyball','Energibola','grass','s',90,100,10);
-M('leafblade','Hoja Aguda','grass','p',90,100,15);
-M('sleeppowder','Somnífero','grass','x',0,75,15,{inf:'slp'});
-M('closecombat','A Bocajarro','fighting','p',120,100,5,{bo:[['def',-1,100,1],['spd',-1,100,1]]});
-M('aurasphere','Esfera Aural','fighting','s',80,0,20,{never:1});
-M('focusblast','Onda Certera','fighting','s',120,70,5);
-M('bravebird','Pájaro Osado','flying','p',120,100,15,{recoil:1/3});
-M('airslash','Aire Afilado','flying','s',75,95,15);
-M('aerialace','Golpe Aéreo','flying','p',60,0,20,{never:1});
-M('sludgebomb','Bomba Lodo','poison','s',90,100,10,{st:['psn',30]});
-M('toxic','Tóxico','poison','x',0,90,10,{inf:'tox'});
-M('earthquake','Terremoto','ground','p',100,100,10);
-M('stoneedge','Roca Afilada','rock','p',100,80,5);
-M('rockslide','Avalancha','rock','p',75,90,10);
-M('megahorn','Megacuerno','bug','p',120,85,10);
-M('xscissor','Tijera X','bug','p',80,100,15);
-M('shadowball','Bola Sombra','ghost','s',80,100,15,{bo:[['spd',-1,20,0]]});
-M('dragonclaw','Garra Dragón','dragon','p',80,100,15);
-M('dragonpulse','Pulso Dragón','dragon','s',85,100,10);
-M('dragondance','Danza Dragón','dragon','x',0,0,20,{bo:[['atk',1,100,1],['spe',1,100,1]]});
-M('crunch','Triturar','dark','p',80,100,15,{bo:[['def',-1,20,0]]});
-M('darkpulse','Pulso Umbrío','dark','s',80,100,15);
-M('suckerpunch','Golpe Bajo','dark','p',70,100,5,{pr:1});
-M('nightslash','Tajo Umbrío','dark','p',70,100,15);
-M('ironhead','Cabeza de Hierro','steel','p',80,100,15);
-M('flashcannon','Foco Resplandor','steel','s',80,100,10,{bo:[['spd',-1,10,0]]});
-M('bulletpunch','Puño Bala','steel','p',40,100,30,{pr:1});
-M('psychic','Psíquico','psychic','s',90,100,10,{bo:[['spd',-1,10,0]]});
-M('zenheadbutt','Cabezazo Zen','psychic','p',80,90,15);
-M('calmmind','Paz Mental','psychic','x',0,0,20,{bo:[['spa',1,100,1],['spd',1,100,1]]});
-M('moonblast','Fuerza Lunar','fairy','s',95,100,15,{bo:[['spa',-1,30,0]]});
-M('bodyslam','Golpe Cuerpo','normal','p',85,100,15,{st:['par',30]});
-M('hypervoice','Vozarrón','normal','s',90,100,10);
-M('quickattack','Ataque Rápido','normal','p',40,100,30,{pr:1});
-M('extremespeed','Velocidad Extrema','normal','p',80,100,5,{pr:2});
-M('recover','Recuperación','normal','x',0,0,10,{heal:.5});
-M('roost','Respiro','flying','x',0,0,10,{heal:.5});
-M('swordsdance','Danza Espada','normal','x',0,0,20,{bo:[['atk',2,100,1]]});
-M('seedbomb','Bomba Germen','grass','p',80,100,15);
-M('machpunch','Puño Certero','fighting','p',40,100,30,{pr:1});
-M('poisonjab','Puya Nociva','poison','p',80,100,20,{st:['psn',30]});
-M('hurricane','Vendaval','flying','s',110,70,10);
-M('playrough','Carantoña','fairy','p',90,90,10);
-M('dracometeor','Cometa Draco','dragon','s',130,90,5,{bo:[['spa',-2,100,1]]});
-M('overheat','Sofoco','fire','s',130,90,5,{bo:[['spa',-2,100,1]]});
-M('leafstorm','Lluevehojas','grass','s',130,90,5,{bo:[['spa',-2,100,1]]});
-M('superpower','Fuerza Bruta','fighting','p',120,100,5,{bo:[['atk',-1,100,1],['def',-1,100,1]]});
-M('scald','Escaldar','water','s',80,100,15,{st:['brn',30]});
-M('iceshard','Esquirla Helada','ice','p',40,100,30,{pr:1});
-M('aquajet','Acua Jet','water','p',40,100,20,{pr:1});
-M('spore','Espora','grass','x',0,100,15,{inf:'slp'});
-M('rest','Descanso','psychic','x',0,0,10,{rest:1});
-M('earthpower','Tierra Viva','ground','s',90,100,10,{bo:[['spd',-1,10,0]]});
-M('shadowclaw','Garra Umbría','ghost','p',70,100,15);
-M('thunderpunch','Puño Trueno','electric','p',75,100,15,{st:['par',10]});
-M('bugbuzz','Zumbido','bug','s',90,100,10,{bo:[['spd',-1,10,0]]});
-M('knockoff','Desarme','dark','p',65,100,20);
-M('blizzard','Ventisca','ice','s',110,70,5,{st:['frz',10]});
-M('originpulse','Pulso Origen','water','s',110,85,10);
-M('precipice','Filo del Abismo','ground','p',120,85,10);
-M('aeroblast','Aerochorro','flying','s',100,95,5);
-M('sacredfire','Fuego Sagrado','fire','s',100,95,5,{st:['brn',50]});
-const IMM={tox:['steel','poison'],psn:['steel','poison'],brn:['fire'],par:['electric'],frz:['ice'],slp:[]};
-
-const DEX={};
-function D(n,t,b,m){DEX[n]={n,id:n.toLowerCase().replace(/[^a-z0-9]/g,''),t:t.split('/'),b:b.split(',').map(Number),m:m.split(' ')}}
-D('Blaziken','fire/fighting','80,120,70,110,70,80','flareblitz closecombat bravebird swordsdance stoneedge flamethrower');
-D('Swampert','water/ground','100,110,90,85,90,60','waterfall earthquake icepunch stoneedge surf toxic');
-D('Sceptile','grass','70,85,65,105,85,120','leafblade dragonpulse gigadrain earthquake focusblast energyball');
-D('Gardevoir','psychic/fairy','68,65,65,125,115,80','moonblast psychic shadowball thunderbolt calmmind willowisp');
-D('Salamence','dragon/flying','95,135,80,110,80,100','dragonclaw bravebird earthquake flamethrower dragondance fireblast');
-D('Metagross','steel/psychic','80,135,130,95,90,70','ironhead zenheadbutt earthquake icepunch bulletpunch stoneedge');
-D('Aggron','steel/rock','70,110,180,60,60,50','ironhead stoneedge earthquake rockslide icepunch firepunch');
-D('Flygon','ground/dragon','80,100,80,80,80,100','earthquake dragonclaw firepunch rockslide aerialace dragondance');
-D('Milotic','water','95,60,79,100,125,81','surf icebeam recover toxic hydropump dragonpulse');
-D('Absol','dark','65,130,60,75,60,75','nightslash suckerpunch swordsdance closecombat stoneedge aerialace');
-D('Gengar','ghost/poison','60,65,60,130,75,110','shadowball sludgebomb thunderbolt focusblast willowisp darkpulse');
-D('Charizard','fire/flying','78,84,78,109,85,100','flamethrower airslash dragonpulse roost fireblast focusblast');
-D('Garchomp','dragon/ground','108,130,95,80,85,102','dragonclaw earthquake stoneedge swordsdance firepunch ironhead');
-D('Lucario','fighting/steel','70,110,70,115,70,90','aurasphere flashcannon closecombat dragonpulse swordsdance extremespeed');
-D('Pikachu','electric','35,55,40,50,50,90','thunderbolt quickattack ironhead thunderwave wildcharge thunder');
-D('Tyranitar','rock/dark','100,134,110,95,100,61','stoneedge crunch earthquake fireblast icepunch darkpulse');
-D('Gyarados','water/flying','95,125,79,60,100,81','waterfall crunch earthquake stoneedge dragondance icepunch');
-D('Alakazam','psychic','55,50,45,135,95,120','psychic shadowball focusblast recover calmmind energyball');
-D('Scizor','bug/steel','70,130,100,55,80,65','bulletpunch xscissor swordsdance ironhead aerialace roost');
-D('Heracross','bug/fighting','80,125,75,40,95,85','megahorn closecombat stoneedge earthquake swordsdance rockslide');
-D('Togekiss','fairy/flying','85,50,95,120,115,80','airslash moonblast aurasphere roost thunderwave flamethrower');
-D('Greninja','water/dark','72,95,67,103,71,122','hydropump darkpulse icebeam surf nightslash gigadrain');
-D('Sylveon','fairy','95,65,65,110,130,60','moonblast hypervoice shadowball calmmind quickattack psychic');
-D('Arcanine','fire','90,110,80,100,80,95','flareblitz extremespeed closecombat crunch flamethrower wildcharge');
-D('Snorlax','normal','160,110,65,65,110,30','bodyslam earthquake crunch icepunch firepunch');
-D('Blastoise','water','79,83,100,85,105,78','hydropump icebeam flashcannon darkpulse surf toxic');
-D('Venusaur','grass/poison','80,82,83,100,100,80','gigadrain sludgebomb earthquake sleeppowder energyball toxic');
-D('Dragonite','dragon/flying','91,134,95,100,100,80','dragonclaw firepunch earthquake extremespeed dragondance bravebird');
-D('Latios','dragon/psychic','80,90,80,130,110,110','dragonpulse psychic surf thunderbolt calmmind shadowball');
-D('Latias','dragon/psychic','80,80,90,110,130,110','dragonpulse psychic surf thunderbolt calmmind recover');
-D('Mewtwo','psychic','106,110,90,154,90,130','psychic aurasphere icebeam fireblast calmmind shadowball');
-D('Rayquaza','dragon/flying','105,150,90,150,90,95','dragonclaw earthquake extremespeed flamethrower dragondance airslash');
-D('Probopass','rock/steel','60,55,145,75,150,40','flashcannon stoneedge thunderwave earthquake');
-D('Golem','rock/ground','80,120,130,55,65,45','earthquake stoneedge rockslide firepunch icepunch');
-D('Rhyperior','ground/rock','115,140,130,55,55,40','earthquake stoneedge megahorn icepunch rockslide firepunch');
-D('Aerodactyl','rock/flying','80,105,65,60,75,130','stoneedge earthquake bravebird firepunch aerialace');
-D('Hariyama','fighting','144,120,60,40,60,50','closecombat icepunch stoneedge bulletpunch earthquake firepunch');
-D('Medicham','fighting/psychic','60,60,75,60,75,80','closecombat zenheadbutt icepunch firepunch bulletpunch');
-D('Machamp','fighting','90,130,80,65,85,55','closecombat stoneedge earthquake icepunch firepunch bulletpunch');
-D('Manectric','electric','70,75,60,105,60,105','thunderbolt flamethrower thunderwave energyball thunder');
-D('Electivire','electric','75,123,67,95,85,95','wildcharge icepunch earthquake firepunch thunderbolt');
-D('Raichu','electric','60,90,55,90,80,110','thunderbolt surf quickattack thunderwave focusblast');
-D('Magnezone','electric/steel','70,70,115,130,90,60','thunderbolt flashcannon thunderwave thunder');
-D('Jolteon','electric','65,65,60,110,95,130','thunderbolt shadowball energyball thunderwave quickattack');
-D('Torkoal','fire','70,85,140,85,70,20','flamethrower fireblast earthquake toxic willowisp');
-D('Camerupt','fire/ground','70,100,70,105,75,40','earthquake fireblast stoneedge flamethrower');
-D('Ninetales','fire','73,76,75,81,100,100','flamethrower willowisp energyball shadowball');
-D('Typhlosion','fire','78,84,78,109,85,100','flamethrower fireblast focusblast earthquake');
-D('Slaking','normal','150,160,100,95,65,100','bodyslam earthquake firepunch closecombat');
-D('Kangaskhan','normal','105,95,80,40,80,90','bodyslam earthquake crunch firepunch icepunch');
-D('Staraptor','normal/flying','85,120,70,50,60,100','bravebird closecombat quickattack earthquake');
-D('Altaria','dragon/flying','75,70,90,70,105,80','dragonpulse airslash flamethrower roost dragondance earthquake');
-D('Skarmory','steel/flying','65,80,140,40,70,70','bravebird ironhead roost toxic stoneedge');
-D('Swellow','normal/flying','60,85,60,75,50,125','bravebird bodyslam quickattack aerialace swordsdance');
-D('Pelipper','water/flying','60,50,100,95,70,65','hydropump surf airslash icebeam roost');
-D('Lunatone','rock/psychic','90,55,65,95,85,70','psychic rockslide shadowball calmmind icebeam');
-D('Solrock','rock/psychic','90,95,85,55,65,70','stoneedge zenheadbutt earthquake firepunch rockslide');
-D('Claydol','ground/psychic','60,70,105,70,120,75','earthquake psychic icebeam stoneedge energyball');
-D('Ludicolo','water/grass','80,70,70,90,100,70','surf gigadrain icebeam energyball hydropump');
-D('Whiscash','water/ground','110,78,73,76,71,60','earthquake waterfall icebeam stoneedge surf');
-D('Cradily','rock/grass','86,81,97,81,107,43','gigadrain stoneedge earthquake rockslide energyball toxic');
-D('Armaldo','rock/bug','75,125,100,70,80,45','stoneedge xscissor earthquake swordsdance rockslide aerialace');
-D('Crobat','poison/flying','85,90,80,70,80,130','bravebird airslash sludgebomb toxic roost crunch');
-D('Houndoom','dark/fire','75,90,50,110,80,95','darkpulse flamethrower sludgebomb fireblast');
-D('Sharpedo','water/dark','70,120,40,95,40,95','waterfall crunch icebeam earthquake');
-D('Mightyena','dark','70,90,70,60,60,70','crunch suckerpunch firepunch earthquake icepunch');
-D('Breloom','grass/fighting','60,130,80,60,60,70','seedbomb machpunch closecombat swordsdance stoneedge spore');
-D('Shiftry','grass/dark','90,100,60,90,60,80','leafblade nightslash suckerpunch swordsdance leafstorm iceshard');
-D('Mawile','steel/fairy','50,85,85,55,55,50','ironhead playrough suckerpunch firepunch swordsdance icepunch');
-D('Starmie','water/psychic','60,75,85,100,85,115','hydropump psychic icebeam thunderbolt scald recover');
-D('Gallade','psychic/fighting','68,125,65,65,115,80','closecombat zenheadbutt nightslash swordsdance xscissor stoneedge');
-D('Infernape','fire/fighting','76,104,71,104,71,108','flareblitz closecombat machpunch earthquake overheat stoneedge');
-D('Empoleon','water/steel','84,86,88,111,101,60','hydropump flashcannon icebeam scald surf toxic');
-D('Torterra','grass/ground','95,109,105,75,85,56','earthquake seedbomb stoneedge swordsdance');
-D('Luxray','electric','80,120,79,95,79,70','wildcharge crunch icepunch firepunch thunderpunch');
-D('Roserade','grass/poison','60,70,55,125,105,90','energyball sludgebomb leafstorm sleeppowder shadowball');
-D('Weavile','dark/ice','70,120,65,45,85,125','iceshard icepunch knockoff suckerpunch swordsdance nightslash');
-D('Mamoswine','ice/ground','110,130,80,70,60,80','earthquake iceshard icepunch stoneedge knockoff');
-D('Vaporeon','water','130,65,60,110,95,65','scald icebeam recover hydropump surf');
-D('Flareon','fire','65,130,60,95,110,65','flareblitz bodyslam quickattack firepunch superpower');
-D('Espeon','psychic','65,65,60,130,95,110','psychic shadowball calmmind thunderbolt energyball');
-D('Umbreon','dark','95,65,110,60,130,65','darkpulse toxic recover willowisp suckerpunch');
-D('Hydreigon','dark/dragon','92,105,90,125,90,98','darkpulse dracometeor flamethrower earthpower dragonpulse focusblast');
-D('Volcarona','bug/fire','85,60,65,135,105,100','bugbuzz fireblast gigadrain hurricane calmmind flamethrower');
-D('Excadrill','ground/steel','110,135,60,50,65,88','earthquake ironhead rockslide swordsdance stoneedge');
-D('Conkeldurr','fighting','105,140,95,55,65,45','closecombat machpunch stoneedge icepunch firepunch earthquake');
-D('Chandelure','ghost/fire','60,55,90,145,90,80','shadowball fireblast energyball flamethrower darkpulse psychic');
-D('Haxorus','dragon','76,147,90,60,70,97','dragonclaw earthquake swordsdance superpower stoneedge firepunch');
-D('Serperior','grass','75,75,95,75,95,113','leafstorm gigadrain dragonpulse hurricane energyball sleeppowder');
-D('Goodra','dragon','90,100,70,110,150,80','dragonpulse dracometeor thunderbolt fireblast icebeam sludgebomb');
-D('Talonflame','fire/flying','78,81,71,74,69,126','bravebird flareblitz roost swordsdance flamethrower hurricane');
-D('Bisharp','dark/steel','65,125,100,60,70,70','suckerpunch ironhead knockoff swordsdance closecombat');
-D('Ferrothorn','grass/steel','74,94,131,54,116,20','seedbomb ironhead gigadrain toxic leafstorm');
-D('Kyogre','water','100,100,90,150,140,90','originpulse icebeam thunder calmmind surf');
-D('Groudon','ground','100,150,140,100,90,90','precipice firepunch stoneedge swordsdance earthquake');
-D('Lugia','psychic/flying','106,90,130,90,154,110','aeroblast psychic icebeam recover surf');
-D('Ho-Oh','fire/flying','106,130,90,110,154,90','sacredfire bravebird earthquake recover stoneedge');
-D('Zapdos','electric/flying','90,90,85,125,90,100','thunderbolt hurricane roost thunder flamethrower');
-D('Moltres','fire/flying','90,100,90,125,85,90','flamethrower hurricane roost fireblast');
-D('Articuno','ice/flying','90,85,100,95,125,85','icebeam hurricane roost airslash blizzard');
-D('Suicune','water','100,75,115,90,115,85','surf icebeam calmmind recover scald');
-D('Raikou','electric','90,85,75,115,100,115','thunderbolt shadowball calmmind aurasphere');
-D('Banette','ghost','64,115,65,83,63,65','shadowclaw suckerpunch willowisp swordsdance icepunch firepunch');
-D('Mismagius','ghost','60,60,60,105,105,105','shadowball thunderbolt psychic willowisp darkpulse energyball');
-D('Dusknoir','ghost','45,100,135,65,135,45','shadowclaw earthquake icepunch firepunch willowisp');
-D('Glalie','ice','80,80,80,80,80,80','icebeam earthquake iceshard crunch shadowball');
-D('Walrein','ice/water','110,80,90,95,90,65','icebeam surf earthquake toxic recover');
-D('Froslass','ice/ghost','70,80,70,80,70,110','icebeam shadowball willowisp iceshard');
-
-/* ---- Habilidades ---- */
-const AB={Blaziken:'blaze',Charizard:'blaze',Typhlosion:'blaze',Infernape:'blaze',Talonflame:'blaze',Swampert:'torrent',Blastoise:'torrent',Greninja:'torrent',Empoleon:'torrent',Sceptile:'overgrow',Venusaur:'overgrow',Torterra:'overgrow',
- Salamence:'intimidate',Gyarados:'intimidate',Arcanine:'intimidate',Mightyena:'intimidate',Luxray:'intimidate',Mawile:'intimidate',
- Gengar:'levitate',Latios:'levitate',Latias:'levitate',Claydol:'levitate',Lunatone:'levitate',Solrock:'levitate',Flygon:'levitate',Hydreigon:'levitate',Mismagius:'levitate',
- Houndoom:'flashfire',Ninetales:'flashfire',Flareon:'flashfire',Chandelure:'flashfire',Jolteon:'voltabsorb',Manectric:'lightningrod',
- Medicham:'purepower',Hariyama:'guts',Machamp:'guts',Conkeldurr:'guts',Scizor:'technician',Breloom:'technician',
- Rhyperior:'solidrock',Snorlax:'thickfat',Tyranitar:'sandstream',Pelipper:'drizzle',Kyogre:'drizzle',Torkoal:'drought',Groudon:'drought',
- Aggron:'sturdy',Probopass:'sturdy',Golem:'sturdy',Skarmory:'sturdy',Magnezone:'sturdy'};
-const ABN={blaze:['Mar Llamas','Con pocos PS, sus ataques de Fuego ×1,5.'],torrent:['Torrente','Con pocos PS, sus ataques de Agua ×1,5.'],overgrow:['Espesura','Con pocos PS, sus ataques de Planta ×1,5.'],
- intimidate:['Intimidación','Al entrar, baja el Ataque del rival.'],levitate:['Levitación','Inmune a los ataques de Tierra.'],flashfire:['Absorbe Fuego','Inmune al Fuego; potencia sus ataques de Fuego.'],
- voltabsorb:['Absorbe Elec','Inmune a la Electricidad; se cura un 25%.'],lightningrod:['Pararrayos','Inmune a la Electricidad; sube At. Esp.'],hugepower:['Potencia','Duplica su Ataque.'],purepower:['Energía Pura','Duplica su Ataque.'],
- speedboost:['Impulso','Sube la Velocidad cada turno.'],sturdy:['Robustez','Resiste un golpe mortal desde PS completos.'],technician:['Experto','Movimientos de poder ≤60 ×1,5.'],guts:['Agallas','Con un estado alterado, Ataque ×1,5.'],
- solidrock:['Roca Sólida','Reduce el daño súper eficaz.'],filter:['Filtro','Reduce el daño súper eficaz.'],thickfat:['Sebo','Reduce el daño de Fuego y Hielo.'],adaptability:['Adaptable','El bonus por mismo tipo es ×2.'],
- drizzle:['Llovizna','Al entrar, provoca lluvia.'],drought:['Sequía','Al entrar, provoca sol.'],sandstream:['Chorro Arena','Al entrar, provoca tormenta de arena.']};
-
-/* ---- Megaevoluciones ---- */
-const MEGA={};
-function MG(n,stone,sl,t,b,ab,name){(MEGA[n]=MEGA[n]||[]).push({stone,sl,t:t.split('/'),b:b.split(',').map(Number),ab:ab||'',name:name||'Mega '+n})}
-MG('Blaziken','Blazikenita','blaziken-mega','fire/fighting','80,160,80,130,80,100','speedboost');
-MG('Swampert','Swampertita','swampert-mega','water/ground','100,150,110,95,110,70');
-MG('Sceptile','Sceptilita','sceptile-mega','grass/dragon','70,110,75,145,85,145');
-MG('Gardevoir','Gardevoirita','gardevoir-mega','psychic/fairy','68,85,65,165,135,100');
-MG('Salamence','Salamencita','salamence-mega','dragon/flying','95,145,130,120,90,120');
-MG('Metagross','Metagrossita','metagross-mega','steel/psychic','80,145,150,105,110,110');
-MG('Aggron','Aggronita','aggron-mega','steel','70,140,230,60,80,50','filter');
-MG('Absol','Absolita','absol-mega','dark','65,150,60,115,60,115');
-MG('Gengar','Gengarita','gengar-mega','ghost/poison','60,65,80,170,95,130');
-MG('Charizard','Charizardita X','charizard-megax','fire/dragon','78,130,111,130,85,100','','Mega Charizard X');
-MG('Charizard','Charizardita Y','charizard-megay','fire/flying','78,104,78,159,115,100','drought','Mega Charizard Y');
-MG('Garchomp','Garchompita','garchomp-mega','dragon/ground','108,170,115,120,95,92');
-MG('Lucario','Lucarita','lucario-mega','fighting/steel','70,145,88,140,70,112','adaptability');
-MG('Tyranitar','Tyranitarita','tyranitar-mega','rock/dark','100,164,150,95,120,71','sandstream');
-MG('Gyarados','Gyaradosita','gyarados-mega','water/dark','95,155,109,70,130,81');
-MG('Alakazam','Alakazamita','alakazam-mega','psychic','55,50,65,175,105,150');
-MG('Scizor','Scizorita','scizor-mega','bug/steel','70,150,140,65,100,75','technician');
-MG('Heracross','Heracrossita','heracross-mega','bug/fighting','80,185,115,40,105,75');
-MG('Latios','Latiosita','latios-mega','dragon/psychic','80,130,100,160,120,110','levitate');
-MG('Latias','Latiasita','latias-mega','dragon/psychic','80,100,120,140,150,110','levitate');
-MG('Venusaur','Venusaurita','venusaur-mega','grass/poison','80,100,123,122,120,80');
-MG('Blastoise','Blastoisita','blastoise-mega','water','79,103,120,135,115,78');
-MG('Mawile','Mawilita','mawile-mega','steel/fairy','50,105,125,55,95,50','hugepower');
-MG('Camerupt','Cameruptita','camerupt-mega','fire/ground','70,120,100,145,105,20');
-MG('Manectric','Manectricita','manectric-mega','electric','70,75,80,135,80,135');
-MG('Altaria','Altarianita','altaria-mega','dragon/fairy','75,110,110,110,105,80');
-MG('Medicham','Medichamita','medicham-mega','fighting/psychic','60,100,85,80,85,100','purepower');
-MG('Kangaskhan','Kangaskhanita','kangaskhan-mega','normal','105,125,100,60,100,100');
-MG('Houndoom','Houndoomita','houndoom-mega','dark/fire','75,90,90,140,90,115');
-MG('Sharpedo','Sharpedonita','sharpedo-mega','water/dark','70,140,70,110,65,105');
-MG('Aerodactyl','Aerodactylita','aerodactyl-mega','rock/flying','80,135,85,70,95,150');
-MG('Gallade','Galladita','gallade-mega','psychic/fighting','68,165,95,65,115,110');
-
-const ITEMS={leftovers:['Restos','Recupera 1/16 de los PS cada turno.'],lifeorb:['Vidasfera','Ataques ×1,3, pero pierde un 10% de PS al atacar.'],bandc:['Banda Elección','Ataque ×1,5, pero queda fijado a un movimiento.'],specs:['Gafas Elección','At. Esp. ×1,5, pero queda fijado a un movimiento.'],scarf:['Pañuelo Elección','Velocidad ×1,5, pero queda fijado a un movimiento.'],sash:['Cinta Focus','Resiste un golpe mortal desde PS completos.'],sitrus:['Baya Zidra','Recupera un 25% de PS al bajar del 50%.']};
-const defItem=n=>MEGA[n]?'mega0':'leftovers';
-
-const TRAINERS=[
- {id:'roxanne',name:'Petra',title:'Líder de Petalia · Roca',q:'¡Te enseñaré la solidez de la roca!',team:['Probopass','Golem','Aerodactyl','Rhyperior'],diff:.45},
- {id:'brawly',name:'Marcial',title:'Líder de Algaria · Lucha',q:'¡Vas a sentir el oleaje de mi puño!',team:['Hariyama','Machamp','Lucario','Medicham|mega0'],diff:.5},
- {id:'wattson',name:'Erico',title:'Líder de Ciudad Malvalona · Eléctrico',q:'¡Wahahahaha! ¡Te voy a electrizar!',team:['Electivire','Raichu','Magnezone','Jolteon','Manectric|mega0'],diff:.55},
- {id:'flannery',name:'Candela',title:'Líder de Lavacalda · Fuego',q:'¡Mi fuego es de abuelo, pero abrasa!',team:['Torkoal','Ninetales','Typhlosion','Arcanine','Camerupt'],diff:.6},
- {id:'norman',name:'Norman',title:'Líder de Petalia Norte · Normal',q:'Por mi familia, ¡no pienso perder!',team:['Slaking','Kangaskhan','Staraptor','Snorlax','Swellow'],diff:.65},
- {id:'winona',name:'Alana',title:'Líder de Arrecípolis · Volador',q:'¡Danzo junto a los Pokémon pájaro!',team:['Swellow','Pelipper','Skarmory','Togekiss','Altaria|mega0'],diff:.7},
- {id:'tateandliza',name:'Vito y Leti',title:'Líderes de Ciudad Calagua · Psíquico',q:'¡Somos dos mentes y un solo ataque!',team:['Lunatone','Solrock','Claydol','Alakazam','Gardevoir|mega0'],diff:.75},
- {id:'juan',name:'Plubio',title:'Líder de Ciudad Arrecífica · Agua',q:'¡Mi elegancia es como el agua!',team:['Ludicolo','Whiscash','Pelipper','Gyarados','Milotic'],diff:.8},
- {id:'maxie',name:'Magno',title:'Líder del Team Magma',q:'¡Haremos crecer la tierra firme!',team:['Mightyena','Crobat','Houndoom','Torkoal','Camerupt|mega0','Groudon'],diff:.8},
- {id:'archie',name:'Aquiles',title:'Líder del Team Aqua',q:'¡El mar es la cuna de la vida!',team:['Mightyena','Crobat','Whiscash','Sharpedo|mega0','Swampert','Kyogre'],diff:.8},
- {id:'sidney',name:'Sidney',title:'Alto Mando · Siniestro',q:'¡Me encanta un buen desafío!',team:['Mightyena','Shiftry','Sharpedo','Weavile','Absol|mega0'],diff:.85},
- {id:'phoebe',name:'Phoebe',title:'Alto Mando · Fantasma',q:'Los espíritus me susurran tu destino...',team:['Banette','Mismagius','Dusknoir','Chandelure','Gengar'],diff:.88},
- {id:'glacia',name:'Glacia',title:'Alto Mando · Hielo',q:'¡Congelaré tus esperanzas!',team:['Glalie','Walrein','Froslass','Mamoswine','Weavile'],diff:.9},
- {id:'drake',name:'Drake',title:'Alto Mando · Dragón',q:'Los dragones obedecen a quien los respeta.',team:['Altaria','Flygon','Haxorus','Hydreigon','Salamence|mega0'],diff:.92},
- {id:'steven',name:'Máximo',title:'Campeón de Hoenn',q:'Veamos de qué eres capaz, entrenador.',team:['Skarmory','Claydol','Aggron','Cradily','Armaldo','Metagross|mega0'],diff:.97},
-];
-
-/* ================= UTIL ================= */
+/* ================= UTIL / NOMBRES ================= */
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const store={get(k,f){try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
 const SS='https://play.pokemonshowdown.com/sprites/';
-const tchip=t=>`<span class="tchip" style="background:${TYPES[t][1]}">${TYPES[t][0]}</span>`;
-function blob(d,size=90){const e=document.createElement('div');e.className='blob';e.style.cssText=`width:${size}px;height:${size}px;background:radial-gradient(circle at 35% 30%,#fff8,${TYPES[d.t[0]][1]})`;e.textContent=d.n[0];return e}
-function mkImg(srcs,d,onload,fbSize){
+const TYPES={Normal:['Normal','#a8a878'],Fire:['Fuego','#f08030'],Water:['Agua','#6890f0'],Electric:['Eléctrico','#e8b800'],Grass:['Planta','#78c850'],Ice:['Hielo','#7cc8c8'],Fighting:['Lucha','#c03028'],Poison:['Veneno','#a040a0'],Ground:['Tierra','#c8a040'],Flying:['Volador','#8f78e8'],Psychic:['Psíquico','#f85888'],Bug:['Bicho','#a8b820'],Rock:['Roca','#b8a038'],Ghost:['Fantasma','#705898'],Dragon:['Dragón','#7038f8'],Dark:['Siniestro','#705848'],Steel:['Acero','#8a8aa8'],Fairy:['Hada','#e87a95'],Stellar:['Astral','#44a8d8']};
+const tES=t=>TYPES[t]?TYPES[t][0]:t,tCol=t=>TYPES[t]?TYPES[t][1]:'#888';
+const tchip=t=>`<span class="tchip" style="background:${tCol(t)}">${tES(t)}</span>`;
+const nmMove=m=>{const o=typeof m==='string'?Dex.moves.get(m):m;return NAMES.m[o.id]||o.name};
+const nmAb=a=>{const o=Dex.abilities.get(a);return NAMES.a[o.id]||o.name||a};
+const nmItem=i=>{const o=Dex.items.get(i);return NAMES.i[o.id]||o.name||i};
+function nmSp(name){
+  const sp=Dex.species.get(name),base=NAMES.s[toID(sp.baseSpecies)];
+  if(!base)return sp.name;if(!sp.forme)return base;
+  if(sp.isMega)return 'Mega '+base+(/-[XYZ]$/.test(sp.name)?' '+sp.name.slice(-1):'');
+  return `${base} (${sp.forme})`}
+const STN={atk:'Ataque',def:'Defensa',spa:'At. Esp.',spd:'Def. Esp.',spe:'Velocidad',accuracy:'Precisión',evasion:'Evasión'};
+const STT={brn:['QUE','#e8590c','sufre quemaduras'],par:['PAR','#d4a600','está paralizado'],psn:['ENV','#a040a0','fue envenenado'],tox:['ENV','#7a1f7a','fue gravemente envenenado'],slp:['DOR','#6b7a90','se durmió'],frz:['CON','#3aa6c9','se congeló']};
+const sid=sp=>sp.spriteid||toID(sp.baseSpecies)+(sp.forme?'-'+toID(sp.forme):'');
+const sprSrcs=(sp,back)=>{const b=toID(sp.baseSpecies),ids=[sid(sp)];if(b!==ids[0])ids.push(b);return ids.flatMap(i=>back?[`${SS}ani-back/${i}.gif`,`${SS}gen5-back/${i}.png`]:[`${SS}ani/${i}.gif`,`${SS}gen5/${i}.png`])};
+const iconSrcs=sp=>{const i=sid(sp),b=toID(sp.baseSpecies);return [`${SS}dex/${i}.png`,`${SS}gen5/${i}.png`,`${SS}dex/${b}.png`,`${SS}ani/${i}.gif`]};
+function blob(sp,size=90){const e=document.createElement('div');e.className='blob';e.style.cssText=`width:${size}px;height:${size}px;background:radial-gradient(circle at 35% 30%,#fff8,${tCol(sp.types[0])})`;e.textContent=sp.name[0];return e}
+function mkImg(srcs,sp,onload,fb){
   const im=new Image();let i=0;
-  im.onerror=()=>{i++;if(i<srcs.length){im.src=srcs[i]}else{im.replaceWith(blob(d,fbSize))}};
+  im.onerror=()=>{i++;if(i<srcs.length)im.src=srcs[i];else im.replaceWith(blob(sp,fb))};
   im.onload=()=>{if(/\.png$/.test(im.src))im.classList.add('pix');onload&&onload(im)};
   im.src=srcs[0];im.draggable=false;return im}
-const iconSrcs=id=>[`${SS}dex/${id}.png`,`${SS}gen5/${id}.png`,`${SS}ani/${id}.gif`];
-const iconEl=(d,size=64)=>{const im=mkImg(iconSrcs(d.id),d,null,size);return im};
-const store={get(k,f){try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const iconEl=(sp,size=64)=>mkImg(iconSrcs(sp),sp,null,size);
+
+/* ================= POOLS ================= */
+const POOL=Dex.species.all().filter(s=>s.exists&&s.num>0&&!s.battleOnly&&!s.isMega&&!/Gmax|Eternamax|Totem|Cosplay|Rock-Star|Belle|Pop-Star|Libre|PhD/.test(s.name)&&!['CAP','CAP-Future','Custom','Gigantamax'].includes(s.isNonstandard||'')).sort((a,b)=>a.num-b.num||a.name.localeCompare(b.name));
+const MOVES=Dex.moves.all().filter(m=>m.exists&&!m.isZ&&!m.isMax&&!['CAP','Custom'].includes(m.isNonstandard||'')&&m.id!=='struggle'&&m.id!=='recharge');
+const ITEMLIST=Dex.items.all().filter(i=>i.exists&&!i.isPokeball&&!['CAP','Custom'].includes(i.isNonstandard||''));
+const ABILS=Dex.abilities.all().filter(a=>a.exists&&a.id!=='noability'&&!['CAP','Custom'].includes(a.isNonstandard||''));
+const NATURES=Dex.natures.all();
+const MOVEIDX={},ITEMIDX={};
+MOVES.forEach(m=>{MOVEIDX[toID(nmMove(m))]=m.id;MOVEIDX[m.id]=m.id});
+ITEMLIST.forEach(i=>{ITEMIDX[toID(nmItem(i))]=i.id;ITEMIDX[i.id]=i.id});
+$('#dataStats').textContent=`${POOL.length} Pokémon · ${MOVES.length} movimientos · ${ABILS.length} habilidades · ${ITEMLIST.length} objetos`;
+$('#dl-items').innerHTML=ITEMLIST.map(i=>`<option value="${nmItem(i)}" label="${i.name}"></option>`).join('');
+const LS={};
+function learnable(sp){
+  if(LS[sp.id])return LS[sp.id];
+  const ids=new Set(),seen=new Set();
+  (function walk(s){
+    if(!s||!s.exists||seen.has(s.id))return;seen.add(s.id);
+    const ld=Dex.species.getLearnsetData(s.id);if(ld&&ld.learnset)Object.keys(ld.learnset).forEach(k=>ids.add(k));
+    if(s.prevo)walk(Dex.species.get(s.prevo));
+    if(s.baseSpecies!==s.name)walk(Dex.species.get(s.baseSpecies));
+    if(s.changesFrom)walk(Dex.species.get(s.changesFrom))})(sp);
+  return LS[sp.id]=ids}
+function megaStones(spName){return Dex.items.all().filter(i=>i.exists&&i.megaStone&&i.megaStone[spName]).sort((a,b)=>a.name.localeCompare(b.name))}
+
+/* ================= SETS ================= */
+const UTIL=['recover','roost','softboiled','moonlight','synthesis','slackoff','swordsdance','nastyplot','calmmind','dragondance','bulkup','quiverdance','shellsmash','willowisp','thunderwave','toxic','spore','sleeppowder','stealthrock','protect','substitute','bellydrum','agility','irondefense','amnesia','curse','tailglow','coil','workup'];
+function moveScore(m,sp,phys){
+  let s=m.basePower*(m.accuracy===true?1:m.accuracy/100);
+  if(m.multihit)s*=Array.isArray(m.multihit)?(m.multihit[0]+m.multihit[1])/2:m.multihit;
+  if(sp.types.includes(m.type))s*=1.5;
+  s*=(m.category==='Physical')===phys?1.2:.55;
+  if(m.flags.recharge)s*=.55;if(m.flags.charge)s*=.5;if(m.selfdestruct)s*=.2;if(m.recoil)s*=.88;
+  if(m.self&&m.self.boosts&&Object.values(m.self.boosts).some(v=>v<0))s*=.8;
+  if(m.priority>0)s*=1.1;if(m.priority<0)s*=.7;
+  if(['dreameater','focuspunch','belch','lastresort','synchronoise','steelroller','poltergeist','fakeout','firstimpression','suckerpunch','hyperspacefury','naturalgift','snore','spitup','upperhand'].includes(m.id))s*=.1;
+  return s}
+function suggestMoves(sp){
+  const phys=sp.baseStats.atk>=sp.baseStats.spa;
+  const ms=[...learnable(sp)].map(i=>Dex.moves.get(i)).filter(m=>m.exists&&!m.isZ&&!m.isMax&&!['CAP','Custom'].includes(m.isNonstandard||''));
+  const dmg=ms.filter(m=>m.category!=='Status'&&m.basePower>=40).map(m=>({m,s:moveScore(m,sp,phys)})).sort((a,b)=>b.s-a.s);
+  const pick=[],types=new Set();
+  for(const {m} of dmg){if(pick.length>=2)break;if(sp.types.includes(m.type)&&!types.has(m.type)){pick.push(m);types.add(m.type)}}
+  for(const {m} of dmg){if(pick.length>=3)break;if(!types.has(m.type)&&!pick.includes(m)){pick.push(m);types.add(m.type)}}
+  const ut=UTIL.map(u=>ms.find(m=>m.id===u)).filter(Boolean);
+  const setups=phys?['swordsdance','dragondance','bulkup','shellsmash','bellydrum','coil','workup']:['nastyplot','calmmind','quiverdance','tailglow','shellsmash'];
+  const u=ut.find(m=>setups.includes(m.id))||ut.find(m=>!['swordsdance','dragondance','bulkup','bellydrum','coil','workup','nastyplot','calmmind','quiverdance','tailglow','shellsmash'].includes(m.id));
+  if(u&&pick.length<4)pick.push(u);
+  for(const {m} of dmg){if(pick.length>=4)break;if(!pick.includes(m))pick.push(m)}
+  for(const m of ms){if(pick.length>=4)break;if(!pick.includes(m))pick.push(m)}
+  return pick.slice(0,4).map(m=>m.name)}
+function defaultSet(name,opts={}){
+  const sp=Dex.species.get(name),b=sp.baseStats,off=b.atk>=b.spa?'atk':'spa';
+  const stones=megaStones(sp.name);
+  return{species:sp.name,level:opts.level||50,ability:sp.abilities[0],item:opts.item!==undefined?opts.item:(stones[0]?stones[0].name:'Leftovers'),
+    nature:off==='atk'?'Jolly':'Timid',moves:opts.moves||suggestMoves(sp),evs:{hp:4,atk:0,def:0,spa:0,spd:0,spe:252,[off]:252},
+    ivs:{hp:31,atk:31,def:31,spa:31,spd:31,spe:31},teraType:sp.types[0],name:'',gender:''}}
+const calcStat=(k,base,iv,ev,lvl,nat)=>{const x=Math.floor((2*base+iv+Math.floor(ev/4))*lvl/100);if(k==='hp')return base===1?1:x+lvl+10;const n=Dex.natures.get(nat);return Math.floor((x+5)*(n.plus===k?1.1:n.minus===k?.9:1))};
+
+/* ================= EQUIPO ================= */
+let MY=store.get('zaf2.team',[]).filter(s=>s&&Dex.species.get(s.species).exists);
+let sel=0,filT=null,filG=null,LEARN=false;
+const saveTeam=()=>{store.set('zaf2.team',MY);$('#teamOk').disabled=!MY.length};
+function randomTeam(){MY=[...POOL].sort(()=>Math.random()-.5).slice(0,6).map(s=>defaultSet(s.name));sel=0;saveTeam()}
+const ROMAN=['','I','II','III','IV','V','VI','VII','VIII','IX'];
+function renderTeam(){
+  $('#gf').innerHTML=ROMAN.slice(1).map((r,i)=>`<span class="fchip g ${filG===i+1?'on':''}" data-g="${i+1}">${r}</span>`).join('');
+  $$('#gf .fchip').forEach(c=>c.onclick=()=>{filG=filG===+c.dataset.g?null:+c.dataset.g;renderTeam()});
+  $('#tf').innerHTML=Object.keys(TYPES).filter(t=>t!=='Stellar').map(t=>`<span class="fchip ${filT===t?'on':''}" data-t="${t}" style="background:${tCol(t)}">${tES(t)}</span>`).join('');
+  $$('#tf .fchip').forEach(c=>c.onclick=()=>{filT=filT===c.dataset.t?null:c.dataset.t;renderTeam()});
+  renderRoster();renderSlots();renderEditor();$('#teamOk').disabled=!MY.length}
+let rList=[],rShown=0;
+function renderRoster(){
+  const q=$('#q').value.trim().toLowerCase();
+  rList=POOL.filter(s=>(!filG||s.gen===filG)&&(!filT||s.types.includes(filT))&&(!q||s.name.toLowerCase().includes(q)||nmSp(s.name).toLowerCase().includes(q)||String(s.num)===q));
+  $('#roster').innerHTML='';rShown=0;moreRoster();$('#roster').scrollTop=0}
+function moreRoster(){
+  const g=$('#roster'),end=Math.min(rList.length,rShown+80);
+  for(let i=rShown;i<end;i++){
+    const s=rList[i],c=document.createElement('div');c.className='card';
+    c.innerHTML=`<small>#${s.num}</small><div class="ic"></div><b>${nmSp(s.name)}</b><div>${s.types.map(tchip).join('')}</div>`;
+    c.querySelector('.ic').append(iconEl(s));
+    c.onclick=()=>{if(MY.length<6){MY.push(defaultSet(s.name));sel=MY.length-1}else{MY[sel]=defaultSet(s.name)}saveTeam();renderSlots();renderEditor()};
+    g.append(c)}
+  rShown=end}
+$('#roster').onscroll=()=>{const g=$('#roster');if(rShown<rList.length&&g.scrollTop+g.clientHeight>g.scrollHeight-300)moreRoster()};
+$('#q').oninput=renderRoster;
+function renderSlots(){
+  const s=$('#slots');s.innerHTML='';
+  for(let i=0;i<6;i++){
+    const m=MY[i],e=document.createElement('div');
+    if(!m){e.className='slot empty';e.textContent='— libre —'}
+    else{const sp=Dex.species.get(m.species);e.className='slot'+(i===sel?' act':'');
+      e.innerHTML=`<div class="ic"></div><div><b>${nmSp(m.species)}</b><div>${sp.types.map(tchip).join('')}</div></div><button class="x">×</button>`;
+      e.querySelector('.ic').append(iconEl(sp,44));
+      e.onclick=ev=>{if(ev.target.classList.contains('x')){MY.splice(i,1);sel=Math.max(0,Math.min(sel,MY.length-1));saveTeam();renderSlots();renderEditor()}else{sel=i;renderSlots();renderEditor()}}}
+    s.append(e)}}
+function fillMovesDL(sp){
+  const L=LEARN?learnable(sp):null;
+  $('#dl-moves').innerHTML=MOVES.filter(m=>!L||L.has(m.id)).map(m=>`<option value="${nmMove(m)}" label="${m.name} · ${tES(m.type)}${m.basePower?' '+m.basePower:''}"></option>`).join('')}
+function moveTags(id){const m=Dex.moves.get(id);if(!m.exists)return '';return `${tchip(m.type)} ${m.category==='Status'?'Estado':m.category==='Physical'?'Físico':'Especial'}${m.basePower?' · Pod '+m.basePower:''}${m.accuracy===true?'':' · Prec '+m.accuracy} · PP ${m.pp}`}
+function renderEditor(){
+  const el=$('#editor'),m=MY[sel];
+  if(!m){el.innerHTML='<p style="opacity:.75;margin-top:10px">Pulsa un Pokémon de la lista para añadirlo (máx. 6). Después podrás elegir su habilidad, objeto, movimientos, naturaleza, EVs e IVs.</p>';return}
+  const sp=Dex.species.get(m.species);fillMovesDL(sp);
+  const own=Object.values(sp.abilities),others=ABILS.filter(a=>!own.includes(a.name));
+  const stones=megaStones(sp.name),itemDesc=Dex.items.get(m.item);
+  const stat=k=>calcStat(k,sp.baseStats[k],m.ivs[k],m.evs[k],m.level,m.nature);
+  const KS=['hp','atk','def','spa','spd','spe'],LB={hp:'PS',atk:'Ata',def:'Def',spa:'AtE',spd:'DeE',spe:'Vel'};
+  el.innerHTML=`<h3>${nmSp(m.species)} <small style="opacity:.6">${m.species!==nmSp(m.species)?m.species:''}</small></h3>
+   <div>${sp.types.map(tchip).join('')} <span style="opacity:.7;font-size:11px">Gen ${sp.gen} · #${sp.num}</span></div>
+   <div class="row"><label>Nivel<input type="number" min="1" max="100" id="eLv" value="${m.level}"></label>
+     <label>Naturaleza<select id="eNat">${NATURES.map(n=>`<option value="${n.name}" ${n.name===m.nature?'selected':''}>${n.name}${n.plus?` (+${LB[n.plus]} −${LB[n.minus]})`:''}</option>`).join('')}</select></label>
+     <label>Teratipo<select id="eTera">${Object.keys(TYPES).map(t=>`<option value="${t}" ${t===m.teraType?'selected':''}>${tES(t)}</option>`).join('')}</select></label></div>
+   <div class="row"><label>Habilidad<select id="eAb"><optgroup label="De la especie">${own.map(a=>`<option value="${a}" ${a===m.ability?'selected':''}>${nmAb(a)}</option>`).join('')}</optgroup><optgroup label="Todas las demás">${others.map(a=>`<option value="${a.name}" ${a.name===m.ability?'selected':''}>${nmAb(a.name)}</option>`).join('')}</optgroup></select></label></div>
+   <div class="desc" id="abDesc">${Dex.abilities.get(m.ability).shortDesc||''}</div>
+   <div class="row"><label>Objeto <input id="eItem" list="dl-items" value="${m.item?nmItem(m.item):''}" placeholder="Ninguno"></label>
+     ${stones.length?`<button class="btn sm" id="eStone">✦ ${stones[0].name}</button>`:''}</div>
+   <div class="desc" id="itDesc">${itemDesc.exists?itemDesc.shortDesc:''}</div>
+   <p style="margin-top:8px;font-weight:700">Movimientos <label class="toggle" style="display:inline-flex;margin-left:8px"><input type="checkbox" id="eLearn" ${LEARN?'checked':''}>solo los que aprende</label> <button class="btn sm ghost" id="eSug" style="margin-left:6px">✨ Sugerir</button></p>
+   ${[0,1,2,3].map(i=>`<div class="mvrow"><input class="mvin" data-i="${i}" list="dl-moves" value="${m.moves[i]?nmMove(m.moves[i]):''}" placeholder="Movimiento ${i+1}"><div class="tags">${m.moves[i]?moveTags(m.moves[i]):''}</div></div>`).join('')}
+   <p style="margin-top:8px;font-weight:700">EVs / IVs</p>
+   <div class="evgrid"><span></span>${KS.map(k=>`<span class="hd">${LB[k]}</span>`).join('')}
+     <span class="hd">EV</span>${KS.map(k=>`<input type="number" min="0" max="252" step="4" data-ev="${k}" value="${m.evs[k]}">`).join('')}
+     <span class="hd">IV</span>${KS.map(k=>`<input type="number" min="0" max="31" data-iv="${k}" value="${m.ivs[k]}">`).join('')}
+     <span class="hd">Stat</span>${KS.map(k=>`<b id="st-${k}">${stat(k)}</b>`).join('')}</div>
+   <div class="desc" id="evTot">EVs totales: ${Object.values(m.evs).reduce((a,b)=>a+b,0)} / 510</div>`;
+  const upd=()=>{saveTeam();KS.forEach(k=>{$('#st-'+k).textContent=stat(k)});$('#evTot').textContent='EVs totales: '+Object.values(m.evs).reduce((a,b)=>a+b,0)+' / 510'};
+  $('#eLv').onchange=e=>{m.level=Math.max(1,Math.min(100,+e.target.value||50));upd()};
+  $('#eNat').onchange=e=>{m.nature=e.target.value;upd()};
+  $('#eTera').onchange=e=>{m.teraType=e.target.value;saveTeam()};
+  $('#eAb').onchange=e=>{m.ability=e.target.value;$('#abDesc').textContent=Dex.abilities.get(m.ability).shortDesc||'';saveTeam()};
+  const setItem=v=>{const id=ITEMIDX[toID(v)];if(!v){m.item='';$('#eItem').classList.remove('bad');$('#itDesc').textContent=''}else if(id){m.item=Dex.items.get(id).name;$('#eItem').classList.remove('bad');$('#itDesc').textContent=Dex.items.get(id).shortDesc}else $('#eItem').classList.add('bad');saveTeam()};
+  $('#eItem').onchange=e=>setItem(e.target.value);
+  const st=$('#eStone');if(st)st.onclick=()=>{m.item=stones[0].name;renderEditor()};
+  $('#eLearn').onchange=e=>{LEARN=e.target.checked;fillMovesDL(sp)};
+  $('#eSug').onclick=()=>{m.moves=suggestMoves(sp);saveTeam();renderEditor()};
+  $$('.mvin').forEach(inp=>inp.onchange=()=>{
+    const i=+inp.dataset.i,v=inp.value.trim(),id=MOVEIDX[toID(v)];
+    if(!v){m.moves.splice(i,1)}else if(id){const name=Dex.moves.get(id).name;m.moves=m.moves.filter((x,j)=>j===i||x!==name);m.moves[Math.min(i,m.moves.length)]=name;m.moves=m.moves.slice(0,4)}else{inp.classList.add('bad');return}
+    saveTeam();renderEditor()});
+  $$('[data-ev]').forEach(inp=>inp.onchange=()=>{m.evs[inp.dataset.ev]=Math.max(0,Math.min(252,+inp.value||0));upd()});
+  $$('[data-iv]').forEach(inp=>inp.onchange=()=>{m.ivs[inp.dataset.iv]=Math.max(0,Math.min(31,inp.value===''?31:+inp.value));upd()})}
+$('#randTeam').onclick=()=>{randomTeam();renderTeam()};
+$('#teamOk').onclick=()=>show('trainers');
+$('#ieBtn').onclick=()=>{const b=$('#ieBox');b.style.display=b.style.display==='block'?'none':'block'};
+$('#ieExport').onclick=()=>{$('#ieText').value=Teams.export(MY)};
+$('#ieImport').onclick=()=>{try{const t=Teams.import($('#ieText').value);if(!t||!t.length)throw 0;MY=t.slice(0,6).map(s=>{const d=defaultSet(s.species);return{...d,...s,name:'',evs:{hp:0,atk:0,def:0,spa:0,spd:0,spe:0,...s.evs},ivs:{hp:31,atk:31,def:31,spa:31,spd:31,spe:31,...s.ivs},level:s.level||100,teraType:s.teraType||d.teraType,moves:s.moves.slice(0,4)}});sel=0;saveTeam();renderTeam()}catch(e){alert('No se pudo importar el equipo.')}};
 
 /* ================= PANTALLAS ================= */
 function show(n){$$('.screen').forEach(s=>s.classList.toggle('on',s.id==='scr-'+n));if(n==='battle')fit();if(n==='team')renderTeam();if(n==='trainers')renderTrainers()}
 $$('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
 $('#goTeam').onclick=()=>show('team');
-$('#goTrainers').onclick=()=>{if(!MY.length)randomTeam();show('trainers')};
+const ensureTeam=()=>{if(!MY.length)randomTeam()};
+$('#goTrainers').onclick=()=>{ensureTeam();show('trainers')};
 
-/* ================= CONSTRUCTOR DE EQUIPO ================= */
-let MY=store.get('zaf.team',[]).filter(x=>DEX[x.n]).map(x=>({...x,item:x.item===undefined?defItem(x.n):x.item})); // [{n, mv:[keys]}]
-let selSlot=0,filT=null;
-function saveTeam(){store.set('zaf.team',MY);$('#teamOk').disabled=!MY.length}
-function randomTeam(){MY=Object.keys(DEX).sort(()=>Math.random()-.5).slice(0,6).map(n=>({n,mv:DEX[n].m.slice(0,4),item:defItem(n)}));selSlot=0;saveTeam()}
-$('#randTeam').onclick=()=>{randomTeam();renderTeam()};
-$('#teamOk').onclick=()=>show('trainers');
-$('#q').oninput=renderRoster;
-function renderTeam(){
-  $('#tf').innerHTML=Object.keys(TYPES).map(t=>`<span class="fchip ${filT===t?'on':''}" data-t="${t}" style="background:${TYPES[t][1]}">${TYPES[t][0]}</span>`).join('');
-  $$('#tf .fchip').forEach(c=>c.onclick=()=>{filT=filT===c.dataset.t?null:c.dataset.t;renderTeam()});
-  renderRoster();renderSlots();$('#teamOk').disabled=!MY.length}
-function renderRoster(){
-  const q=$('#q').value.trim().toLowerCase(),g=$('#roster');g.innerHTML='';
-  Object.values(DEX).filter(d=>(!q||d.n.toLowerCase().includes(q))&&(!filT||d.t.includes(filT))).sort((a,b)=>a.n.localeCompare(b.n)).forEach(d=>{
-    const inT=MY.some(x=>x.n===d.n),c=document.createElement('div');c.className='card'+(inT?' sel':'');
-    c.innerHTML=`<div class="ic"></div><b>${d.n}</b><div>${d.t.map(tchip).join('')}</div>`;
-    c.querySelector('.ic').append(iconEl(d));
-    c.onclick=()=>{const i=MY.findIndex(x=>x.n===d.n);if(i>=0){MY.splice(i,1);selSlot=Math.max(0,Math.min(selSlot,MY.length-1))}else if(MY.length<6){MY.push({n:d.n,mv:d.m.slice(0,4),item:defItem(d.n)});selSlot=MY.length-1}saveTeam();renderTeam()};
-    g.append(c)})}
-function renderSlots(){
-  const s=$('#slots');s.innerHTML='';
-  for(let i=0;i<6;i++){
-    const m=MY[i],e=document.createElement('div');
-    if(!m){e.className='slot empty';e.textContent='— hueco libre —'}
-    else{const d=DEX[m.n];e.className='slot'+(i===selSlot?' act':'');
-      e.innerHTML=`<div class="ic"></div><div><b>${d.n}${m.item&&m.item.startsWith('mega')?' ✦':''}</b><div>${d.t.map(tchip).join('')}</div></div><button class="x">×</button>`;
-      e.querySelector('.ic').append(iconEl(d,50));
-      e.onclick=ev=>{if(ev.target.classList.contains('x')){MY.splice(i,1);selSlot=Math.max(0,Math.min(selSlot,MY.length-1));saveTeam();renderTeam()}else{selSlot=i;renderSlots()}}}
-    s.append(e)}
-  renderDetail()}
-function statsOf(d,L=50){const f=b=>Math.floor((2*b+52)*L/100)+5;return{hp:Math.floor((2*d.b[0]+52)*L/100)+L+10,atk:f(d.b[1]),def:f(d.b[2]),spa:f(d.b[3]),spd:f(d.b[4]),spe:f(d.b[5])}}
-function abItemHTML(m,d){
-  const meg=MEGA[d.n]||[],a=ABN[AB[d.n]],cur=m.item||'';
-  const opts=[['','Ninguno'],...meg.map((v,i)=>['mega'+i,v.stone+' ✦ Mega']),...Object.entries(ITEMS).map(([k,v])=>[k,v[0]])];
-  const mv=cur.startsWith('mega')?meg[+cur.slice(4)]:null;
-  const info=mv?`Evoluciona en ${mv.name}${mv.ab&&ABN[mv.ab]?' · Habilidad: '+ABN[mv.ab][0]:''}. Una vez por combate.`:(ITEMS[cur]?ITEMS[cur][1]:'');
-  return `<div class="abx"><b>Habilidad:</b> ${a?a[0]+' — '+a[1]:'—'}</div><div class="abx"><b>Objeto:</b><select class="isel" id="itemSel">${opts.map(o=>`<option value="${o[0]}" ${o[0]===cur?'selected':''}>${o[1]}</option>`).join('')}</select>${info}</div>`}
-function renderDetail(){
-  const el=$('#detail'),m=MY[selSlot];if(!m){el.innerHTML='<p style="opacity:.7;margin-top:8px">Pulsa un Pokémon de la lista para añadirlo (máx. 6).</p>';return}
-  const d=DEX[m.n],st=statsOf(d),lab={hp:'PS',atk:'Ata',def:'Def',spa:'AtE',spd:'DeE',spe:'Vel'};
-  el.innerHTML=`<h3 style="margin:6px 0">${d.n} <small style="opacity:.7">Nv. 50</small></h3>`+
-   Object.keys(lab).map(k=>`<div class="stat"><span>${lab[k]}</span><div style="flex:1"><i style="width:${Math.min(100,st[k]/3.2)}%"></i></div><b style="width:30px;text-align:right">${st[k]}</b></div>`).join('')+
-   abItemHTML(m,d)+`<p style="margin-top:8px;font-weight:700">Movimientos (elige 4)</p><div class="mvgrid">${d.m.map(k=>{const v=MV[k];return `<button class="mvb ${m.mv.includes(k)?'on':''}" data-k="${k}" style="background:${TYPES[v.t][1]}">${v.n}<small>${TYPES[v.t][0]} · ${v.c==='x'?'Estado':(v.c==='p'?'Físico':'Especial')}${v.p?' · '+v.p:''}</small></button>`}).join('')}</div>`;
-  const is=$('#itemSel');if(is)is.onchange=()=>{m.item=is.value||null;saveTeam();renderSlots()};
-  $$('.mvb').forEach(b=>b.onclick=()=>{const k=b.dataset.k,i=m.mv.indexOf(k);if(i>=0){if(m.mv.length>1)m.mv.splice(i,1)}else{if(m.mv.length>=4)m.mv.shift();m.mv.push(k)}saveTeam();renderDetail()})}
-
-/* ================= SELECCIÓN DE RIVAL ================= */
+/* ================= RIVALES ================= */
+const TRAINERS=[
+ {id:'roxanne',name:'Petra',title:'Líder de Petalia · Roca',q:'¡Te enseñaré la solidez de la roca!',team:['Probopass','Golem','Aerodactyl','Rhyperior'],diff:.45},
+ {id:'brawly',name:'Marcial',title:'Líder de Algaria · Lucha',q:'¡Vas a sentir el oleaje de mi puño!',team:['Hariyama','Machamp','Lucario','Medicham|mega'],diff:.5},
+ {id:'wattson',name:'Erico',title:'Líder de Ciudad Malvalona · Eléctrico',q:'¡Wahahahaha! ¡Te voy a electrizar!',team:['Electivire','Raichu','Magnezone','Jolteon','Manectric|mega'],diff:.55},
+ {id:'flannery',name:'Candela',title:'Líder de Lavacalda · Fuego',q:'¡Mi fuego es de abuelo, pero abrasa!',team:['Torkoal','Ninetales','Typhlosion','Arcanine','Camerupt'],diff:.6},
+ {id:'norman',name:'Norman',title:'Líder de Petalia Norte · Normal',q:'Por mi familia, ¡no pienso perder!',team:['Slaking','Kangaskhan','Staraptor','Snorlax','Swellow'],diff:.65},
+ {id:'winona',name:'Alana',title:'Líder de Arrecípolis · Volador',q:'¡Danzo junto a los Pokémon pájaro!',team:['Swellow','Pelipper','Skarmory','Togekiss','Altaria|mega'],diff:.7},
+ {id:'tateandliza',name:'Vito y Leti',title:'Líderes de Ciudad Calagua · Psíquico',q:'¡Somos dos mentes y un solo ataque!',team:['Lunatone','Solrock','Claydol','Alakazam','Gardevoir|mega'],diff:.75},
+ {id:'juan',name:'Plubio',title:'Líder de Ciudad Arrecífica · Agua',q:'¡Mi elegancia es como el agua!',team:['Ludicolo','Whiscash','Pelipper','Gyarados','Milotic'],diff:.8},
+ {id:'maxie',name:'Magno',title:'Líder del Team Magma',q:'¡Haremos crecer la tierra firme!',team:['Mightyena','Crobat','Houndoom','Torkoal','Camerupt|mega','Groudon'],diff:.8},
+ {id:'archie',name:'Aquiles',title:'Líder del Team Aqua',q:'¡El mar es la cuna de la vida!',team:['Mightyena','Crobat','Whiscash','Sharpedo|mega','Swampert','Kyogre'],diff:.8},
+ {id:'sidney',name:'Sidney',title:'Alto Mando · Siniestro',q:'¡Me encanta un buen desafío!',team:['Mightyena','Shiftry','Sharpedo','Weavile','Absol|mega'],diff:.85},
+ {id:'phoebe',name:'Phoebe',title:'Alto Mando · Fantasma',q:'Los espíritus me susurran tu destino...',team:['Banette','Mismagius','Dusknoir','Chandelure','Gengar'],diff:.88},
+ {id:'glacia',name:'Glacia',title:'Alto Mando · Hielo',q:'¡Congelaré tus esperanzas!',team:['Glalie','Walrein','Froslass','Mamoswine','Weavile'],diff:.9},
+ {id:'drake',name:'Drake',title:'Alto Mando · Dragón',q:'Los dragones obedecen a quien los respeta.',team:['Altaria','Flygon','Haxorus','Hydreigon','Salamence|mega'],diff:.92},
+ {id:'steven',name:'Máximo',title:'Campeón de Hoenn',q:'Veamos de qué eres capaz, entrenador.',team:['Skarmory','Claydol','Aggron','Cradily','Armaldo','Metagross|mega'],diff:.97},
+];
+const TITEMS=['Leftovers','Sitrus Berry','Focus Sash','Life Orb','Lum Berry','Assault Vest','Choice Band','Choice Specs'];
+function trainerSets(t){
+  return t.team.map(spec=>{
+    const [n,tag]=spec.split('|'),sp=Dex.species.get(n),b=sp.baseStats,stones=megaStones(sp.name);
+    let item=rnd(TITEMS);
+    if(item==='Choice Band'&&b.atk<b.spa)item='Leftovers';
+    if(item==='Choice Specs'&&b.spa<b.atk)item='Leftovers';
+    if(tag==='mega'&&stones.length)item=stones[0].name;
+    const moves=(CUR[n]||suggestMoves(sp)).map(id=>Dex.moves.get(id).name).slice(0,4);
+    return defaultSet(n,{item,moves})})}
+function randomSets(){return [...POOL].sort(()=>Math.random()-.5).slice(0,6).map(s=>{const set=defaultSet(s.name);if(!megaStones(s.name).length)set.item=rnd(TITEMS.slice(0,6));return set})}
 function renderTrainers(){
-  const beat=store.get('zaf.beat',{});
+  const beat=store.get('zaf2.beat',{});
   $('#myTeamPrev').innerHTML='';
-  MY.forEach(m=>{const i=iconEl(DEX[m.n],30);i.style.cssText='height:34px;width:40px;object-fit:contain';$('#myTeamPrev').append(i)});
+  MY.forEach(m=>{const i=iconEl(Dex.species.get(m.species),30);i.style.cssText='height:34px;width:40px;object-fit:contain';$('#myTeamPrev').append(i)});
   const g=$('#tgrid');g.innerHTML='';
   TRAINERS.forEach(t=>{
     const c=document.createElement('div');c.className='tcard';
     c.innerHTML=`${beat[t.id]?'<span class="medal">🏅</span>':''}<div class="hd"><div class="avatar"></div><div><h3>${t.name}</h3><em>${t.title}</em></div></div><div class="prev"></div><div class="q">“${t.q}”</div><button class="btn gold">¡Combatir!</button>`;
     trainerImg(t,c.querySelector('.avatar'));
-    t.team.forEach(n=>c.querySelector('.prev').append(iconEl(DEX[n.split('|')[0]],34)));
-    c.querySelector('button').onclick=()=>startBattle(t);
+    t.team.forEach(n=>c.querySelector('.prev').append(iconEl(Dex.species.get(n.split('|')[0]),34)));
+    c.querySelector('button').onclick=()=>startMatch({trainer:t});
     g.append(c)})}
 function trainerImg(t,box){
   const srcs=[`${SS}trainers/${t.id}.png`,`${SS}trainers/${t.id}-gen6.png`,`${SS}trainers/${t.id}-gen3.png`];let i=0;
   const im=new Image();im.onerror=()=>{i++;if(i<srcs.length)im.src=srcs[i];else{im.remove();box.textContent=t.name[0]}};im.src=srcs[0];box.append(im)}
+const RANDOM_TR={id:'random',name:'Rival',team:[],diff:.65,q:''};
+const startRandom=()=>{ensureTeam();startMatch({trainer:RANDOM_TR,sets:randomSets(),random:true})};
+$('#randBattle').onclick=startRandom;
+function startLeague(){ensureTeam();const list=['sidney','phoebe','glacia','drake','steven'];startMatch({trainer:TRAINERS.find(x=>x.id===list[0]),league:{list,i:0}})}
+$$('[data-league]').forEach(b=>b.onclick=startLeague);
 
-/* ================= MOTOR DE COMBATE ================= */
-const STG=['atk','def','spa','spd','spe'],STN={atk:'Ataque',def:'Defensa',spa:'Ataque Esp.',spd:'Defensa Esp.',spe:'Velocidad'};
-const STT={brn:['QUE','#e8590c','se quemó'],par:['PAR','#d4a600','está paralizado'],psn:['ENV','#a040a0','fue envenenado'],tox:['ENV','#7a1f7a','fue gravemente envenenado'],slp:['DOR','#6b7a90','se durmió'],frz:['CON','#3aa6c9','se congeló']};
-function mkMon(name,mvKeys,side,item){
-  const d=DEX[name],s=statsOf(d);
-  const mg=item&&item.startsWith('mega')?(MEGA[name]||[])[+item.slice(4)]:null;
-  return{d,name,base:name,side,types:d.t,lvl:50,maxHp:s.hp,hp:s.hp,stats:s,st:{atk:0,def:0,spa:0,spd:0,spe:0},status:null,tox:0,slp:0,fainted:false,
-    ab:AB[name]||'',item:mg?null:(item||null),megaV:mg||null,mega:false,lock:null,ff:false,
-    moves:(mvKeys||d.m.slice(0,4)).map(k=>({...MV[k],pp:MV[k].pp}))}}
-const mult=s=>s>=0?(2+s)/2:2/(2-s);
-const effStat=(m,k)=>Math.floor(m.stats[k]*mult(m.st[k])*(k==='spe'&&m.status==='par'?.5:1)*(k==='spe'&&m.item==='scarf'?1.5:1));
-function abImm(d,mv){
-  if(d.ab==='levitate'&&mv.t==='ground')return 'lev';
-  if(d.ab==='flashfire'&&mv.t==='fire')return 'ff';
-  if(d.ab==='voltabsorb'&&mv.t==='electric')return 'volt';
-  if(d.ab==='lightningrod'&&mv.t==='electric')return 'lr';
-  return null}
-function calc(a,d,mv,crit,roll){
-  if(abImm(d,mv))return 0;
-  const ph=mv.c==='p',ak=ph?'atk':'spa',dk=ph?'def':'spd',W=B&&B.w;
-  let sa=a.st[ak],sd=d.st[dk];if(crit){sa=Math.max(0,sa);sd=Math.min(0,sd)}
-  let A=Math.floor(a.stats[ak]*mult(sa)),Dd=Math.floor(d.stats[dk]*mult(sd));
-  if(ph&&(a.ab==='hugepower'||a.ab==='purepower'))A*=2;
-  if(ph&&a.ab==='guts'&&a.status)A=Math.floor(A*1.5);
-  if(a.item==='bandc'&&ph)A=Math.floor(A*1.5);
-  if(a.item==='specs'&&!ph)A=Math.floor(A*1.5);
-  if(W==='sand'&&!ph&&d.types.includes('rock'))Dd=Math.floor(Dd*1.5);
-  let bp=mv.p;
-  if(a.ab==='technician'&&bp<=60)bp=Math.floor(bp*1.5);
-  if({blaze:'fire',torrent:'water',overgrow:'grass'}[a.ab]===mv.t&&a.hp*3<=a.maxHp)bp=Math.floor(bp*1.5);
-  if(a.ff&&mv.t==='fire')bp=Math.floor(bp*1.5);
-  let dmg=Math.floor(Math.floor((2*a.lvl/5+2)*bp*A/Dd)/50)+2;
-  if(W==='rain'){if(mv.t==='water')dmg=Math.floor(dmg*1.5);else if(mv.t==='fire')dmg=Math.floor(dmg*.5)}
-  if(W==='sun'){if(mv.t==='fire')dmg=Math.floor(dmg*1.5);else if(mv.t==='water')dmg=Math.floor(dmg*.5)}
-  if(crit)dmg=Math.floor(dmg*1.5);
-  dmg=Math.floor(dmg*roll);
-  if(a.types.includes(mv.t))dmg=Math.floor(dmg*(a.ab==='adaptability'?2:1.5));
-  const e=eff(mv.t,d.types);dmg=Math.floor(dmg*e);
-  if((d.ab==='solidrock'||d.ab==='filter')&&e>1)dmg=Math.floor(dmg*.75);
-  if(d.ab==='thickfat'&&(mv.t==='fire'||mv.t==='ice'))dmg=Math.floor(dmg*.5);
-  if(a.status==='brn'&&ph&&a.ab!=='guts')dmg=Math.floor(dmg*.5);
-  if(a.item==='lifeorb')dmg=Math.floor(dmg*1.3);
-  return e===0?0:Math.max(1,dmg)}
-const canInflict=(t,s)=>!t.status&&!t.types.some(x=>IMM[s].includes(x));
-
-let B=null,FAST=false,MUTE=false,skipCb=null;
-const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-function wait(ms){return new Promise(r=>{if(FAST)ms/=5;const t=setTimeout(done,ms);function done(){clearTimeout(t);if(skipCb===done)skipCb=null;r()}skipCb=done})}
-$('#stage').addEventListener('click',()=>skipCb&&skipCb());
-async function say(t,hold=700){
-  const m=$('#msg');let i=0,fin=false;
-  await new Promise(res=>{const iv=setInterval(()=>{i+=FAST?4:1;m.textContent=t.slice(0,i);if(i>=t.length||fin){clearInterval(iv);m.textContent=t;res()}},16);skipCb=()=>{fin=true}});
-  await wait(hold)}
-const act=s=>B[s].team[B[s].act];
-const nm=m=>m.side==='f'?`${m.name} rival`:m.name;
-const nmC=m=>m.side==='f'?`El ${m.name} rival`:m.name;
-function pos(side){return side==='f'?{x:690,y:150}:{x:235,y:325}}
-
-/* --- sonido --- */
-let AC=null;
-function snd(f,d=.12,type='square',vol=.05,f2){if(MUTE)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;if(f2)o.frequency.exponentialRampToValueAtTime(f2,AC.currentTime+d);g.gain.value=vol;g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.connect(g).connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch{}}
-const sfx={hit:()=>snd(160,.18,'sawtooth',.08,50),sup:()=>{snd(220,.2,'sawtooth',.1,40);snd(90,.25,'square',.06)},weak:()=>snd(120,.15,'triangle',.05,80),faint:()=>snd(400,.7,'triangle',.07,60),up:()=>snd(400,.25,'sine',.06,900),down:()=>snd(700,.25,'sine',.06,250),ball:()=>snd(600,.2,'sine',.06,1200)};
-
-/* --- fondo estilo Hoenn --- */
+/* ================= ESCENARIO ================= */
 function drawBG(){
   const c=$('#bg'),x=c.getContext('2d');let seed=7;const r=()=>(seed=(seed*16807)%2147483647)/2147483647;
   let g=x.createLinearGradient(0,0,0,250);g.addColorStop(0,'#3d9bff');g.addColorStop(.7,'#9fdcff');g.addColorStop(1,'#e4f7ff');x.fillStyle=g;x.fillRect(0,0,960,540);
   g=x.createRadialGradient(780,40,0,780,40,260);g.addColorStop(0,'#fff9d6dd');g.addColorStop(1,'#fff9d600');x.fillStyle=g;x.fillRect(0,0,960,300);
   x.fillStyle='#ffffffcc';for(let i=0;i<9;i++){const cx=r()*960,cy=20+r()*120,w=60+r()*90;for(let k=0;k<5;k++){x.beginPath();x.ellipse(cx+(k-2)*w*.28,cy+Math.sin(k*2)*6,w*.3,w*.16,0,0,7);x.fill()}}
-  // montañas
   x.fillStyle='#7aa6d6';x.beginPath();x.moveTo(0,190);for(let i=0;i<=960;i+=30)x.lineTo(i,150+Math.sin(i*.011)*30+Math.sin(i*.037)*14);x.lineTo(960,230);x.lineTo(0,230);x.fill();
   x.fillStyle='#5f9a78';x.beginPath();x.moveTo(0,210);for(let i=0;i<=960;i+=24)x.lineTo(i,185+Math.sin(i*.02+2)*18+Math.sin(i*.07)*6);x.lineTo(960,240);x.lineTo(0,240);x.fill();
-  // mar
   g=x.createLinearGradient(0,205,0,245);g.addColorStop(0,'#58c1ff');g.addColorStop(1,'#1b86d6');x.fillStyle=g;x.fillRect(0,205,960,40);
   x.fillStyle='#ffffff99';for(let i=0;i<60;i++){x.fillRect(r()*960,207+r()*34,10+r()*26,1.5)}
-  // césped con perspectiva
   g=x.createLinearGradient(0,238,0,540);g.addColorStop(0,'#a4e46a');g.addColorStop(.5,'#6cc447');g.addColorStop(1,'#3b9a37');x.fillStyle=g;x.fillRect(0,238,960,302);
   for(let y=240,h=6,i=0;y<540;y+=h,h*=1.18,i++){if(i%2){x.fillStyle='#ffffff14';x.fillRect(0,y,960,h)}}
-  // árboles lejanos
   for(let i=0;i<30;i++){const tx=r()*960,ty=232+r()*6,s=8+r()*10;x.fillStyle='#2d7a3a';x.beginPath();x.arc(tx,ty-s*.6,s,0,7);x.fill();x.fillStyle='#4a2f1a';x.fillRect(tx-1.5,ty-3,3,6)}
-  // flores y matas
-  for(let i=0;i<260;i++){const fy=250+Math.pow(r(),1.4)*290,s=1+(fy-240)/90;x.fillStyle=rnd(['#fff','#ffe14d','#ff8fb0','#8fd0ff','#4a9a30','#3a8a2a']);x.beginPath();x.arc(r()*960,fy,s,0,7);x.fill()}
-  // plataformas
+  const cols=['#fff','#ffe14d','#ff8fb0','#8fd0ff','#4a9a30','#3a8a2a'];
+  for(let i=0;i<260;i++){const fy=250+Math.pow(r(),1.4)*290,s=1+(fy-240)/90;x.fillStyle=cols[Math.floor(r()*cols.length)];x.beginPath();x.arc(r()*960,fy,s,0,7);x.fill()}
   const plat=(cx,cy,rx,ry)=>{
     x.fillStyle='#0003';x.beginPath();x.ellipse(cx,cy+ry*.45,rx*1.03,ry*1.05,0,0,7);x.fill();
     x.fillStyle='#6b4a22';x.beginPath();x.ellipse(cx,cy+ry*.3,rx,ry,0,0,7);x.fill();
@@ -668,300 +506,418 @@ function drawBG(){
     x.strokeStyle='#ffffff55';x.lineWidth=2;x.beginPath();x.ellipse(cx,cy-ry*.08,rx*.9,ry*.8,0,Math.PI*1.05,Math.PI*1.7);x.stroke();
     x.strokeStyle='#3e8b2c';x.lineWidth=1.5;for(let i=0;i<40;i++){const a=r()*6.28,rr=Math.sqrt(r()),px=cx+Math.cos(a)*rx*.85*rr,py=cy-ry*.08+Math.sin(a)*ry*.75*rr;x.beginPath();x.moveTo(px,py);x.lineTo(px+(r()-.5)*4,py-3-r()*4);x.stroke()}};
   plat(690,222,175,36);plat(235,402,235,52)}
+function fit(){const s=Math.min(innerWidth/960,innerHeight/540);$('#stage').style.setProperty('--s',s)}
+addEventListener('resize',fit);
 
-/* --- HUD --- */
-function hudHTML(side){return `<div class="r1"><span class="n"></span><span class="lv"></span></div><div class="hp"><span class="ps">PS</span><div class="bar"><i></i></div></div><div class="r3"><span class="stt"></span>${side==='p'?'<b class="num"></b>':''}<span class="balls"></span></div>`}
-function updHud(side,anim=false){
-  const h=side==='f'?$('#foeHud'):$('#plHud'),m=act(side),p=m.hp/m.maxHp*100;
-  h.querySelector('.n').textContent=m.name;h.querySelector('.lv').textContent='Nv'+m.lvl;
-  const i=h.querySelector('.bar i');if(!anim)i.style.transition='none';i.style.width=p+'%';i.className=p>50?'':(p>20?'y':'r');if(!anim){i.offsetWidth;i.style.transition=''}
-  const s=h.querySelector('.stt');s.innerHTML=m.status?`<span class="st" style="background:${STT[m.status][1]}">${STT[m.status][0]}</span>`:'';
-  h.querySelector('.balls').innerHTML=B[side].team.map(t=>`<i class="${t.fainted?'dead':''}"></i>`).join('');
-  const n=h.querySelector('.num');if(n){const from=+n.dataset.v||m.hp;n.dataset.v=m.hp;if(!anim||from===m.hp)n.textContent=`${m.hp}/${m.maxHp}`;else{const t0=performance.now(),dur=FAST?200:900;(function f(t){const k=Math.min(1,(t-t0)/dur);n.textContent=`${Math.round(from+(m.hp-from)*k)}/${m.maxHp}`;if(k<1)requestAnimationFrame(f)})(t0)}}}
-const sprEl=s=>(s==='f'?$('#foeA'):$('#plA')).firstElementChild;
+/* ================= SONIDO / TEXTO ================= */
+let FAST=false,MUTE=false,skipCb=null,AC=null;
+function wait(ms){return new Promise(r=>{if(FAST)ms/=5;const t=setTimeout(done,ms);function done(){clearTimeout(t);if(skipCb===done)skipCb=null;r()}skipCb=done})}
+$('#stage').addEventListener('click',()=>skipCb&&skipCb());
+async function say(t,hold=700){
+  const m=$('#msg');let i=0,fin=false;
+  await new Promise(res=>{const iv=setInterval(()=>{i+=FAST?4:1;m.textContent=t.slice(0,i);if(i>=t.length||fin){clearInterval(iv);m.textContent=t;res()}},16);skipCb=()=>{fin=true}});
+  await wait(hold)}
+function snd(f,d=.12,type='square',vol=.05,f2){if(MUTE)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;if(f2)o.frequency.exponentialRampToValueAtTime(f2,AC.currentTime+d);g.gain.value=vol;g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.connect(g).connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch{}}
+const sfx={hit:()=>snd(160,.18,'sawtooth',.08,50),sup:()=>{snd(220,.2,'sawtooth',.1,40);snd(90,.25,'square',.06)},weak:()=>snd(120,.15,'triangle',.05,80),faint:()=>snd(400,.7,'triangle',.07,60),up:()=>snd(400,.25,'sine',.06,900),down:()=>snd(700,.25,'sine',.06,250),ball:()=>snd(600,.2,'sine',.06,1200)};
+const anim=(el,kf,o)=>el&&el.animate?el.animate(kf,{fill:'forwards',...o,duration:FAST?(o.duration||300)/4:(o.duration||300)}).finished.catch(()=>{}):Promise.resolve();
+
+/* ================= COMBATE: ESTADO Y HUD ================= */
+let M=null;
+const newSide=()=>({sp:null,disp:'',lvl:50,hp:1,max:1,status:'',tera:'',fainted:0,size:6,out:false});
+const sd=ident=>ident.slice(0,2);
+const pos=side=>side==='p2'?{x:690,y:150}:{x:235,y:325};
+const hudEl=side=>side==='p2'?$('#foeHud'):$('#plHud');
+const sprEl=side=>(side==='p2'?$('#foeA'):$('#plA')).firstElementChild;
+const W=side=>side==='p2'?`el ${M.S.p2.disp} rival`:M.S.p1.disp;
+const Wc=side=>side==='p2'?`El ${M.S.p2.disp} rival`:M.S.p1.disp;
+function hudHTML(side){return `<div class="r1"><span class="n"></span><span class="lv"></span></div><div class="hp"><span class="ps">PS</span><div class="bar"><i></i></div></div><div class="r3"><span class="stt"></span>${side==='p1'?'<b class="num"></b>':''}<span class="balls"></span></div>`}
+function updHud(side,animate=false){
+  const h=hudEl(side),s=M.S[side],p=s.hp/s.max*100;
+  h.querySelector('.n').textContent=s.disp;h.querySelector('.lv').textContent='Nv'+s.lvl;
+  const i=h.querySelector('.bar i');if(!animate)i.style.transition='none';i.style.width=p+'%';i.className=p>50?'':(p>20?'y':'r');if(!animate){i.offsetWidth;i.style.transition=''}
+  h.querySelector('.stt').innerHTML=(s.status&&STT[s.status]?`<span class="st" style="background:${STT[s.status][1]}">${STT[s.status][0]}</span>`:'')+(s.tera?`<span class="st" style="background:${tCol(s.tera)}">✦ ${tES(s.tera)}</span>`:'');
+  const alive=s.size-s.fainted;h.querySelector('.balls').innerHTML=Array.from({length:s.size},(_,k)=>`<i class="${k>=alive?'dead':''}"></i>`).join('');
+  const n=h.querySelector('.num');if(n){const from=+n.dataset.v||s.hp;n.dataset.v=s.hp;if(!animate||from===s.hp)n.textContent=`${s.hp}/${s.max}`;else{const t0=performance.now(),dur=FAST?200:900;(function f(t){const k=Math.min(1,(t-t0)/dur);n.textContent=`${Math.round(from+(s.hp-from)*k)}/${s.max}`;if(k<1)requestAnimationFrame(f)})(t0)}}}
 function setSprite(side){
-  const m=act(side),A=side==='f'?$('#foeA'):$('#plA');A.innerHTML='';
-  const back=side==='p',id=m.d.id;
-  const bid=DEX[m.base].id,ids=id===bid?[id]:[id,bid];
-  const srcs=ids.flatMap(i=>back?[`${SS}ani-back/${i}.gif`,`${SS}gen5-back/${i}.png`]:[`${SS}ani/${i}.gif`,`${SS}gen5/${i}.png`]);
-  const k=back?2:1.55,maxH=back?270:210;
-  const im=mkImg(srcs,m.d,i=>{const sc=Math.min(k,maxH/i.naturalHeight);i.style.width=i.naturalWidth*sc+'px';i.style.height=i.naturalHeight*sc+'px';},back?130:100);
+  const s=M.S[side],A=side==='p2'?$('#foeA'):$('#plA');A.innerHTML='';
+  const back=side==='p1',k=back?2:1.55,maxH=back?270:210;
+  const im=mkImg(sprSrcs(s.sp,back),s.sp,i=>{const sc=Math.min(k,maxH/i.naturalHeight);i.style.width=i.naturalWidth*sc+'px';i.style.height=i.naturalHeight*sc+'px'},back?130:100);
+  if(s.tera)im.style.filter=`drop-shadow(0 0 10px ${tCol(s.tera)})`;
   A.append(im)}
-const anim=(el,kf,o)=>el.animate?el.animate(kf,{fill:'forwards',...o,duration:FAST?(o.duration||300)/4:(o.duration||300)}).finished.catch(()=>{}):Promise.resolve();
-async function sendOut(side){
-  const m=act(side);setSprite(side);updHud(side);
-  const hud=side==='f'?$('#foeHud'):$('#plHud');hud.style.display='';anim(hud,[{opacity:0,transform:'translateX('+(side==='f'?-40:40)+'px)'},{opacity:1,transform:'none'}],{duration:350});
-  sfx.ball();
-  const e=sprEl(side);e.style.opacity=0;await wait(60);
-  await anim(e,[{transform:'translateX(-50%) scale(.1)',filter:'brightness(6)',opacity:1},{transform:'translateX(-50%) scale(1.12)',filter:'brightness(2)',opacity:1,offset:.6},{transform:'translateX(-50%) scale(1)',filter:'none',opacity:1}],{duration:550});
+function fxEl(cls,x,y){const e=document.createElement('div');e.className=cls;e.style.left=x+'px';e.style.top=y+'px';$('#fx').append(e);return e}
+async function sendOutAnim(side){
+  const hud=hudEl(side);hud.style.display='';anim(hud,[{opacity:0,transform:'translateX('+(side==='p2'?-40:40)+'px)'},{opacity:1,transform:'none'}],{duration:350});
+  sfx.ball();const e=sprEl(side);if(!e)return;e.style.opacity=0;await wait(60);
+  await anim(e,[{transform:'translateX(-50%) scale(.1)',filter:'brightness(6)',opacity:1},{transform:'translateX(-50%) scale(1.12)',filter:'brightness(2)',opacity:1,offset:.6},{transform:'translateX(-50%) scale(1)',filter:e.style.filter||'none',opacity:1}],{duration:550});
   e.style.opacity=1}
-function fxEl(cls,x,y,css=''){const e=document.createElement('div');e.className=cls;e.style.left=x+'px';e.style.top=y+'px';e.style.cssText+=css;$('#fx').append(e);return e}
-async function floatTxt(side,txt,color='#fff'){const p=pos(side);const e=fxEl('float',p.x,p.y-30);e.textContent=txt;e.style.color=color;await anim(e,[{opacity:0,transform:'translate(-50%,0)'},{opacity:1,transform:'translate(-50%,-30px)',offset:.2},{opacity:1,transform:'translate(-50%,-50px)',offset:.8},{opacity:0,transform:'translate(-50%,-60px)'}],{duration:900});e.remove()}
-async function animAttack(a,d,mv){
-  const as=a.side,ds=d.side,pa=pos(as),pd=pos(ds),el=sprEl(as),col=TYPES[mv.t][1];
-  if(mv.c==='x'){await anim(el,[{filter:'none'},{filter:'brightness(1.8) saturate(1.5)'},{filter:'none'}],{duration:450});return}
-  if(mv.c==='p'){
+async function animMove(src,tgt,mv){
+  const pa=pos(src),pd=pos(tgt),el=sprEl(src),col=tCol(mv.type);if(!el)return;
+  if(mv.category==='Status'||src===tgt){await anim(el,[{filter:'none'},{filter:`brightness(1.8) saturate(1.5) drop-shadow(0 0 12px ${col})`},{filter:el.style.filter||'none'}],{duration:450});return}
+  if(mv.category==='Physical'){
     const dx=(pd.x-pa.x)*.8,dy=(pd.y-pa.y)*.7;
-    await anim(el,[{transform:'translateX(-50%)'},{transform:`translateX(-50%) translate(${-dx*.1}px,${-dy*.1}px)`,offset:.25},{transform:`translateX(-50%) translate(${dx}px,${dy}px)`,offset:.5},{transform:'translateX(-50%)'}],{duration:500});
-  }else{
+    await anim(el,[{transform:'translateX(-50%)'},{transform:`translateX(-50%) translate(${-dx*.1}px,${-dy*.1}px)`,offset:.25},{transform:`translateX(-50%) translate(${dx}px,${dy}px)`,offset:.5},{transform:'translateX(-50%)'}],{duration:500})}
+  else{
     const p=fxEl('proj',pa.x,pa.y);p.style.background=`radial-gradient(circle,#fff 0%,${col} 50%,${col}00 72%)`;p.style.boxShadow=`0 0 24px ${col}`;
-    await anim(p,[{transform:'scale(.4)',left:pa.x+'px',top:pa.y+'px'},{transform:'scale(1.3)',left:(pa.x+pd.x)/2+'px',top:(pa.y+pd.y)/2-30+'px',offset:.5},{transform:'scale(1)',left:pd.x+'px',top:pd.y+'px'}],{duration:450});p.remove()}
-}
-async function animHit(d,mv,e){
-  const pd=pos(d.side),col=TYPES[mv.t][1];
-  (e>1?sfx.sup:e<1?sfx.weak:sfx.hit)();
+    await anim(p,[{transform:'scale(.4)',left:pa.x+'px',top:pa.y+'px'},{transform:'scale(1.3)',left:(pa.x+pd.x)/2+'px',top:(pa.y+pd.y)/2-30+'px',offset:.5},{transform:'scale(1)',left:pd.x+'px',top:pd.y+'px'}],{duration:450});p.remove()}}
+async function animHit(side,type,e){
+  const pd=pos(side),col=tCol(type);(e>1?sfx.sup:e<1?sfx.weak:sfx.hit)();
   const r=fxEl('ring',pd.x,pd.y);r.style.borderColor=col;r.style.boxShadow=`0 0 20px ${col}`;
   anim(r,[{transform:'scale(.3)',opacity:1},{transform:`scale(${e>1?5:3.6})`,opacity:0}],{duration:420}).then(()=>r.remove());
-  await anim(sprEl(d.side),[{opacity:1},{opacity:.1},{opacity:1},{opacity:.1},{opacity:1},{opacity:.1},{opacity:1}],{duration:420})}
-async function animFaint(m){sfx.faint();const e=sprEl(m.side);await anim(e,[{transform:'translateX(-50%) translateY(0)',opacity:1},{transform:'translateX(-50%) translateY(70px)',opacity:0}],{duration:700});}
-async function setHp(m,newHp){m.hp=Math.max(0,Math.min(m.maxHp,newHp));if(act(m.side)===m){updHud(m.side,true);await wait(950)}}
+  await anim(sprEl(side),[{opacity:1},{opacity:.1},{opacity:1},{opacity:.1},{opacity:1},{opacity:.1},{opacity:1}],{duration:420})}
+async function animFaint(side){sfx.faint();await anim(sprEl(side),[{transform:'translateX(-50%) translateY(0)',opacity:1},{transform:'translateX(-50%) translateY(70px)',opacity:0}],{duration:700})}
+async function setHpBar(side,hp,max,status){const s=M.S[side];s.hp=hp;s.max=max;if(status!==undefined)s.status=status;updHud(side,true);await wait(950)}
+function showWx(){
+  const w=M.weather,e=$('#wx');e.className=w||'';
+  const L={rain:'☔ Lluvia',sun:'☀ Sol',sand:'🌪 Tormenta de arena',snow:'❄ Nieve'}[w]||'';
+  $('#wlabel').textContent=[L,...(M.fields||[])].filter(Boolean).join(' · ')}
+const WMAP={RainDance:'rain',PrimordialSea:'rain',SunnyDay:'sun',DesolateLand:'sun',Sandstorm:'sand',Hail:'snow',Snow:'snow',Snowscape:'snow'};
 
-function statusEnd(m){m.status=null;m.tox=0;m.slp=0}
-async function giveStatus(t,s){t.status=s;t.tox=0;if(s==='slp')t.slp=1+Math.floor(Math.random()*3);updHud(t.side);await say(`¡${nmC(t)} ${STT[s][2]}!`)}
-async function changeStage(m,k,n){
-  const cur=m.st[k],nv=Math.max(-6,Math.min(6,cur+n));
-  if(nv===cur){await say(`¡${STN[k]} de ${nm(m)} no puede ${n>0?'subir':'bajar'} más!`);return}
-  m.st[k]=nv;(n>0?sfx.up:sfx.down)();
-  const a=Math.abs(n);await say(`¡${STN[k]} de ${nm(m)} ${n>0?'subió':'bajó'}${a>1?' mucho':''}!`)}
+/* ================= COMBATE: PROTOCOLO ================= */
+function parseHp(str){const [h,st]=str.split(' ');if(h==='0')return{hp:0,max:null,status:''};const [a,b]=h.split('/');return{hp:+a,max:+b,status:st&&st!=='fnt'?st:''}}
+async function playLines(lines){for(const l of lines){if(!M||M.dead)return;try{await playLine(l)}catch(e){console.error('línea',l,e)}}}
+async function flushNotes(){
+  const n=M.notes;M.notes=[];
+  if(n.includes('crit'))await say('¡Un golpe crítico!',450);
+  if(n.includes('sup'))await say('¡Es súper eficaz!',500);else if(n.includes('res'))await say('No es muy eficaz...',500)}
+const IGNORE=new Set(['','t:','gametype','gen','tier','clearpoke','poke','rule','start','teampreview','debug','inactive','inactiveoff','upkeep','-anim','j','l','c','html','raw','uhtml','n','rated','request','split','-center']);
+async function fmtSay(args,kw){
+  let txt='';try{txt=M.f.formatText(args,kw)}catch{return}
+  for(const l of txt.split('\n').map(x=>x.trim()).filter(Boolean))await say(l,600)}
+async function playLine(line){
+  if(!line||line[0]!=='|')return;
+  const {args,kwArgs:kw}=Protocol.parseBattleLine(line),t=args[0];
+  if(IGNORE.has(t))return;
+  switch(t){
+    case 'player':{if(args[1]==='p1'||args[1]==='p2')M.f[args[1]]=args[2];return}
+    case 'teamsize':M.S[args[1]].size=+args[2];return;
+    case 'switch':case 'drag':return onSwitch(args,t==='drag');
+    case 'replace':{const sdd=sd(args[1]),s=M.S[sdd];s.sp=Dex.species.get(args[2].split(',')[0]);s.disp=nmSp(s.sp.name);setSprite(sdd);updHud(sdd);return}
+    case 'detailschange':case '-formechange':return onForme(args,kw);
+    case 'move':return onMove(args,kw);
+    case '-miss':await flushNotes();return say(`¡El ataque de ${W(sd(args[1]))} falló!`);
+    case '-fail':case '-notarget':return say('¡Pero falló!');
+    case '-immune':{await flushNotes();if(kw.from&&/ability/.test(kw.from))return fmtSay(args,kw);return say(`No afecta a ${W(sd(args[1]))}...`)}
+    case '-crit':M.notes.push('crit');return;
+    case '-supereffective':M.notes.push('sup');return;
+    case '-resisted':M.notes.push('res');return;
+    case '-damage':return onDamage(args,kw);
+    case '-heal':return onHeal(args,kw);
+    case '-sethp':{const s=sd(args[1]),p=parseHp(args[2]);return setHpBar(s,p.hp,p.max||M.S[s].max)}
+    case 'faint':return onFaint(sd(args[1]));
+    case '-status':{const s=sd(args[1]);M.S[s].status=args[2];updHud(s);
+      if(kw.from)return fmtSay(args,kw);
+      return say(`¡${Wc(s)} ${STT[args[2]]?STT[args[2]][2]:'tiene un problema de estado'}!`)}
+    case '-curestatus':{const s=sd(args[1]);M.S[s].status='';updHud(s);if(kw.silent)return;return say(`¡${Wc(s)} se curó de su estado!`)}
+    case '-boost':case '-unboost':{
+      const s=sd(args[1]),n=+args[3],up=t==='-boost';(up?sfx.up:sfx.down)();
+      return say(`¡${STN[args[2]]||args[2]} de ${W(s)} ${up?'subió':'bajó'}${n>=3?' muchísimo':n===2?' mucho':''}!`)}
+    case '-weather':{
+      const w=args[1];if(w==='none'){M.weather=null;showWx();return say('El clima se calmó.')}
+      M.weather=WMAP[w]||null;showWx();if(kw.upkeep)return;return fmtSay(args,kw)}
+    case '-fieldstart':{const n=args[1].replace('move: ','');(M.fields=M.fields||[]).push(n);showWx();return fmtSay(args,kw)}
+    case '-fieldend':{const n=args[1].replace('move: ','');M.fields=(M.fields||[]).filter(x=>x!==n);showWx();return fmtSay(args,kw)}
+    case '-terastallize':{const s=sd(args[1]);M.S[s].tera=args[2];
+      await say(`¡${Wc(s)} se terastalizó en el tipo ${tES(args[2])}!`,400);setSprite(s);updHud(s);
+      await anim(sprEl(s),[{filter:'brightness(5)'},{filter:`drop-shadow(0 0 14px ${tCol(args[2])})`}],{duration:600});return}
+    case '-mega':{const s=sd(args[1]);sfx.up();
+      await say(`¡${Wc(s)} reacciona a su ${nmItem(args[3]||'')}!`,500);
+      await anim(sprEl(s),[{filter:'none',transform:'translateX(-50%)'},{filter:'brightness(9) saturate(0)',transform:'translateX(-50%) scale(1.18)'},{filter:'none',transform:'translateX(-50%)'}],{duration:800});
+      return say(`¡${Wc(s)} ha megaevolucionado!`,700)}
+    case 'cant':{
+      const s=sd(args[1]),r=args[2];await flushNotes();
+      const m={par:`¡${Wc(s)} está paralizado! ¡No se puede mover!`,slp:`${Wc(s)} está profundamente dormido.`,frz:`¡${Wc(s)} está congelado!`,flinch:`¡${Wc(s)} se amedrentó!`,recharge:`¡${Wc(s)} debe recargarse!`};
+      return m[r]?say(m[r]):fmtSay(args,kw)}
+    case '-hitcount':return say(`¡Golpeó ${args[2]} veces!`,500);
+    case 'turn':await flushNotes();return;
+    case 'win':M.over=true;M.winner=args[1];return;
+    case 'tie':M.over=true;M.winner=null;return;
+    case 'error':{M.pending=M.lastReq;return say('Acción no válida: '+(args[1]||'').replace(/^\[[^\]]+\]\s*/,''),500)}
+    case '-ability':{const s=sd(args[1]),ab=args[2];
+      if(ab==='Pressure')return say(`¡${Wc(s)} ejerce su presión!`,500);
+      if(kw.from)return fmtSay(args,kw);
+      return say(`[${nmAb(ab)} de ${W(s)}]`,500)}
+    case '-enditem':{const s=sd(args[1]),it=args[2];
+      if(kw.eat)return say(`¡${Wc(s)} comió su ${nmItem(it)}!`,500);
+      if(kw.from&&/move/.test(kw.from))return fmtSay(args,kw);
+      return say(`¡${Wc(s)} usó su ${nmItem(it)}!`,500)}
+    case '-message':return say(args[1],600);
+    default:{await flushNotes();return fmtSay(args,kw)}}}
+async function onSwitch(args,drag){
+  const side=sd(args[1]),s=M.S[side],sp=Dex.species.get(args[2].split(',')[0]),lvl=+((args[2].match(/L(\d+)/)||[])[1]||100),hp=parseHp(args[3]);
+  await flushNotes();
+  if(s.out){
+    if(!drag)await say(side==='p1'?`¡Vuelve, ${s.disp}!`:`${M.opp.name} retiró a ${s.disp}.`,300);
+    await anim(sprEl(side),[{opacity:1,transform:'translateX(-50%) scale(1)'},{opacity:0,transform:'translateX(-50%) scale(.1)'}],{duration:350})}
+  s.sp=sp;s.disp=nmSp(sp.name);s.lvl=lvl;s.hp=hp.hp;s.max=hp.max||s.max;s.status=hp.status;s.tera='';s.out=true;
+  setSprite(side);updHud(side);
+  await say(drag?`¡${Wc(side)} fue arrastrado al combate!`:side==='p1'?`¡Adelante, ${s.disp}!`:`${M.opp.name} sacó a ${s.disp}.`,250);
+  await sendOutAnim(side)}
+async function onForme(args,kw){
+  const side=sd(args[1]),s=M.S[side];if(!s.sp)return;
+  const sp=Dex.species.get(args[2].split(',')[0]);s.sp=sp;s.disp=nmSp(sp.name);
+  setSprite(side);updHud(side);
+  if(!kw.silent){sfx.up();await anim(sprEl(side),[{filter:'brightness(8)'},{filter:'none'}],{duration:600})}}
+async function onMove(args,kw){
+  const side=sd(args[1]),mv=Dex.moves.get(args[2]),tgt=args[3]&&/^p[12]/.test(args[3])?sd(args[3]):side;
+  await flushNotes();
+  M.last={type:mv.type,cat:mv.category,tgt,src:side};
+  await say(`¡${Wc(side)} usó ${nmMove(mv)}!`,300);
+  if(kw.miss||kw.still||kw.notarget)return;
+  await animMove(side,tgt,mv)}
+async function onDamage(args,kw){
+  const side=sd(args[1]),p=parseHp(args[2]);
+  if(!kw.from&&M.last&&M.last.tgt===side&&M.last.cat!=='Status'){const e=M.notes.includes('sup')?2:M.notes.includes('res')?.5:1;await animHit(side,M.last.type,e)}
+  await setHpBar(side,p.hp,p.max||M.S[side].max,p.status);
+  if(kw.from){
+    const f=kw.from.replace(/^(item|ability|move): /,'');
+    if(f==='brn')return say(`¡${Wc(side)} sufre quemaduras!`,450);
+    if(f==='psn'||f==='tox')return say(`¡${Wc(side)} sufre por el veneno!`,450);
+    if(f==='Recoil')return say(`¡${Wc(side)} se hirió por el retroceso!`,450);
+    const T={Sandstorm:`¡La tormenta de arena golpea a ${W(side)}!`,Hail:`¡El granizo golpea a ${W(side)}!`,'Leech Seed':`¡Las drenadoras absorben PS de ${W(side)}!`,'Stealth Rock':`¡Unas piedras puntiagudas se clavan en ${W(side)}!`,Spikes:`¡${Wc(side)} fue herido por las púas!`,confusion:'¡Está tan confuso que se hirió a sí mismo!'};
+    if(T[f])return say(T[f],450);
+    if(kw.from.startsWith('item: '))return say(`¡${Wc(side)} perdió PS por ${nmItem(f)}!`,450);
+    if(kw.from.startsWith('ability: '))return say(`¡${Wc(side)} fue herido por ${nmAb(f)}!`,450);
+    return fmtSay(args,kw)}
+  await flushNotes()}
+async function onHeal(args,kw){
+  const side=sd(args[1]),p=parseHp(args[2]);await setHpBar(side,p.hp,p.max||M.S[side].max,p.status);
+  if(kw.silent)return;
+  if(kw.from){
+    const f=kw.from.replace(/^(item|ability|move): /,'');
+    if(f==='drain')return say(`¡Se absorbieron PS de ${W(kw.of?sd(kw.of):(side==='p1'?'p2':'p1'))}!`,400);
+    if(kw.from.startsWith('item: '))return say(`¡${Wc(side)} recuperó PS con ${nmItem(f)}!`,450);
+    if(kw.from.startsWith('ability: '))return say(`¡${nmAb(f)} de ${W(side)} le recuperó PS!`,450);
+    return fmtSay(args,kw)}
+  return say(`¡${Wc(side)} recuperó PS!`,450)}
+async function onFaint(side){
+  await flushNotes();const s=M.S[side];s.hp=0;updHud(side,true);
+  await animFaint(side);await say(`¡${Wc(side)} se debilitó!`,600);
+  s.out=false;s.fainted++;updHud(side)}
 
-function showWx(){const e=$('#wx');e.className=B&&B.w?B.w:'';$('#wlabel').textContent=B&&B.w?({rain:'☔ Lluvia',sun:'☀ Sol',sand:'🌪 Tormenta de arena'}[B.w]+` (${B.wt})`):''}
-async function setWeather(w){if(B.w===w)return;B.w=w;B.wt=5;showWx();await say({rain:'¡Empezó a llover!',sun:'¡El sol brilla intensamente!',sand:'¡Se desató una tormenta de arena!'}[w],600)}
-async function onEnter(m){
-  const o=act(m.side==='p'?'f':'p');
-  if(m.ab==='intimidate'&&o&&!o.fainted){sfx.down();o.st.atk=Math.max(-6,o.st.atk-1);await say(`¡Intimidación de ${nm(m)} bajó el Ataque de ${nm(o)}!`,500)}
-  if(m.ab==='drizzle')await setWeather('rain');
-  if(m.ab==='drought')await setWeather('sun');
-  if(m.ab==='sandstream')await setWeather('sand')}
-async function berry(m){if(m.item==='sitrus'&&!m.fainted&&m.hp>0&&m.hp*2<=m.maxHp){m.item=null;await setHp(m,m.hp+Math.floor(m.maxHp/4));await say(`¡${nmC(m)} comió su Baya Zidra!`,500)}}
-async function megaEvolve(m){
-  const v=m.megaV,s=m.side,old=m.name;m.mega=true;B[s].megaUsed=true;
-  await say(`¡${nmC(m)} reacciona a la ${v.stone}!`,500);
-  sfx.up();
-  await anim(sprEl(s),[{filter:'none',transform:'translateX(-50%)'},{filter:'brightness(9) saturate(0)',transform:'translateX(-50%) scale(1.18)'},{filter:'none',transform:'translateX(-50%)'}],{duration:800});
-  m.stats={...statsOf({b:v.b}),hp:m.stats.hp};m.types=v.t;m.d={...m.d,id:v.sl,t:v.t};m.ab=v.ab;m.name=v.name;m.lock=null;
-  setSprite(s);updHud(s);
-  const e=sprEl(s);e.style.opacity=0;await anim(e,[{opacity:1,filter:'brightness(6)'},{opacity:1,filter:'none'}],{duration:500});e.style.opacity=1;
-  await say(`¡${old} ha megaevolucionado en ${v.name}!`,700);
-  await onEnter(m)}
-async function abilityImmune(a,d,im){
-  if(im==='lev')await say(`¡${nmC(d)} flota gracias a Levitación! No le afecta.`);
-  else if(im==='ff'){d.ff=true;await say(`¡Absorbe Fuego de ${nm(d)} potencia sus ataques de Fuego!`)}
-  else if(im==='volt'){if(d.hp<d.maxHp){await setHp(d,d.hp+Math.floor(d.maxHp/4));await say(`¡Absorbe Elec de ${nm(d)} le recuperó PS!`)}else await say(`¡Absorbe Elec de ${nm(d)} anuló el ataque!`)}
-  else if(im==='lr'){await say(`¡Pararrayos de ${nm(d)} atrajo el ataque!`,400);await changeStage(d,'spa',1)}}
-
-async function useMove(a,idx){
-  const d=act(a.side==='p'?'f':'p'),mv=a.moves[idx];
-  if(a.status==='slp'){a.slp--;if(a.slp<=0){statusEnd(a);updHud(a.side);await say(`¡${nmC(a)} se despertó!`)}else{await say(`${nmC(a)} está profundamente dormido.`);return}}
-  if(a.status==='frz'){if(Math.random()<.2){statusEnd(a);updHud(a.side);await say(`¡${nmC(a)} se descongeló!`)}else{await say(`¡${nmC(a)} está congelado!`);return}}
-  if(a.status==='par'&&Math.random()<.25){await say(`¡${nmC(a)} está paralizado! ¡No se puede mover!`);return}
-  if(mv.pp>0)mv.pp--;
-  if(/^(bandc|specs|scarf)$/.test(a.item||''))a.lock=idx;
-  await say(`¡${nmC(a)} usó ${mv.n}!`,300);
-  if(!mv.never&&mv.a&&Math.random()*100>=mv.a){await say(`¡El ataque de ${nm(a)} falló!`);return}
-  if(mv.c==='x'){
-    await animAttack(a,d,mv);
-    if(mv.inf){
-      const s=mv.inf;
-      if(mv.k==='thunderwave'&&eff('electric',d.types)===0||!canInflict(d,s)){await say('¡Pero no afectó!');return}
-      await giveStatus(d,s)}
-    if(mv.heal){if(a.hp>=a.maxHp){await say(`¡Los PS de ${nm(a)} ya están al máximo!`);return}await setHp(a,a.hp+Math.floor(a.maxHp*mv.heal));await say(`¡${nmC(a)} recuperó PS!`)}
-    if(mv.rest){if(a.hp>=a.maxHp||a.status==='slp'){await say('¡Pero falló!');return}a.status='slp';a.slp=3;a.tox=0;await setHp(a,a.maxHp);updHud(a.side);await say(`¡${nmC(a)} se durmió y recuperó toda su salud!`)}
-    if(mv.bo)for(const [k,n] of mv.bo)await changeStage(a,k,n);
-    return}
-  await animAttack(a,d,mv);
-  const im=abImm(d,mv);
-  if(im){await abilityImmune(a,d,im);return}
-  const e=eff(mv.t,d.types);
-  if(e===0){await say(`No afecta a ${nm(d)}...`);return}
-  const crit=Math.random()<1/16;let dmg=calc(a,d,mv,crit,.85+Math.random()*.15),note=null;
-  if(dmg>=d.hp&&d.hp===d.maxHp){
-    if(d.ab==='sturdy'){dmg=d.hp-1;note=`¡${nmC(d)} resistió el golpe gracias a Robustez!`}
-    else if(d.item==='sash'){dmg=d.hp-1;d.item=null;note=`¡${nmC(d)} se aferró con la Cinta Focus!`}}
-  await animHit(d,mv,e);
-  const real=Math.min(dmg,d.hp);await setHp(d,d.hp-dmg);
-  if(crit)await say('¡Un golpe crítico!',450);
-  if(e>1)await say('¡Es súper eficaz!',500);else if(e<1)await say('No es muy eficaz...',500);
-  if(note)await say(note,500);
-  if(mv.drain&&!a.fainted){await setHp(a,a.hp+Math.max(1,Math.floor(real*mv.drain)));await say(`¡${nmC(d)} fue absorbido!`,400)}
-  if(d.hp<=0){await faint(d)}
-  else{
-    if(mv.st&&Math.random()*100<mv.st[1]&&canInflict(d,mv.st[0]))await giveStatus(d,mv.st[0]);
-    if(mv.bo)for(const [k,n,ch,self] of mv.bo)if(Math.random()*100<ch&&!(self&&a.fainted))await changeStage(self?a:d,k,n);
-    await berry(d)}
-  if(a.item==='lifeorb'&&!a.fainted){await setHp(a,a.hp-Math.max(1,Math.floor(a.maxHp/10)));await say(`¡${nmC(a)} perdió PS por la Vidasfera!`,450);if(a.hp<=0)await faint(a)}
-  if(mv.recoil&&!a.fainted){await setHp(a,a.hp-Math.max(1,Math.floor(real*mv.recoil)));await say(`¡${nmC(a)} se hirió por el retroceso!`,500);if(a.hp<=0)await faint(a)}
-  else if(mv.bo&&d.fainted&&!a.fainted)for(const [k,n,ch,self] of mv.bo)if(self&&ch===100)await changeStage(a,k,n);
-  if(!a.fainted)await berry(a)}
-async function faint(m){m.fainted=true;m.hp=0;updHud(m.side,true);await animFaint(m);await say(`¡${nmC(m)} se debilitó!`,600);updHud(m.side)}
-
-function order(pa,fa){
-  const list=[{s:'p',a:pa},{s:'f',a:fa}].filter(x=>x.a);
-  const pri=x=>x.a.t==='sw'?10:(act(x.s).moves[x.a.i].pr||0);
-  const spd=x=>effStat(act(x.s),'spe');
-  list.sort((x,y)=>pri(y)-pri(x)||spd(y)-spd(x)||Math.random()-.5);return list}
-
-/* IA rival */
-function aiChoose(){
-  const me=act('f'),you=act('p'),diff=B.diff;
-  const sc=me.moves.map((m,i)=>{
-    if(m.pp<=0)return -1;let s=1;
-    if(m.c!=='x'){const dm=calc(me,you,m,false,.92);s=dm*(m.never?1:(m.a||100)/100);if(dm>=you.hp)s+=400+(m.pr||0)*60;if(dm===0)s=0}
-    else if(m.inf)s=(!canInflict(you,m.inf)||(m.k==='thunderwave'&&eff('electric',you.types)===0))?0:70*(m.inf==='slp'?1.2:1);
-    else if(m.heal)s=me.hp/me.maxHp<.45?220:0;
-    else if(m.rest)s=(me.hp/me.maxHp<.35&&me.status!=='slp')?200:0;
-    else if(m.bo)s=(me.st[m.bo[0][0]]<1&&me.hp/me.maxHp>.55)?60:5;
-    return s*(1+(Math.random()-.5)*(1-diff)*1.4)});
-  // cambio táctico
-  if(diff>.55&&Math.random()<.35){
-    const best=Math.max(...me.moves.map(m=>m.c==='x'?0:eff(m.t,you.types)));
-    if(best<1){const alt=B.f.team.map((t,i)=>({t,i})).filter(o=>!o.t.fainted&&o.i!==B.f.act&&o.t.moves.some(m=>m.c!=='x'&&eff(m.t,you.types)>1));if(alt.length)return{t:'sw',i:rnd(alt).i}}}
-  let bi=0;sc.forEach((v,i)=>{if(v>sc[bi])bi=i});
-  if(sc[bi]<0)bi=0;return{t:'mv',i:bi}}
-
-/* menús del jugador */
-function setMsgFull(on){$('#cmd').classList.toggle('on',!on?false:true)}
-function waitChoice(){
+/* ================= COMBATE: MENÚS ================= */
+const foeTypesNow=()=>{const s=M.S.p2;return s.tera?[s.tera]:(s.sp?s.sp.types:['Normal'])};
+function promptUI(req){
   return new Promise(res=>{
-    const me=act('p'),cmd=$('#cmd'),tb=$('#textbox');let mega=false;
-    const canMega=me.megaV&&!me.mega&&!B.p.megaUsed;
-    const clean=()=>{$$('#textbox .tmp').forEach(e=>e.remove());tb.classList.remove('mv');cmd.classList.remove('on')};
+    const cmd=$('#cmd'),tb=$('#textbox');
+    const clean=()=>{$$('#textbox .tmp').forEach(e=>e.remove());tb.classList.remove('mv');cmd.classList.remove('on');$('#switch').classList.remove('on')};
+    const done=v=>{clean();res(v)};
+    const pokes=req.side.pokemon,act=req.active&&req.active[0],forced=!!req.forceSwitch;
+    const switchList=()=>{
+      const sw=$('#switch');
+      sw.innerHTML=`<h3>${forced?'Elige tu siguiente Pokémon':'Pokémon'}</h3><div class="sgrid"></div>${forced?'':'<button class="btn ghost" id="swb">Cancelar</button>'}`;
+      const g=sw.querySelector('.sgrid');
+      pokes.forEach((p,i)=>{
+        const sp=Dex.species.get(p.details.split(',')[0]),hp=parseHp(p.condition),dead=p.condition.endsWith('fnt')||hp.hp===0;
+        const b=document.createElement('button');b.className='sc'+((dead||p.active)?' dead':'');
+        b.innerHTML=`<div class="ic"></div><div><b>${nmSp(sp.name)}</b> <small>Nv${(p.details.match(/L(\d+)/)||[,100])[1]}</small><div class="mini"><i style="width:${hp.max?hp.hp/hp.max*100:0}%"></i></div><small>${hp.hp}/${hp.max||'?'}${hp.status&&STT[hp.status]?' · '+STT[hp.status][0]:''}</small></div>`;
+        b.querySelector('.ic').append(iconEl(sp,50));
+        b.onclick=()=>done('switch '+(i+1));g.append(b)});
+      sw.classList.add('on');
+      const c=sw.querySelector('#swb');if(c)c.onclick=()=>sw.classList.remove('on')};
+    if(forced){$('#msg').textContent='Elige tu siguiente Pokémon.';switchList();return}
+    let ext=null;
     const main=()=>{
-      clean();
-      $('#msg').textContent=`¿Qué hará ${me.name}?`;
-      cmd.innerHTML=`<button class="cbtn" style="background:#d9442f" id="b1">⚔ Luchar</button><button class="cbtn" style="background:#2f9e5b" id="b2">🔴 Pokémon</button><button class="cbtn" style="background:#6b7a90;grid-column:span 2" id="b3">🏳 Rendirse</button>`;
+      clean();$('#msg').textContent=`¿Qué hará ${M.S.p1.disp}?`;
+      const trapped=act&&act.trapped;
+      cmd.innerHTML=`<button class="cbtn" style="background:#d9442f" id="b1">⚔ Luchar</button><button class="cbtn" style="background:#2f9e5b" id="b2" ${trapped?'disabled':''}>🔴 Pokémon</button><button class="cbtn" style="background:#6b7a90;grid-column:span 2" id="b3">🏳 Rendirse</button>`;
       cmd.classList.add('on');
-      $('#b1').onclick=moves;
-      $('#b2').onclick=()=>pick(false).then(i=>{if(i!=null){clean();res({t:'sw',i})}});
-      $('#b3').onclick=()=>{clean();res({t:'quit'})}};
+      $('#b1').onclick=moves;$('#b2').onclick=switchList;$('#b3').onclick=()=>done('quit')};
     const moves=()=>{
-      if(!me.moves.some(m=>m.pp>0)){clean();res({t:'mv',i:0,struggle:true});return}
-      const locked=me.lock!=null&&me.moves[me.lock].pp>0;
-      cmd.innerHTML=me.moves.map((m,i)=>{const e=m.c==='x'?null:eff(m.t,act('f').types);return `<button class="cbtn" data-i="${i}" style="background:${TYPES[m.t][1]}" ${(m.pp<=0||(locked&&i!==me.lock))?'disabled':''}>${m.n}<small>${TYPES[m.t][0]} · PP ${m.pp}/${MV[m.k].pp}${m.p?' · Pod '+m.p:''}</small>${e!=null&&e!==1?`<span class="ef">${e===0?'×0':e>1?'×'+e:'×½'}</span>`:''}</button>`}).join('');
-      $$('#cmd .cbtn').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;clean();res({t:'mv',i,mega})});
-      tb.classList.add('mv');cmd.classList.add('on');
-      $('#msg').textContent=locked?`${ITEMS[me.item][0]}: movimiento fijado.`:'Elige un movimiento.';
-      const bk=document.createElement('button');bk.className='tmp tbtn';bk.textContent='← Atrás';bk.style.cssText='left:10px;top:10px';bk.onclick=main;tb.append(bk);
-      if(canMega){const mb=document.createElement('button');mb.className='tmp tbtn mega';mb.style.cssText='left:10px;top:58px';mb.textContent='✦ Mega: NO';mb.onclick=()=>{mega=!mega;mb.classList.toggle('on',mega);mb.textContent=mega?'✦ Mega: SÍ':'✦ Mega: NO'};tb.append(mb)}};
+      clean();ext=null;
+      const foeT=foeTypesNow(),exts=[];
+      if(act.canMegaEvo)exts.push(['mega','✦ Mega']);
+      if(act.canUltraBurst)exts.push(['ultra','✦ Ultra']);
+      if(act.canZMove)exts.push(['zmove','✦ Mov. Z']);
+      if(act.canDynamax)exts.push(['dynamax','✦ Dynamax']);
+      if(act.canTerastallize)exts.push(['terastallize','✦ Tera']);
+      const draw=()=>{
+        cmd.innerHTML=act.moves.map((m,i)=>{
+          let name=m.move,dis=m.disabled||m.pp===0;
+          if(ext==='zmove'){const z=act.canZMove[i];if(z)name=z.move;else dis=true}
+          if(ext==='dynamax'&&act.maxMoves&&act.maxMoves.maxMoves[i])name=act.maxMoves.maxMoves[i].move;
+          const d=Dex.moves.get(m.id);let e=null;
+          if(d.exists&&d.category!=='Status'){e=!Dex.getImmunity(d.type,{types:foeT})?0:Math.pow(2,Dex.getEffectiveness(d.type,{types:foeT}))}
+          const ty=d.exists?d.type:'Normal';
+          return `<button class="cbtn" data-i="${i}" style="background:${tCol(ty)}" ${dis?'disabled':''}>${ext&&ext!=='terastallize'&&ext!=='mega'?name:(d.exists?nmMove(d):name)}<small>${tES(ty)}${m.maxpp?' · PP '+m.pp+'/'+m.maxpp:''}${d.exists&&d.basePower?' · Pod '+d.basePower:''}</small>${e!=null&&e!==1?`<span class="ef">${e===0?'×0':e>1?'×'+e:'×½'}</span>`:''}</button>`}).join('');
+        $$('#cmd .cbtn').forEach(b=>b.onclick=()=>done(`move ${+b.dataset.i+1}${ext?' '+ext:''}`))};
+      draw();tb.classList.add('mv');cmd.classList.add('on');
+      $('#msg').textContent='Elige un movimiento.';
+      const bk=document.createElement('button');bk.className='tmp tbtn';bk.textContent='← Atrás';bk.style.cssText='left:10px;top:8px';bk.onclick=main;tb.append(bk);
+      exts.forEach(([k,label],n)=>{
+        const b=document.createElement('button');b.className='tmp tbtn ext';b.dataset.k=k;b.dataset.l=label;b.textContent=label+': NO';
+        b.style.left=(10+(n%2)*90)+'px';b.style.top=(44+Math.floor(n/2)*30)+'px';
+        b.onclick=()=>{ext=ext===k?null:k;$$('#textbox .tbtn.ext').forEach(x=>{x.classList.toggle('on',x.dataset.k===ext);x.textContent=x.dataset.l+': '+(x.dataset.k===ext?'SÍ':'NO')});draw()};
+        tb.append(b)})};
     main()})}
-function pick(forced){
-  return new Promise(res=>{
-    const sw=$('#switch');
-    sw.innerHTML=`<h3>${forced?'Elige tu siguiente Pokémon':'Pokémon'}</h3><div class="sgrid"></div>${forced?'':'<button class="btn ghost" id="swb">Cancelar</button>'}`;
-    const g=sw.querySelector('.sgrid');
-    B.p.team.forEach((m,i)=>{
-      const b=document.createElement('button');b.className='sc'+(m.fainted?' dead':'')+(i===B.p.act?' cur':'');
-      b.innerHTML=`<div class="ic"></div><div><b>${m.name}</b> <small>Nv${m.lvl}</small><div class="mini"><i style="width:${m.hp/m.maxHp*100}%"></i></div><small>${m.hp}/${m.maxHp}${m.status?' · '+STT[m.status][0]:''}</small></div>`;
-      b.querySelector('.ic').append(iconEl(m.d,50));
-      if(i===B.p.act&&!forced)b.classList.add('dead');
-      b.onclick=()=>{sw.classList.remove('on');res(i)};g.append(b)});
-    sw.classList.add('on');
-    const c=sw.querySelector('#swb');if(c)c.onclick=()=>{sw.classList.remove('on');res(null)}})}
 
-async function switchTo(side,i,first){
-  const t=B[side];const old=act(side);
-  if(!first&&!old.fainted){await say(side==='p'?`¡Vuelve, ${old.name}!`:`${B.tname} retiró a ${old.name}.`,350);await anim(sprEl(side),[{opacity:1,transform:'translateX(-50%) scale(1)'},{opacity:0,transform:'translateX(-50%) scale(.1)'}],{duration:350})}
-  if(!first){Object.keys(old.st).forEach(k=>old.st[k]=0);old.tox=0;old.lock=null}
-  t.act=i;
-  await say(side==='p'?`¡Adelante, ${act('p').name}!`:`${B.tname} sacó a ${act('f').name}.`,200);
-  await sendOut(side);await onEnter(act(side))}
+/* ================= COMBATE: IA RIVAL ================= */
+const ABS_IMM={Levitate:'Ground','Flash Fire':'Fire','Water Absorb':'Water','Volt Absorb':'Electric','Lightning Rod':'Electric','Storm Drain':'Water','Sap Sipper':'Grass','Motor Drive':'Electric','Dry Skin':'Water','Earth Eater':'Ground','Well-Baked Body':'Fire'};
+function estDmg(m,myStats,mySp,myLvl,foeSp,foeLvl,foeAb){
+  if(m.category==='Status')return 0;
+  const types=foeSp.types;if(!Dex.getImmunity(m.type,{types}))return 0;
+  if(foeAb&&ABS_IMM[foeAb]===m.type)return 0;
+  let bp=m.basePower;
+  if(m.damage==='level')return myLvl*(m.accuracy===true?1:m.accuracy/100);
+  if(typeof m.damage==='number')return m.damage;
+  if(m.ohko)bp=40;if(!bp)bp=45;
+  const phys=m.category==='Physical',atk=phys?myStats.atk:myStats.spa,fb=foeSp.baseStats,defB=phys?fb.def:fb.spd;
+  const def=Math.floor((2*defB+36)*foeLvl/100)+5;
+  let d=Math.floor(Math.floor((2*myLvl/5+2)*bp*atk/def)/50)+2;
+  d*=(mySp.types.includes(m.type)?1.5:1)*Math.pow(2,Dex.getEffectiveness(m.type,{types}))*.925;
+  if(m.multihit)d*=Array.isArray(m.multihit)?(m.multihit[0]+m.multihit[1])/2:m.multihit;
+  d*=m.accuracy===true?1:m.accuracy/100;
+  if(m.flags.recharge)d*=.55;if(m.selfdestruct)d*=.25;if(m.recoil)d*=.92;
+  if(m.self&&m.self.boosts&&Object.values(m.self.boosts).some(v=>v<0))d*=.85;
+  return d}
+const foeMaxHp=(sp,lvl)=>Math.floor((2*sp.baseStats.hp+52)*lvl/100)+lvl+10;
+function aiDecide(req,A){
+  const diff=M.diff,mons=req.side.pokemon;
+  if(req.teamPreview)return 'team '+Array.from({length:mons.length},(_,i)=>i+1).join('');
+  const foe=A.foe,foeSp=foe?foe.sp:Dex.species.get('Rattata'),foeLvl=foe?foe.lvl:50,foeHpFrac=foe?foe.hp/foe.max:1;
+  const foeAb=foeSp.abilities&&Object.keys(foeSp.abilities).length===1?foeSp.abilities[0]:'';
+  const detSp=p=>Dex.species.get(p.details.split(',')[0]),lvlOf=p=>+((p.details.match(/L(\d+)/)||[,100])[1]);
+  const matchup=p=>{
+    const sp=detSp(p),L=lvlOf(p);let own=0;
+    for(const id of p.moves)own=Math.max(own,estDmg(Dex.moves.get(id),p.stats,sp,L,foeSp,foeLvl,foeAb));
+    let threat=0;for(const ty of foeSp.types)if(Dex.getImmunity(ty,{types:sp.types}))threat=Math.max(threat,Math.pow(2,Dex.getEffectiveness(ty,{types:sp.types})));
+    return own/Math.max(1,foeMaxHp(foeSp,foeLvl))*2-threat*.4+(sp.baseStats.spe>foeSp.baseStats.spe?.15:0)};
+  const bestSwitch=()=>{let best=-1,bs=-1e9;mons.forEach((p,i)=>{if(p.active||p.condition.endsWith('fnt'))return;const s=matchup(p);if(s>bs){bs=s;best=i}});return best};
+  if(req.forceSwitch){const i=bestSwitch();return i>=0?'switch '+(i+1):'default'}
+  const act=req.active[0],me=mons[0],mySp=detSp(me),myL=lvlOf(me),myHp=parseHp(me.condition),myFrac=myHp.hp/(myHp.max||1);
+  const foeHp=foeHpFrac*foeMaxHp(foeSp,foeLvl);
+  const sc=act.moves.map(mv=>{
+    if(mv.disabled||mv.pp===0)return -1;
+    const m=Dex.moves.get(mv.id);if(!m.exists)return 1;
+    let s;
+    if(m.category!=='Status'){
+      const d=estDmg(m,me.stats,mySp,myL,foeSp,foeLvl,foeAb);s=d;
+      if(d>=foeHp&&d>0)s=d+1000+m.priority*200;else if(m.priority>0&&foeHpFrac<.3)s+=d*.5;
+      if(['fakeout','firstimpression'].includes(m.id)&&A.turns>1)s=0;
+      if(['dreameater','focuspunch','belch','lastresort','synchronoise','suckerpunch'].includes(m.id))s*=.3}
+    else{
+      s=8;
+      if(m.heal||m.id==='rest')s=myFrac<.5?(myFrac<.3?160:110):0;
+      else if(m.boosts&&(m.target==='self'||!m.target)&&m.id!=='protect')s=(myFrac>.6&&(A.boost||0)<2)?55:6;
+      else if(m.self&&m.self.boosts)s=(myFrac>.6&&(A.boost||0)<2)?55:6;
+      else if(m.status){const st=m.status,imm=((st==='psn'||st==='tox')&&foeSp.types.some(t=>t==='Steel'||t==='Poison'))||(st==='brn'&&foeSp.types.includes('Fire'))||(st==='par'&&foeSp.types.includes('Electric'))||(st==='slp'&&foeSp.types.includes('Grass')&&['spore','sleeppowder','stunspore'].includes(m.id));
+        s=(foe&&!foe.status&&!imm)?(st==='slp'?85:60):0;
+        if(m.type&&!Dex.getImmunity(m.type,{types:foeSp.types}))s=0}
+      else if(m.sideCondition&&['stealthrock','spikes','toxicspikes','stickyweb'].includes(m.id))s=A.hazards?0:45;
+      else if(m.sideCondition||m.weather||m.terrain)s=22;
+      else if(['protect','detect','kingsshield','spikyshield','banefulbunker'].includes(m.id))s=4;
+      else if(m.id==='substitute')s=myFrac>.5?20:0}
+    return s*(1+(Math.random()-.5)*(1-diff)*1.2)});
+  let bi=0;sc.forEach((v,i)=>{if(v>sc[bi])bi=i});
+  if(diff>.55&&!act.trapped&&A.lastSwitch!==A.turns-1&&Math.random()<.4){
+    const cur=matchup(me),alt=bestSwitch();
+    if(alt>=0&&matchup(mons[alt])>cur+.9&&sc[bi]<foeHp*.5){A.lastSwitch=A.turns;return 'switch '+(alt+1)}}
+  let ch=`move ${bi+1}`;
+  if(act.canMegaEvo)ch+=' mega';else if(act.canUltraBurst)ch+=' ultra';
+  else if(act.canTerastallize&&Math.random()<.2+.4*diff)ch+=' terastallize';
+  else if(act.canDynamax&&Math.random()<.35)ch+=' dynamax';
+  else if(act.canZMove&&act.canZMove[bi]&&Math.random()<.5)ch+=' zmove';
+  const mv=Dex.moves.get(act.moves[bi].id);
+  if(mv.exists&&mv.boosts&&mv.target==='self')A.boost=(A.boost||0)+1;
+  if(mv.exists&&['stealthrock','spikes','toxicspikes'].includes(mv.id))A.hazards=true;
+  return ch}
 
-async function endTurn(){
-  for(const s of ['p','f']){
-    const m=act(s);if(m.fainted)continue;
-    if(B.w==='sand'&&!m.types.some(x=>['rock','ground','steel'].includes(x))){
-      await setHp(m,m.hp-Math.max(1,Math.floor(m.maxHp/16)));await say(`¡La tormenta de arena golpea a ${nmC(m)}!`,450);
-      if(m.hp<=0){await faint(m);continue}}
-    if(m.item==='leftovers'&&m.hp<m.maxHp){await setHp(m,m.hp+Math.max(1,Math.floor(m.maxHp/16)));await say(`¡${nmC(m)} recuperó PS con los Restos!`,400)}
-    if(m.status==='brn'||m.status==='psn'||m.status==='tox'){
-      let dv=m.status==='brn'?16:m.status==='psn'?8:16,n=Math.max(1,Math.floor(m.maxHp/dv));
-      if(m.status==='tox'){m.tox++;n=Math.max(1,Math.floor(m.maxHp*m.tox/16))}
-      await anim(sprEl(s),[{filter:'none'},{filter:`drop-shadow(0 0 10px ${STT[m.status][1]}) brightness(1.5)`},{filter:'none'}],{duration:500});
-      await setHp(m,m.hp-n);await say(m.status==='brn'?`¡${nmC(m)} sufre quemaduras!`:`¡${nmC(m)} sufre por el veneno!`,500);
-      if(m.hp<=0){await faint(m);continue}}
-    await berry(m);
-    if(m.ab==='speedboost'&&m.st.spe<6){m.st.spe++;sfx.up();await say(`¡Impulso de ${nm(m)} subió su Velocidad!`,450)}}
-  if(B.w){B.wt--;if(B.wt<=0){await say({rain:'Dejó de llover.',sun:'Se acabó el sol.',sand:'La tormenta de arena se calmó.'}[B.w],500);B.w=null}showWx()}}
-
-async function startBattle(t,lg){
-  B={tname:t.name,diff:t.diff,tr:t,over:false,league:lg||null,w:null,wt:0,
-     p:{team:MY.map(x=>mkMon(x.n,x.mv,'p',x.item)),act:0},
-     f:{team:t.team.map(sp=>{const [n,it]=sp.split('|');return mkMon(n,null,'f',it===undefined?rnd(['leftovers','sitrus','sash','lifeorb',null]):it)}),act:0}};
-  B.p.team.forEach(m=>m.side='p');B.f.team.forEach(m=>m.side='f');
+/* ================= COMBATE: PARTIDA ================= */
+const FMT='gen9customgame';
+const cleanSet=s=>({name:'',species:s.species,gender:'',item:s.item||'',ability:s.ability,moves:s.moves.slice(0,4),nature:s.nature,level:s.level||50,evs:s.evs,ivs:s.ivs,teraType:s.teraType});
+async function startMatch(opts){
+  ensureTeam();
+  const t=opts.trainer,L=opts.league||null;
+  const oppSets=opts.sets||trainerSets(t);
+  const mine=MY.map(cleanSet),theirs=oppSets.map(cleanSet);
+  const me=M={opts,L,trainer:t,opp:{name:t.name},diff:t.diff||.6,S:{p1:newSide(),p2:newSide()},notes:[],weather:null,fields:[],over:false,dead:false,winner:null,lastReq:null,pending:null,chain:Promise.resolve(),promptTimer:null,last:null,f:new LogFormatter('p1')};
+  me.f.gen=9;me.f.p1='Tú';me.f.p2=t.name;
   show('battle');drawBG();
   $('#result').classList.remove('on');$('#cmd').classList.remove('on');$('#switch').classList.remove('on');$('#fx').innerHTML='';
-  $('#foeHud').innerHTML=hudHTML('f');$('#plHud').innerHTML=hudHTML('p');$('#foeHud').style.display=$('#plHud').style.display='none';
+  $('#foeHud').innerHTML=hudHTML('p2');$('#plHud').innerHTML=hudHTML('p1');$('#foeHud').style.display=$('#plHud').style.display='none';
   $('#foeA').innerHTML=$('#plA').innerHTML='';$('#msg').textContent='';showWx();
-  // intro
-  const it=$('#intro');it.innerHTML=`<div class="side"><div class="avatar" id="iv1">▶</div>Tú</div><div class="vs">VS</div><div class="side"><div class="avatar" id="iv2"></div>${t.name}</div>`;
-  trainerImg(t,$('#iv2'));$('#iv1').textContent='🧢';it.classList.add('on');
+  const it=$('#intro');it.innerHTML=`<div class="side"><div class="avatar">🧢</div>Tú</div><div class="vs">VS</div><div class="side"><div class="avatar" id="iv2"></div>${t.name}</div>`;
+  trainerImg(t,$('#iv2'));it.classList.add('on');
   anim(it.querySelector('.vs'),[{transform:'scale(3)',opacity:0},{transform:'scale(1)',opacity:1}],{duration:500});
-  await wait(1700);it.classList.remove('on');
-  const run=B;
+  await wait(1700);it.classList.remove('on');if(M!==me)return;
+  const streams=getPlayerStreams(new BattleStream());me.streams=streams;
+  const A={foe:null,turns:0};
+  (async()=>{for await(const chunk of streams.p1){if(M!==me||me.dead)return;onP1(chunk)}})();
+  (async()=>{for await(const chunk of streams.p2){if(M!==me||me.dead)return;onP2(chunk,A)}})();
+  streams.omniscient.write(`>start ${JSON.stringify({formatid:FMT})}`);
+  streams.omniscient.write(`>player p1 ${JSON.stringify({name:'Tú',team:Teams.pack(mine)})}`);
+  streams.omniscient.write(`>player p2 ${JSON.stringify({name:t.name,team:Teams.pack(theirs)})}`);
+  await say(L?`Desafío de la Liga ${L.i+1}/${L.list.length}: ¡${t.name} te desafía!`:`¡${t.name} te desafía a un combate!`,500)}
+function onP1(chunk){
+  const m=M,log=[];
+  for(const l of chunk.split('\n')){
+    if(l.startsWith('|request|')){try{const r=JSON.parse(l.slice(9));m.lastReq=r;
+      if(r.teamPreview){m.streams.p1.write('team '+Array.from({length:r.side.pokemon.length},(_,i)=>i+1).join(''));m.pending=null}
+      else if(r.wait)m.pending=null;
+      else m.pending=r}catch(e){console.error(e)}}
+    else log.push(l)}
+  if(log.length)m.chain=m.chain.then(()=>playLines(log)).then(()=>armPrompt());
+  else armPrompt()}
+function armPrompt(){
+  const m=M;if(!m)return;clearTimeout(m.promptTimer);
+  m.promptTimer=setTimeout(()=>{if(M===m)m.chain=m.chain.then(()=>tryPrompt(m))},120)}
+async function tryPrompt(m){
+  if(M!==m||m.dead)return;
+  if(m.over)return finishMatch(m);
+  const req=m.pending;if(!req||m.prompting)return;
+  m.prompting=true;
   try{
-    await say(B.league?`Desafío de la Liga ${B.league.i+1}/${B.league.list.length}: ¡${t.name} te desafía!`:`¡${t.name} te desafía a un combate!`,500);
-    await switchTo('f',0,true);
-    await switchTo('p',0,true);
-    while(!B.over&&B===run){
-      let pa=await waitChoice();
-      if(B!==run)return;
-      if(pa.t==='quit'){B.over=true;show('trainers');return}
-      if(pa.t==='mv'&&pa.i<0){pa={t:'mv',i:0,struggle:true}}
-      const fa=aiChoose();
-      {const fm=act('f');if(fa.t==='mv'&&fm.megaV&&!fm.mega&&!B.f.megaUsed)fa.mega=true}
-      for(const [sd,ac] of [['p',pa],['f',fa]])if(ac.mega&&ac.t==='mv'&&!act(sd).fainted)await megaEvolve(act(sd));
-      for(const x of order(pa,fa)){
-        if(B.over)break;const m=act(x.s);if(m.fainted)continue;
-        if(x.a.t==='sw'){await switchTo(x.s,x.a.i)}
-        else{
-          if(x.s==='p'&&x.a.struggle){m.moves[0].pp=1}
-          await useMove(m,x.a.i)}
-        if(act('p').fainted||act('f').fainted)break}
-      if(!act('p').fainted&&!act('f').fainted)await endTurn();
-      // reemplazos
-      if(act('f').fainted){
-        const nx=B.f.team.findIndex(m=>!m.fainted);
-        if(nx<0){await finish(true);return}
-        if(!act('p').fainted||true){await switchTo('f',nx)}}
-      if(act('p').fainted){
-        const nx=B.p.team.findIndex(m=>!m.fainted);
-        if(nx<0){await finish(false);return}
-        $('#msg').textContent='Elige tu siguiente Pokémon.';
-        const i=await pick(true);await switchTo('p',i)}}
-  }catch(err){console.error(err)}}
-function startLeague(){
-  if(!MY.length)randomTeam();
-  const list=['sidney','phoebe','glacia','drake','steven'];
-  startBattle(TRAINERS.find(x=>x.id===list[0]),{list,i:0})}
-async function finish(win){
-  B.over=true;const t=B.tr,L=B.league;
-  if(win){const b=store.get('zaf.beat',{});b[t.id]=1;store.set('zaf.beat',b)}
-  await say(win?`¡Has derrotado a ${t.name}!`:`¡No te quedan Pokémon! Has perdido ante ${t.name}...`,500);
-  if(win)await say(`${t.name}: “¡Un combate magnífico!”`,600);
+    const ch=await promptUI(req);
+    if(M!==m||m.dead)return;
+    if(ch==='quit'){m.dead=true;show('trainers');return}
+    m.pending=null;m.streams.p1.write(ch)}
+  finally{m.prompting=false}}
+function onP2(chunk,A){
+  const m=M;
+  for(const l of chunk.split('\n')){
+    if(l[0]!=='|')continue;
+    if(l.startsWith('|request|')){
+      let r;try{r=JSON.parse(l.slice(9))}catch{continue}
+      if(r.wait)continue;
+      let ch;try{ch=aiDecide(r,A)}catch(e){console.error('IA',e);ch='default'}
+      setTimeout(()=>{if(M===m&&!m.dead)m.streams.p2.write(ch)},0);continue}
+    let a;try{a=Protocol.parseBattleLine(l)}catch{continue}
+    const {args}=a,t=args[0],foeLine=args[1]&&String(args[1]).startsWith('p1');
+    if((t==='switch'||t==='drag')&&foeLine){const hp=parseHp(args[3]);A.foe={sp:Dex.species.get(args[2].split(',')[0]),lvl:+((args[2].match(/L(\d+)/)||[,100])[1]),hp:hp.hp,max:hp.max||1,status:hp.status}}
+    else if(t==='detailschange'&&foeLine&&A.foe)A.foe.sp=Dex.species.get(args[2].split(',')[0]);
+    else if((t==='-damage'||t==='-heal'||t==='-sethp')&&foeLine&&A.foe){const hp=parseHp(args[2]);A.foe.hp=hp.hp;if(hp.max)A.foe.max=hp.max;A.foe.status=hp.status}
+    else if(t==='-status'&&foeLine&&A.foe)A.foe.status=args[2];
+    else if(t==='-curestatus'&&foeLine&&A.foe)A.foe.status='';
+    else if(t==='turn')A.turns=+args[1];
+    else if(t==='error')setTimeout(()=>{if(M===m&&!m.dead)m.streams.p2.write('default')},0)}}
+async function finishMatch(m){
+  if(m.finished)return;m.finished=true;
+  const t=m.trainer,L=m.L,win=m.winner==='Tú',tie=m.winner==null;
+  if(win&&t.id!=='random'){const b=store.get('zaf2.beat',{});b[t.id]=1;store.set('zaf2.beat',b)}
+  await say(tie?'¡Empate!':win?`¡Has derrotado a ${t.name}!`:`¡No te quedan Pokémon! Has perdido ante ${t.name}...`,500);
+  if(win&&t.id!=='random')await say(`${t.name}: “¡Un combate magnífico!”`,600);
   const r=$('#result'),btn=(id,cls,txt)=>`<button class="btn ${cls}" id="${id}">${txt}</button>`;
   if(L&&win&&L.i<L.list.length-1){
     const nx=TRAINERS.find(x=>x.id===L.list[L.i+1]);
     r.innerHTML=`<h2 style="color:#ffd24a">¡COMBATE GANADO!</h2><p>Tu equipo se recupera. Siguiente rival: <b>${nx.name}</b> (${L.i+2}/${L.list.length})</p><div style="display:flex;gap:10px">${btn('nxt','gold','Siguiente combate →')}${btn('back','ghost','Abandonar Liga')}</div>`;
-    r.classList.add('on');$('#nxt').onclick=()=>startBattle(nx,{...L,i:L.i+1});
-  }else if(L&&win){
+    r.classList.add('on');$('#nxt').onclick=()=>startMatch({trainer:nx,league:{...L,i:L.i+1}})}
+  else if(L&&win){
     r.innerHTML=`<h2 style="color:#ffd24a">🏆 ¡CAMPEÓN DE LA LIGA!</h2><p>Tu equipo entra en el Salón de la Fama</p><div id="hof" style="display:flex;gap:6px"></div><div style="display:flex;gap:10px">${btn('back','gold','Volver')}</div>`;
-    MY.forEach(m=>{const i=iconEl(DEX[m.n],80);i.style.cssText='height:90px';$('#hof').append(i)});
-    r.classList.add('on');
-  }else if(L){
+    MY.forEach(s=>{const i=iconEl(Dex.species.get(s.species),80);i.style.cssText='height:90px';$('#hof').append(i)});r.classList.add('on')}
+  else if(L){
     r.innerHTML=`<h2 style="color:#ff8a8a">DERROTA</h2><p>Has caído en el combate ${L.i+1}/${L.list.length} de la Liga.</p><div style="display:flex;gap:10px">${btn('again','gold','Reintentar Liga')}${btn('back','ghost','Salir')}${btn('chg','ghost','Cambiar equipo')}</div>`;
-    r.classList.add('on');$('#again').onclick=startLeague;
-  }else{
-    r.innerHTML=`<h2 style="color:${win?'#ffd24a':'#ff8a8a'}">${win?'¡VICTORIA!':'DERROTA'}</h2><div style="display:flex;gap:10px">${btn('again','gold','Revancha')}${btn('back','','Elegir otro rival')}${btn('chg','ghost','Cambiar equipo')}</div>`;
-    r.classList.add('on');$('#again').onclick=()=>startBattle(t)}
+    r.classList.add('on');$('#again').onclick=startLeague}
+  else{
+    r.innerHTML=`<h2 style="color:${tie?'#fff':win?'#ffd24a':'#ff8a8a'}">${tie?'EMPATE':win?'¡VICTORIA!':'DERROTA'}</h2><div style="display:flex;gap:10px">${btn('again','gold','Revancha')}${btn('back','','Elegir otro rival')}${btn('chg','ghost','Cambiar equipo')}</div>`;
+    r.classList.add('on');$('#again').onclick=()=>{if(m.opts.random)startRandom();else startMatch({trainer:t})}}
   $('#back').onclick=()=>show('trainers');const c=$('#chg');if(c)c.onclick=()=>show('team')}
-$$('[data-league]').forEach(b=>b.onclick=startLeague);
 
-/* controles y escala */
-function fit(){const s=Math.min(innerWidth/960,innerHeight/540);$('#stage').style.setProperty('--s',s)}
-addEventListener('resize',fit);
 $('#spd').onclick=e=>{FAST=!FAST;e.target.textContent=FAST?'▶ Normal':'⏩ Rápido'};
 $('#mute').onclick=e=>{MUTE=!MUTE;e.target.textContent=MUTE?'🔇':'🔊'};
-$('#quit').onclick=()=>{if(B)B.over=true;B=null;show('trainers')};
+$('#quit').onclick=()=>{if(M)M.dead=true;M=null;show('trainers')};
+window.__dbg={get M(){return M},get MY(){return MY},set MY(v){MY=v},saveTeam,defaultSet,POOL,suggestMoves,startMatch,renderTeam,TRAINERS,trainerSets};
+$('#loading').style.display='none';
 renderTeam();
+}
 </script>
 </body>
 </html>

@@ -1,0 +1,1 @@
+{"name":"showdown-tools","private":true,"version":"1.0.0","scripts":{"build":"node build.js"},"dependencies":{"@pkmn/client":"^0.7.3","@pkmn/protocol":"^0.7.3","@pkmn/sim":"^0.10.11","@pkmn/view":"^0.7.3","esbuild":"^0.28.2"}}
