@@ -10,6 +10,16 @@ Abre `index.html` en el navegador (necesita internet para los sprites).
 O sirve la carpeta: `python -m http.server` y entra en http://localhost:8000.
 Hay que mantener junta la carpeta del proyecto: `index.html` carga `lib/pkmn.bundle.js`.
 
+## Jugadores y Randomlocke
+- Al entrar eliges **quién juega** (o creas un jugador nuevo): sin cuenta ni contraseña, los datos de cada
+  jugador (equipo, medallas y aventura) se guardan por separado en este navegador.
+- **🎲 Randomlocke**: aventura por Hoenn de 31 etapas (rutas, gimnasios, equipos Magma/Aqua, Alto Mando y
+  Campeón) en la que solo combates. Empiezas con un inicial aleatorio; en cada ruta te enfrentas a un
+  entrenador y a un Pokémon salvaje que capturas al derrotarlo (uno por ruta, sin repetir familia).
+  Todos tus Pokémon tienen **habilidad, objeto y naturaleza aleatorios**; tras cada gimnasio hay una
+  **tienda con objetos aleatorios** (dinero ganado en los combates). Tu equipo sube de nivel y evoluciona
+  solo, se cura tras cada combate y, con la opción de **muerte permanente**, los debilitados se pierden.
+
 ## Motor de combate
 Las reglas las pone el simulador oficial de Pokémon Showdown (`@pkmn/sim`, formato *Custom Game* de 9ª gen),
 así que están implementadas todas las mecánicas reales: ~320 habilidades, ~550 objetos, ~860 movimientos,

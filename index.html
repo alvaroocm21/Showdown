@@ -162,6 +162,45 @@ input,select,textarea{font:inherit}
 .tbtn.ext{background:#5a2bb8;border-color:#d9c2ff;font-size:12px;padding:3px 8px}
 .tbtn.ext.on{background:linear-gradient(#ff8ad8,#8a4bff);box-shadow:0 0 12px #ff8ad8}
 #textbox.mv #msg{padding-left:190px;font-size:19px}
+/* PERFILES / RANDOMLOCKE */
+#scr-profile .wrap{max-width:820px;text-align:center;padding-top:40px}
+.plist{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin:14px 0}
+.pcard{position:relative;width:170px;background:linear-gradient(#1a3d82,#0b2150);border:2px solid #5aa6ff;border-radius:14px;padding:14px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:.1s}
+.pcard:hover{transform:translateY(-3px);border-color:var(--gold)}
+.pcard .pav{width:74px;height:74px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:38px;border:3px solid #fff8}
+.pcard b{font-size:17px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pcard small{font-size:11px;opacity:.75;min-height:14px}
+.pcard .x{position:absolute;right:6px;top:6px;background:#ff4d5e;border-radius:50%;width:20px;height:20px;line-height:18px;font-weight:900;font-size:13px}
+#newp{margin-top:10px;display:inline-flex;flex-direction:column;gap:10px;align-items:center;padding:14px 18px}
+#newp input[type=text]{background:#04122f;color:#fff;border:2px solid #5aa6ff88;border-radius:8px;padding:8px 12px;width:240px;text-align:center;user-select:text}
+.emo{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:380px}
+.emo span{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;border:3px solid transparent;background:#ffffff18}
+.emo span.on{border-color:var(--gold)}
+.emo.col span{font-size:0}
+#whoami{display:flex;gap:10px;align-items:center;justify-content:center}
+#whoami .pav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;border:2px solid #fff8}
+.run-layout{display:grid;grid-template-columns:minmax(0,1fr) 520px;gap:16px}
+@media(max-width:1000px){.run-layout{grid-template-columns:1fr}}
+.run-layout .panel{min-height:300px}
+.rstep{display:flex;gap:8px;align-items:center;padding:6px 10px;border-radius:8px;background:#ffffff10;margin:4px 0;font-size:14px}
+.rstep.done{opacity:.5;text-decoration:line-through}.rstep.cur{background:#ffd24a33;border:1px solid var(--gold)}
+.rlog{font-size:12px;opacity:.85;margin-top:10px;max-height:150px;overflow:auto}
+.rlog p{margin:2px 0}
+.mrow{display:flex;gap:8px;align-items:center;background:#102a5e;border:2px solid #3c76d4;border-radius:10px;padding:4px 8px;margin:5px 0}
+.mrow .ic{width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none}
+.mrow .ic img{max-width:48px;max-height:48px}
+.mrow .inf{flex:1;min-width:0;font-size:12px}
+.mrow .inf b{font-size:14px}
+.mrow select{background:#04122f;color:#fff;border:2px solid #5aa6ff88;border-radius:6px;padding:2px 4px;max-width:150px;font-size:11px}
+.mrow button{background:#ffffff22;border-radius:6px;padding:2px 8px;font-size:12px}
+.chips{display:flex;gap:5px;flex-wrap:wrap;font-size:11px}
+.chips span{background:#ffffff18;border-radius:8px;padding:1px 7px}
+.scard{display:flex;flex-direction:column;align-items:center;gap:6px;background:linear-gradient(#1a3d82,#0b2150);border:2px solid #5aa6ff;border-radius:14px;padding:12px;width:190px;text-align:center;cursor:pointer;font-size:12px}
+.scard:hover{border-color:var(--gold)}
+.scard img{max-height:90px}
+.shopi{display:flex;gap:8px;align-items:center;justify-content:space-between;background:#102a5e;border:2px solid #3c76d4;border-radius:10px;padding:6px 10px;margin:5px 0;font-size:13px}
+.shopi small{opacity:.75;display:block;font-size:11px}
+.runmenu li{margin:5px 0 5px 18px;font-size:14px;opacity:.9}
 </style>
 </head>
 <body>
@@ -169,7 +208,25 @@ input,select,textarea{font:inherit}
 <datalist id="dl-moves"></datalist>
 <datalist id="dl-items"></datalist>
 
-<section id="scr-title" class="screen on">
+<section id="scr-profile" class="screen on">
+  <div class="wrap">
+    <div class="gem" style="margin:0 auto"></div>
+    <div class="logo" style="margin-top:14px">POKÉMON<small>ZAFIRO ALFA · DUELOS</small></div>
+    <h2 style="margin-top:22px">¿Quién juega?</h2>
+    <div class="plist" id="plist"></div>
+    <div class="panel" id="newp">
+      <b>Nuevo jugador</b>
+      <input type="text" id="pname" maxlength="16" placeholder="Nombre del jugador">
+      <div class="emo" id="pemo"></div>
+      <div class="emo col" id="pcol"></div>
+      <button class="btn gold" id="pcreate">Crear jugador</button>
+    </div>
+    <p class="stats-line" style="margin-top:14px">Los jugadores se guardan solo en este navegador (sin cuenta ni contraseña).</p>
+  </div>
+  <div class="waves"></div>
+</section>
+
+<section id="scr-title" class="screen">
   <div class="gem"></div>
   <div class="logo">POKÉMON<small>ZAFIRO ALFA · DUELOS</small></div>
   <p class="tag">Forma tu equipo con cualquier Pokémon de cualquier generación, con cualquier movimiento, habilidad y objeto, y combate con las reglas completas del simulador de Pokémon Showdown.</p>
@@ -177,7 +234,9 @@ input,select,textarea{font:inherit}
     <button class="btn gold" id="goTeam">⚔ Elegir equipo</button>
     <button class="btn" id="goTrainers">Ir a combatir</button>
     <button class="btn gold" data-league>🏆 Desafío de la Liga</button>
+    <button class="btn" id="goRun" style="background:linear-gradient(#b86bff,#6a2fd1);box-shadow:0 4px 0 #3a1580">🎲 Randomlocke</button>
   </div>
+  <div id="whoami"></div>
   <div class="stats-line" id="dataStats"></div>
   <div class="waves"></div>
 </section>
@@ -217,6 +276,21 @@ input,select,textarea{font:inherit}
       <span id="myTeamPrev"></span>
     </div>
     <div class="tgrid" id="tgrid"></div>
+  </div>
+  <div class="waves"></div>
+</section>
+
+<section id="scr-run" class="screen">
+  <div class="wrap">
+    <div class="topbar">
+      <button class="btn ghost" data-go="title">← Inicio</button>
+      <h2>🎲 Randomlocke</h2>
+      <span id="runInfo" style="opacity:.8"></span>
+    </div>
+    <div class="run-layout">
+      <div class="panel" id="runMain"></div>
+      <div class="panel" id="runTeam"></div>
+    </div>
   </div>
   <div class="waves"></div>
 </section>
@@ -314,9 +388,9 @@ function moveScore(m,sp,phys){
   if(m.priority>0)s*=1.1;if(m.priority<0)s*=.7;
   if(['dreameater','focuspunch','belch','lastresort','synchronoise','steelroller','poltergeist','fakeout','firstimpression','suckerpunch','hyperspacefury','naturalgift','snore','spitup','upperhand'].includes(m.id))s*=.1;
   return s}
-function suggestMoves(sp){
+function suggestMoves(sp,only){
   const phys=sp.baseStats.atk>=sp.baseStats.spa;
-  const ms=[...learnable(sp)].map(i=>Dex.moves.get(i)).filter(m=>m.exists&&!m.isZ&&!m.isMax&&!['CAP','Custom'].includes(m.isNonstandard||''));
+  const ms=[...(only||learnable(sp))].map(i=>Dex.moves.get(i)).filter(m=>m.exists&&!m.isZ&&!m.isMax&&!['CAP','Custom'].includes(m.isNonstandard||''));
   const dmg=ms.filter(m=>m.category!=='Status'&&m.basePower>=40).map(m=>({m,s:moveScore(m,sp,phys)})).sort((a,b)=>b.s-a.s);
   const pick=[],types=new Set();
   for(const {m} of dmg){if(pick.length>=2)break;if(sp.types.includes(m.type)&&!types.has(m.type)){pick.push(m);types.add(m.type)}}
@@ -327,7 +401,7 @@ function suggestMoves(sp){
   if(u&&pick.length<4)pick.push(u);
   for(const {m} of dmg){if(pick.length>=4)break;if(!pick.includes(m))pick.push(m)}
   for(const m of ms){if(pick.length>=4)break;if(!pick.includes(m))pick.push(m)}
-  return pick.slice(0,4).map(m=>m.name)}
+  return pick.length?pick.slice(0,4).map(m=>m.name):['Tackle']}
 function defaultSet(name,opts={}){
   const sp=Dex.species.get(name),b=sp.baseStats,off=b.atk>=b.spa?'atk':'spa';
   const stones=megaStones(sp.name);
@@ -337,9 +411,9 @@ function defaultSet(name,opts={}){
 const calcStat=(k,base,iv,ev,lvl,nat)=>{const x=Math.floor((2*base+iv+Math.floor(ev/4))*lvl/100);if(k==='hp')return base===1?1:x+lvl+10;const n=Dex.natures.get(nat);return Math.floor((x+5)*(n.plus===k?1.1:n.minus===k?.9:1))};
 
 /* ================= EQUIPO ================= */
-let MY=store.get('zaf2.team',[]).filter(s=>s&&Dex.species.get(s.species).exists);
+let MY=[];
 let sel=0,filT=null,filG=null,LEARN=false;
-const saveTeam=()=>{store.set('zaf2.team',MY);$('#teamOk').disabled=!MY.length};
+const saveTeam=()=>{if(PID)store.set(pk('team'),MY);$('#teamOk').disabled=!MY.length};
 function randomTeam(){MY=[...POOL].sort(()=>Math.random()-.5).slice(0,6).map(s=>defaultSet(s.name));sel=0;saveTeam()}
 const ROMAN=['','I','II','III','IV','V','VI','VII','VIII','IX'];
 function renderTeam(){
@@ -427,7 +501,7 @@ $('#ieExport').onclick=()=>{$('#ieText').value=Teams.export(MY)};
 $('#ieImport').onclick=()=>{try{const t=Teams.import($('#ieText').value);if(!t||!t.length)throw 0;MY=t.slice(0,6).map(s=>{const d=defaultSet(s.species);return{...d,...s,name:'',evs:{hp:0,atk:0,def:0,spa:0,spd:0,spe:0,...s.evs},ivs:{hp:31,atk:31,def:31,spa:31,spd:31,spe:31,...s.ivs},level:s.level||100,teraType:s.teraType||d.teraType,moves:s.moves.slice(0,4)}});sel=0;saveTeam();renderTeam()}catch(e){alert('No se pudo importar el equipo.')}};
 
 /* ================= PANTALLAS ================= */
-function show(n){$$('.screen').forEach(s=>s.classList.toggle('on',s.id==='scr-'+n));if(n==='battle')fit();if(n==='team')renderTeam();if(n==='trainers')renderTrainers()}
+function show(n){$$('.screen').forEach(s=>s.classList.toggle('on',s.id==='scr-'+n));if(n==='battle')fit();if(n==='team')renderTeam();if(n==='trainers')renderTrainers();if(n==='run')renderRun();if(n==='title')renderWho()}
 $$('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
 $('#goTeam').onclick=()=>show('team');
 const ensureTeam=()=>{if(!MY.length)randomTeam()};
@@ -463,7 +537,7 @@ function trainerSets(t){
     return defaultSet(n,{item,moves})})}
 function randomSets(){return [...POOL].sort(()=>Math.random()-.5).slice(0,6).map(s=>{const set=defaultSet(s.name);if(!megaStones(s.name).length)set.item=rnd(TITEMS.slice(0,6));return set})}
 function renderTrainers(){
-  const beat=store.get('zaf2.beat',{});
+  const beat=store.get(pk('beat'),{});
   $('#myTeamPrev').innerHTML='';
   MY.forEach(m=>{const i=iconEl(Dex.species.get(m.species),30);i.style.cssText='height:34px;width:40px;object-fit:contain';$('#myTeamPrev').append(i)});
   const g=$('#tgrid');g.innerHTML='';
@@ -650,7 +724,7 @@ async function onSwitch(args,drag){
     await anim(sprEl(side),[{opacity:1,transform:'translateX(-50%) scale(1)'},{opacity:0,transform:'translateX(-50%) scale(.1)'}],{duration:350})}
   s.sp=sp;s.disp=nmSp(sp.name);s.lvl=lvl;s.hp=hp.hp;s.max=hp.max||s.max;s.status=hp.status;s.tera='';s.out=true;
   setSprite(side);updHud(side);
-  await say(drag?`¡${Wc(side)} fue arrastrado al combate!`:side==='p1'?`¡Adelante, ${s.disp}!`:`${M.opp.name} sacó a ${s.disp}.`,250);
+  await say(drag?`¡${Wc(side)} fue arrastrado al combate!`:side==='p1'?`¡Adelante, ${s.disp}!`:(M.opts.wild?`¡Un ${s.disp} salvaje apareció!`:`${M.opp.name} sacó a ${s.disp}.`),250);
   await sendOutAnim(side)}
 async function onForme(args,kw){
   const side=sd(args[1]),s=M.S[side];if(!s.sp)return;
@@ -719,9 +793,9 @@ function promptUI(req){
     const main=()=>{
       clean();$('#msg').textContent=`¿Qué hará ${M.S.p1.disp}?`;
       const trapped=act&&act.trapped;
-      cmd.innerHTML=`<button class="cbtn" style="background:#d9442f" id="b1">⚔ Luchar</button><button class="cbtn" style="background:#2f9e5b" id="b2" ${trapped?'disabled':''}>🔴 Pokémon</button><button class="cbtn" style="background:#6b7a90;grid-column:span 2" id="b3">🏳 Rendirse</button>`;
+      cmd.innerHTML=`<button class="cbtn" style="background:#d9442f" id="b1">⚔ Luchar</button><button class="cbtn" style="background:#2f9e5b" id="b2" ${trapped?'disabled':''}>🔴 Pokémon</button>${M.opts.quitLabel===null?'':`<button class="cbtn" style="background:#6b7a90;grid-column:span 2" id="b3">${M.opts.quitLabel||'🏳 Rendirse'}</button>`}`;
       cmd.classList.add('on');
-      $('#b1').onclick=moves;$('#b2').onclick=switchList;$('#b3').onclick=()=>done('quit')};
+      $('#b1').onclick=moves;$('#b2').onclick=switchList;if($('#b3'))$('#b3').onclick=()=>done('quit')};
     const moves=()=>{
       clean();ext=null;
       const foeT=foeTypesNow(),exts=[];
@@ -825,28 +899,34 @@ function aiDecide(req,A){
 const FMT='gen9customgame';
 const cleanSet=s=>({name:'',species:s.species,gender:'',item:s.item||'',ability:s.ability,moves:s.moves.slice(0,4),nature:s.nature,level:s.level||50,evs:s.evs,ivs:s.ivs,teraType:s.teraType});
 async function startMatch(opts){
-  ensureTeam();
+  if(!opts.mine)ensureTeam();
   const t=opts.trainer,L=opts.league||null;
   const oppSets=opts.sets||trainerSets(t);
-  const mine=MY.map(cleanSet),theirs=oppSets.map(cleanSet);
+  const mine=(opts.mine||MY).map(cleanSet),theirs=oppSets.map(cleanSet);
   const me=M={opts,L,trainer:t,opp:{name:t.name},diff:t.diff||.6,S:{p1:newSide(),p2:newSide()},notes:[],weather:null,fields:[],over:false,dead:false,winner:null,lastReq:null,pending:null,chain:Promise.resolve(),promptTimer:null,last:null,f:new LogFormatter('p1')};
   me.f.gen=9;me.f.p1='Tú';me.f.p2=t.name;
   show('battle');drawBG();
   $('#result').classList.remove('on');$('#cmd').classList.remove('on');$('#switch').classList.remove('on');$('#fx').innerHTML='';
   $('#foeHud').innerHTML=hudHTML('p2');$('#plHud').innerHTML=hudHTML('p1');$('#foeHud').style.display=$('#plHud').style.display='none';
   $('#foeA').innerHTML=$('#plA').innerHTML='';$('#msg').textContent='';showWx();
-  const it=$('#intro');it.innerHTML=`<div class="side"><div class="avatar">🧢</div>Tú</div><div class="vs">VS</div><div class="side"><div class="avatar" id="iv2"></div>${t.name}</div>`;
-  trainerImg(t,$('#iv2'));it.classList.add('on');
-  anim(it.querySelector('.vs'),[{transform:'scale(3)',opacity:0},{transform:'scale(1)',opacity:1}],{duration:500});
-  await wait(1700);it.classList.remove('on');if(M!==me)return;
-  const streams=getPlayerStreams(new BattleStream());me.streams=streams;
+  $('#quit').style.display=opts.noQuit?'none':'';
+  const it=$('#intro');
+  if(!opts.wild){
+    it.innerHTML=`<div class="side"><div class="avatar">🧢</div>Tú</div><div class="vs">VS</div><div class="side"><div class="avatar" id="iv2"></div>${t.name}</div>`;
+    trainerImg(t,$('#iv2'));it.classList.add('on');
+    anim(it.querySelector('.vs'),[{transform:'scale(3)',opacity:0},{transform:'scale(1)',opacity:1}],{duration:500});
+    await wait(1700);it.classList.remove('on')}
+  else await wait(400);
+  if(M!==me)return;
+  const bs=new BattleStream();me.bs=bs;
+  const streams=getPlayerStreams(bs);me.streams=streams;
   const A={foe:null,turns:0};
   (async()=>{for await(const chunk of streams.p1){if(M!==me||me.dead)return;onP1(chunk)}})();
   (async()=>{for await(const chunk of streams.p2){if(M!==me||me.dead)return;onP2(chunk,A)}})();
   streams.omniscient.write(`>start ${JSON.stringify({formatid:FMT})}`);
   streams.omniscient.write(`>player p1 ${JSON.stringify({name:'Tú',team:Teams.pack(mine)})}`);
   streams.omniscient.write(`>player p2 ${JSON.stringify({name:t.name,team:Teams.pack(theirs)})}`);
-  await say(L?`Desafío de la Liga ${L.i+1}/${L.list.length}: ¡${t.name} te desafía!`:`¡${t.name} te desafía a un combate!`,500)}
+  if(!opts.wild)await say(L?`Desafío de la Liga ${L.i+1}/${L.list.length}: ¡${t.name} te desafía!`:`¡${t.name} te desafía a un combate!`,500)}
 function onP1(chunk){
   const m=M,log=[];
   for(const l of chunk.split('\n')){
@@ -868,7 +948,7 @@ async function tryPrompt(m){
   try{
     const ch=await promptUI(req);
     if(M!==m||m.dead)return;
-    if(ch==='quit'){m.dead=true;show('trainers');return}
+    if(ch==='quit'){m.dead=true;if(m.opts.onQuit)m.opts.onQuit();else show('trainers');return}
     m.pending=null;m.streams.p1.write(ch)}
   finally{m.prompting=false}}
 function onP2(chunk,A){
@@ -892,7 +972,10 @@ function onP2(chunk,A){
 async function finishMatch(m){
   if(m.finished)return;m.finished=true;
   const t=m.trainer,L=m.L,win=m.winner==='Tú',tie=m.winner==null;
-  if(win&&t.id!=='random'){const b=store.get('zaf2.beat',{});b[t.id]=1;store.set('zaf2.beat',b)}
+  if(m.opts.onFinish){
+    const dead=m.bs&&m.bs.battle?m.bs.battle.p1.pokemon.filter(p=>p.fainted).map(p=>p.set.species):[];
+    await m.opts.onFinish({win,tie,dead});return}
+  if(win&&t.id!=='random'){const b=store.get(pk('beat'),{});b[t.id]=1;store.set(pk('beat'),b)}
   await say(tie?'¡Empate!':win?`¡Has derrotado a ${t.name}!`:`¡No te quedan Pokémon! Has perdido ante ${t.name}...`,500);
   if(win&&t.id!=='random')await say(`${t.name}: “¡Un combate magnífico!”`,600);
   const r=$('#result'),btn=(id,cls,txt)=>`<button class="btn ${cls}" id="${id}">${txt}</button>`;
@@ -913,10 +996,264 @@ async function finishMatch(m){
 
 $('#spd').onclick=e=>{FAST=!FAST;e.target.textContent=FAST?'▶ Normal':'⏩ Rápido'};
 $('#mute').onclick=e=>{MUTE=!MUTE;e.target.textContent=MUTE?'🔇':'🔊'};
-$('#quit').onclick=()=>{if(M)M.dead=true;M=null;show('trainers')};
-window.__dbg={get M(){return M},get MY(){return MY},set MY(v){MY=v},saveTeam,defaultSet,POOL,suggestMoves,startMatch,renderTeam,TRAINERS,trainerSets};
+$('#quit').onclick=()=>{if(M&&M.opts.onQuit){const m=M;m.dead=true;M=null;m.opts.onQuit();return}if(M)M.dead=true;M=null;show('trainers')};
+/* ================= PERFILES ================= */
+let PID=null,run=null;
+const pk=k=>`zaf3.${PID}.${k}`;
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const EMOJIS=['🧢','🔥','💧','🌿','⚡','🌙','⭐','🐉','👾','🎮','🦊','🐱'];
+const PCOLORS=['#2f7bff','#e8590c','#2fa84f','#a040a0','#d4a600','#e84a8a','#2ab7c9','#6b7a90'];
+const profiles=()=>store.get('zaf3.profiles',[]);
+const curProfile=()=>profiles().find(p=>p.id===PID);
+let newEmo=EMOJIS[0],newCol=PCOLORS[0];
+function showProfiles(){
+  PID=null;if(M){M.dead=true;M=null}
+  const list=profiles(),el=$('#plist');el.innerHTML='';
+  list.forEach(p=>{
+    const r=store.get(`zaf3.${p.id}.run`,null);
+    const d=document.createElement('div');d.className='pcard';
+    d.innerHTML=`<div class="pav" style="background:${p.color}">${p.emoji}</div><b>${esc(p.name)}</b><small>${r&&!r.over?'🎲 '+esc(stageLabelOf(r)):'Sin aventura en curso'}</small><button class="x" title="Borrar jugador">×</button>`;
+    d.onclick=e=>{
+      if(e.target.classList.contains('x')){
+        if(confirm(`¿Borrar al jugador "${p.name}" y todos sus datos?`)){
+          ['team','beat','run'].forEach(k=>{try{localStorage.removeItem(`zaf3.${p.id}.${k}`)}catch{}});
+          store.set('zaf3.profiles',list.filter(x=>x.id!==p.id));showProfiles()}}
+      else pickProfile(p.id)};
+    el.append(d)});
+  $('#pemo').innerHTML=EMOJIS.map(e=>`<span data-e="${e}" class="${e===newEmo?'on':''}">${e}</span>`).join('');
+  $('#pcol').innerHTML=PCOLORS.map(c=>`<span data-c="${c}" style="background:${c}" class="${c===newCol?'on':''}"></span>`).join('');
+  $$('#pemo span').forEach(x=>x.onclick=()=>{newEmo=x.dataset.e;showProfiles()});
+  $$('#pcol span').forEach(x=>x.onclick=()=>{newCol=x.dataset.c;showProfiles()});
+  show('profile')}
+$('#pcreate').onclick=()=>{
+  const name=$('#pname').value.trim();if(!name){$('#pname').focus();return}
+  const list=profiles(),id=Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  list.push({id,name,emoji:newEmo,color:newCol});store.set('zaf3.profiles',list);
+  if(list.length===1){ // migrar datos de versiones anteriores
+    const t=store.get('zaf2.team',null),b=store.get('zaf2.beat',null);
+    if(t)store.set(`zaf3.${id}.team`,t);if(b)store.set(`zaf3.${id}.beat`,b)}
+  $('#pname').value='';pickProfile(id)};
+$('#pname').onkeydown=e=>{if(e.key==='Enter')$('#pcreate').click()};
+function pickProfile(id){
+  PID=id;
+  MY=store.get(pk('team'),[]).filter(s=>s&&Dex.species.get(s.species).exists).map(s=>({...s,item:s.item===undefined?'':s.item}));
+  sel=0;run=store.get(pk('run'),null);
+  show('title')}
+function renderWho(){
+  const p=curProfile();if(!p){$('#whoami').innerHTML='';return}
+  $('#whoami').innerHTML=`<div class="pav" style="background:${p.color}">${p.emoji}</div><b>${esc(p.name)}</b><button class="btn sm ghost" id="chgUser">Cambiar jugador</button>`;
+  $('#chgUser').onclick=showProfiles}
+
+/* ================= RANDOMLOCKE ================= */
+const bst=s=>Object.values(s.baseStats).reduce((a,b)=>a+b,0);
+const RPOOL=POOL.filter(s=>(!s.forme||/^(Alola|Galar|Hisui|Paldea)/.test(s.forme))&&s.isNonstandard!=='Unobtainable'&&!s.requiredItem&&!s.requiredMove&&!s.battleOnly);
+const BAN_AB=new Set(['wonderguard','zenmode','schooling','powerconstruct','battlebond','disguise','shieldsdown','stancechange','rksystem','multitype','commander','zerotohero','iceface','gulpmissile','hungerswitch','terashift','teraform','terashell','embodyaspect','poisonpuppeteer','asoneglastrier','asonespectrier','mimicry','zygardecomplete']);
+const RABILS=ABILS.filter(a=>!BAN_AB.has(a.id));
+const BAD_ITEM=/Stone$|Sweet$|Apple$|Teacup|Cap$|Nugget|Rare Bone|Metal Alloy|Dubious|Up-Grade|Electirizer|Magmarizer|Reaper|Razor Claw|Razor Fang|Dragon Scale|Prism Scale|Oval|Auspicious|Malicious|Chipped|Cracked|Masterpiece|Galarica|Berry Sweet|Binding Band|Ring Target|Lagging Tail|Iron Ball|Float Stone|Room Service|Adrenaline|Absorb Bulb|Cell Battery|Eject|Red Card|Shed Shell|Utility Umbrella|Normal Gem|Pretty Feather|Fairy Feather|Booster Energy|Blunder|Mirror Herb|Terrain Extender/;
+const RITEMS=Dex.items.all().filter(i=>i.exists&&!i.isNonstandard&&!i.isPokeball&&!i.zMove&&!i.megaStone&&!i.onPlate&&!i.onMemory&&!i.itemUser&&!i.onDrive&&!BAD_ITEM.test(i.name));
+const GOODI=new Set(['leftovers','lifeorb','choiceband','choicespecs','choicescarf','focussash','assaultvest','eviolite','rockyhelmet','expertbelt','shellbell','scopelens','widelens','blacksludge','lightclay','weaknesspolicy','heavydutyboots','flameorb','toxicorb','sitrusberry','lumberry','safetygoggles','covertcloak','clearamulet','abilityshield','loadeddice','punchingglove']);
+const itemPrice=it=>{const id=it.id;if(GOODI.has(id))return 3500;if(/berry$/.test(id))return 450;if(/seed$|herb$/.test(id))return 700;let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))%97;return 1000+(h%6)*400};
+const cap=lv=>300+lv*8;
+const LEGEND=s=>(s.tags||[]).some(t=>/Legendary|Mythical/.test(t));
+const famRoot=sp=>{let s=sp,g=0;while(s.prevo&&g++<4)s=Dex.species.get(s.prevo);return toID(s.name)};
+function pickSpecies(level,o={}){
+  const hi=cap(level)+(o.boost||0),lo=o.basic?0:Math.max(150,hi-175);
+  let L=RPOOL.filter(s=>{const b=bst(s);return b<=hi&&b>=lo&&(!o.basic||(!s.prevo&&b<=(o.maxBst||380)))&&(!LEGEND(s)||level>=((s.tags||[]).includes('Restricted Legendary')?66:48))&&(!o.type||s.types.includes(o.type))&&!(o.exclude&&o.exclude.has(famRoot(s)))});
+  if(!L.length)L=RPOOL.filter(s=>!o.type||s.types.includes(o.type));
+  return rnd(L)}
+function levelMoves(sp,level){
+  const ids=new Set(),seen=new Set();
+  (function walk(s){
+    if(!s||!s.exists||seen.has(s.id))return;seen.add(s.id);
+    const ld=Dex.species.getLearnsetData(s.id);
+    if(ld&&ld.learnset)for(const [id,srcs] of Object.entries(ld.learnset)){
+      if(srcs.some(x=>{if(+x[0]<6)return false;const t=x[1];if(t==='L')return +x.slice(2)<=level;if(t==='M')return level>=18;if(t==='E')return level>=12;if(t==='T')return level>=28;return false}))ids.add(id)}
+    if(s.prevo)walk(Dex.species.get(s.prevo));
+    if(s.baseSpecies!==s.name)walk(Dex.species.get(s.baseSpecies))})(sp);
+  return suggestMoves(sp,ids)}
+function evsFor(level,sp){const f=Math.max(0,Math.min(1,(level-12)/48)),b=sp.baseStats,off=b.atk>=b.spa?'atk':'spa',v=Math.round(252*f/4)*4;return{hp:0,atk:0,def:0,spa:0,spd:0,spe:v,[off]:v}}
+const uid=()=>Math.random().toString(36).slice(2,9);
+function genMon(level,o={}){
+  const sp=pickSpecies(level,{...o,exclude:o.owned});
+  return{uid:uid(),species:sp.name,level,ability:rnd(RABILS).name,item:rnd(RITEMS).name,nature:rnd(NATURES).name,teraType:rnd(Object.keys(TYPES).filter(t=>t!=='Stellar')),moves:levelMoves(sp,level),caught:o.where||''}}
+function runSet(m){const sp=Dex.species.get(m.species);return{name:'',species:m.species,gender:'',item:m.item||'',ability:m.ability,moves:m.moves.slice(0,4),nature:m.nature,level:m.level,evs:evsFor(m.level,sp),ivs:{hp:31,atk:31,def:31,spa:31,spd:31,spe:31},teraType:m.teraType}}
+function evolveMon(m){
+  let sp=Dex.species.get(m.species),ev=false;
+  for(let k=0;k<2;k++){
+    const c=(sp.evos||[]).map(n=>Dex.species.get(n)).filter(e=>e.exists&&bst(e)<=cap(m.level)+40&&(e.evoLevel?e.evoLevel<=m.level:m.level>=(e.evoType==='levelFriendship'?24:30)));
+    if(!c.length)break;sp=rnd(c);m.species=sp.name;ev=true}
+  return ev}
+const TCLASS=[['youngster','Joven'],['lass','Chica'],['hiker','Montañero'],['fisherman','Pescador'],['sailor','Marinero'],['bugcatcher','Cazabichos'],['beauty','Dama'],['blackbelt','Cinturón Negro'],['scientist','Científico'],['psychic','Médium'],['picnicker','Campista'],['gentleman','Caballero']];
+const TNAMES=['Rubén','Marta','Iván','Lucía','Hugo','Sara','Nico','Elena','Pablo','Carla','Dani','Irene','Álex','Noa','Leo','Vera','Sergio','Paula','Mateo','Julia'];
+const mkStage=(n,lvl,steps,o={})=>({n,lvl,steps,...o});
+const STAGES=[
+ mkStage('Ruta 101',5,['trainer','wild']),mkStage('Ruta 102',7,['trainer','wild']),mkStage('Ruta 103',9,['trainer','wild']),
+ mkStage('Ruta 104',11,['trainer','wild']),mkStage('Bosque Petalia',13,['trainer','wild']),
+ mkStage('Gimnasio de Ciudad Férrica',15,['leader','shop'],{leader:'roxanne',type:'Rock',gym:1}),
+ mkStage('Ruta 116',17,['trainer','wild']),mkStage('Ruta 106',18,['trainer','wild']),
+ mkStage('Gimnasio de Algaria',20,['leader','shop'],{leader:'brawly',type:'Fighting',gym:2}),
+ mkStage('Ruta 110',22,['trainer','wild']),mkStage('Ruta 111',24,['trainer','wild']),
+ mkStage('Gimnasio de Ciudad Malvalona',26,['leader','shop'],{leader:'wattson',type:'Electric',gym:3}),
+ mkStage('Ruta 112 · Monte Cenizo',28,['trainer','wild']),
+ mkStage('Gimnasio de Lavacalda',30,['leader','shop'],{leader:'flannery',type:'Fire',gym:4}),
+ mkStage('Ruta 119',32,['trainer','wild']),
+ mkStage('Gimnasio de Petalia',34,['leader','shop'],{leader:'norman',type:'Normal',gym:5}),
+ mkStage('Ruta 120',36,['trainer','wild']),
+ mkStage('Gimnasio de Arrecípolis',38,['leader','shop'],{leader:'winona',type:'Flying',gym:6}),
+ mkStage('Cima Vela · Team Magma',40,['leader','wild'],{leader:'maxie',type:'Fire',boss:true}),
+ mkStage('Ruta 124',42,['trainer','wild']),
+ mkStage('Gimnasio de Ciudad Calagua',44,['leader','shop'],{leader:'tateandliza',type:'Psychic',gym:7}),
+ mkStage('Ruta 126',46,['trainer','wild']),
+ mkStage('Cueva Abisal · Team Aqua',48,['leader','wild'],{leader:'archie',type:'Water',boss:true}),
+ mkStage('Gimnasio de Arrecífica',50,['leader','shop'],{leader:'juan',type:'Water',gym:8}),
+ mkStage('Ruta 128',52,['trainer','wild']),mkStage('Calle Victoria',55,['trainer','wild','shop']),
+ mkStage('Alto Mando · Sidney',58,['leader'],{leader:'sidney',type:'Dark',elite:true}),
+ mkStage('Alto Mando · Phoebe',60,['leader'],{leader:'phoebe',type:'Ghost',elite:true}),
+ mkStage('Alto Mando · Glacia',62,['leader'],{leader:'glacia',type:'Ice',elite:true}),
+ mkStage('Alto Mando · Drake',64,['leader'],{leader:'drake',type:'Dragon',elite:true}),
+ mkStage('Campeón · Máximo',68,['leader'],{leader:'steven',type:'Steel',elite:true,champ:true,size:6})];
+const stageLabelOf=r=>STAGES[r.si]?`${r.si+1}/${STAGES.length} · ${STAGES[r.si].n}`:'¡Campeón!';
+const saveRun=()=>{if(PID)store.set(pk('run'),run)};
+const ownedFams=()=>new Set([...run.team,...run.box,...run.dead.map(d=>({species:d.species}))].map(m=>famRoot(Dex.species.get(m.species))));
+function newRun(perma){
+  const owned=new Set(),starters=[];
+  for(let i=0;i<3;i++){const m=genMon(5,{basic:true,owned,where:'Inicial'});owned.add(famRoot(Dex.species.get(m.species)));starters.push(m)}
+  run={v:1,si:0,sj:0,perma,money:3000,badges:0,team:[],box:[],dead:[],bag:[],log:[],view:'starter',starters,enemy:null,wild:null,caught:null,stock:null,over:false};
+  saveRun()}
+function applyLevels(){
+  const st=STAGES[run.si];if(!st)return;
+  [...run.team,...run.box].forEach(m=>{
+    const old=m.species;m.level=st.lvl;
+    if(evolveMon(m)){run.log.unshift(`¡${nmSp(old)} evolucionó en ${nmSp(m.species)}!`)}
+    m.moves=levelMoves(Dex.species.get(m.species),m.level)});
+  run.log=run.log.slice(0,25)}
+function endRun(win){run.over=true;run.view=win?'win':'over';saveRun();show('run')}
+function advanceStage(){
+  run.si++;run.sj=0;run.enemy=null;run.wild=null;
+  if(run.si>=STAGES.length){endRun(true);return}
+  applyLevels()}
+const stepLabel=(st,k)=>{const x=st.steps[k];if(x==='trainer')return 'Combate contra un entrenador';if(x==='wild')return 'Pokémon salvaje: derrótalo para capturarlo';if(x==='shop')return 'Tienda';const L=TRAINERS.find(t=>t.id===st.leader);return `${st.elite?'':st.boss?'Jefe: ':'Líder: '}${L.name}`};
+function prepEnemy(st,step){
+  if(run.enemy&&run.enemy.si===run.si&&run.enemy.sj===run.sj)return run.enemy;
+  const diff=Math.min(.97,.3+run.si*.021),excl=new Set(),sets=[];let t;
+  const add=(lv,o)=>{const sp=pickSpecies(lv,{...o,exclude:excl});excl.add(famRoot(sp));const ab=rnd(Object.values(sp.abilities));
+    const d=defaultSet(sp.name,{level:lv,item:o.item||'',moves:levelMoves(sp,lv)});sets.push({...d,ability:ab,evs:evsFor(lv,sp)})};
+  if(step==='leader'){
+    const L=TRAINERS.find(x=>x.id===st.leader);t={id:L.id,name:L.name,title:L.title,diff:Math.min(.97,diff+.12),run:true};
+    const n=st.size||(st.champ?6:st.elite?5:st.boss?5:Math.min(5,3+Math.floor(st.lvl/22)));
+    for(let i=0;i<n;i++)add(st.lvl+(i===n-1?3:1),{type:i<n-1||!st.champ?st.type:undefined,boost:i===n-1?55:25,item:rnd(TITEMS.slice(0,6))})}
+  else{
+    const c=rnd(TCLASS);t={id:c[0],name:`${c[1]} ${rnd(TNAMES)}`,diff,run:true};
+    const n=Math.min(3,1+Math.floor(st.lvl/16)+(Math.random()<.35?1:0));
+    for(let i=0;i<n;i++)add(st.lvl+(Math.random()<.5?0:1),{item:Math.random()<.35?rnd(TITEMS.slice(0,6)):''})}
+  return run.enemy={si:run.si,sj:run.sj,t,sets}}
+function runContinue(){
+  const st=STAGES[run.si],step=st.steps[run.sj];
+  if(!run.team.length){endRun(false);return}
+  if(step==='shop'){run.stock=genStock();run.view='shop';saveRun();renderRun();return}
+  const mine=run.team.map(runSet);
+  if(step==='wild'){
+    if(!run.wild)run.wild=genMon(st.lvl,{owned:ownedFams(),where:st.n});
+    saveRun();
+    return startMatch({trainer:{id:'wild',name:'Salvaje',wild:true,diff:.55,run:true},sets:[runSet(run.wild)],mine,wild:true,quitLabel:'🏃 Huir',onFinish:runDone,onQuit:()=>runDone({fled:true,dead:[]})})}
+  const e=prepEnemy(st,step);saveRun();
+  startMatch({trainer:e.t,sets:e.sets,mine,noQuit:true,quitLabel:null,onFinish:runDone})}
+function runDone(info){
+  const st=STAGES[run.si],step=st.steps[run.sj];
+  if(run.perma)(info.dead||[]).forEach(sp=>{const i=run.team.findIndex(m=>m.species===sp);if(i>=0){const m=run.team.splice(i,1)[0];run.dead.push({species:m.species,level:m.level,where:st.n});run.log.unshift(`☠ ${nmSp(m.species)} ha caído en ${st.n} y no volverá.`)}});
+  if(info.fled){run.wild=null;run.log.unshift(`Huiste del Pokémon salvaje de ${st.n}: sin captura.`);run.sj++}
+  else if(info.win){
+    run.money+=step==='leader'?1200+st.lvl*60:step==='wild'?st.lvl*8:250+st.lvl*30;
+    if(step==='wild'&&run.wild){const m=run.wild;run.wild=null;run.caught=m;if(run.team.length<6)run.team.push(m);else run.box.push(m);run.view='catch'}
+    if(step==='leader'&&st.gym){run.badges++;run.log.unshift(`🏅 ¡Medalla ${st.gym} conseguida!`)}
+    run.sj++;run.enemy=null}
+  else{
+    if(run.perma||!run.team.length){endRun(false);return}
+    run.money=Math.floor(run.money*.8);run.log.unshift('Tu equipo ha caído... te recuperas y vuelves a intentarlo (pierdes un 20% del dinero).')}
+  if(run.sj>=st.steps.length)advanceStage();
+  if(!run.over)saveRun();
+  show('run')}
+function genStock(){
+  const names=new Set(),out=[];
+  while(out.length<6){const it=rnd(RITEMS);if(names.has(it.name))continue;names.add(it.name);out.push({name:it.name,price:itemPrice(it),sold:false})}
+  if(run.badges>=2){
+    const stones=[];run.team.forEach(m=>megaStones(m.species).forEach(i=>stones.push({name:i.name,price:7000,sold:false,mega:m.species})));
+    if(stones.length)out.push(rnd(stones))}
+  return out}
+const monRow=(m,kind)=>{
+  const sp=Dex.species.get(m.species),bag=[...new Set(run.bag)].filter(n=>n!==m.item);
+  const opts=[['','Sin objeto']];if(m.item)opts.push([m.item,nmItem(m.item)+' (equipado)']);bag.forEach(n=>opts.push([n,nmItem(n)+' · mochila']));
+  return `<div class="mrow" data-uid="${m.uid}"><div class="ic" data-ic="${m.uid}"></div><div class="inf"><b>${nmSp(m.species)}</b> Nv${m.level} ${sp.types.map(tchip).join('')}<br>Hab: <span title="${esc(Dex.abilities.get(m.ability).shortDesc||'')}">${nmAb(m.ability)}</span> · ${m.nature}<br>${m.moves.map(x=>nmMove(x)).join(', ')}<br><span style="opacity:.6">${esc(m.caught||'')}</span></div>
+   <div style="display:flex;flex-direction:column;gap:4px"><select data-it="${m.uid}" ${kind==='box'?'disabled':''}>${opts.map(o=>`<option value="${esc(o[0])}" ${o[0]===(m.item||'')?'selected':''}>${esc(o[1])}</option>`).join('')}</select>
+   <button data-mv="${m.uid}">${kind==='team'?'→ Caja':'→ Equipo'}</button></div></div>`};
+function renderRun(){
+  const p=curProfile();$('#runInfo').textContent=p?`${p.emoji} ${p.name}`:'';
+  const main=$('#runMain'),side=$('#runTeam');
+  if(!run){
+    main.innerHTML=`<h3>Nueva aventura Randomlocke</h3><ul class="runmenu"><li>Empiezas con un inicial aleatorio (eliges entre 3).</li><li>En cada ruta combatirás a un entrenador y a un Pokémon salvaje: al derrotarlo lo capturas (uno por ruta, sin repetir familia).</li><li>Todos tus Pokémon tienen <b>habilidad, objeto y naturaleza aleatorios</b>.</li><li>Tras cada gimnasio hay una <b>tienda con objetos aleatorios</b>.</li><li>Tu equipo sube de nivel y evoluciona solo al avanzar; se cura tras cada combate.</li><li>Los líderes mantienen su tipo; el resto de rivales son aleatorios.</li><li>Llega hasta el Campeón de Hoenn: 31 etapas.</li></ul>
+      <label class="toggle"><input type="checkbox" id="rPerma" checked> Muerte permanente (un Pokémon debilitado se pierde para siempre)</label>
+      <div style="margin-top:12px"><button class="btn gold" id="rStart">🎲 Comenzar aventura</button></div>`;
+    $('#rStart').onclick=()=>{newRun($('#rPerma').checked);renderRun()};
+    side.innerHTML='<p style="opacity:.7">Aquí verás tu equipo, la caja, la mochila y el cementerio.</p>';return}
+  // ----- panel principal
+  const st=STAGES[run.si];
+  if(run.view==='starter'){
+    main.innerHTML=`<h3>Elige tu Pokémon inicial</h3><p style="opacity:.8;font-size:13px">Son aleatorios, con habilidad y objeto aleatorios.</p><div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px" id="stl"></div>`;
+    run.starters.forEach(m=>{const sp=Dex.species.get(m.species),c=document.createElement('div');c.className='scard';
+      c.innerHTML=`<div data-i></div><b>${nmSp(m.species)}</b><div>${sp.types.map(tchip).join('')}</div><div>Hab: ${nmAb(m.ability)}</div><div>Obj: ${m.item?nmItem(m.item):'—'}</div><div style="opacity:.7">${m.nature}</div><div style="opacity:.8">${m.moves.map(nmMove).join(', ')}</div><button class="btn sm gold">Elegir</button>`;
+      c.querySelector('[data-i]').append(iconEl(sp,80));
+      c.onclick=()=>{run.team=[m];run.starters=null;run.view='hub';applyLevels();saveRun();renderRun()};
+      $('#stl').append(c)});
+    side.innerHTML='<p style="opacity:.7">Tu equipo aparecerá aquí.</p>';return}
+  if(run.view==='catch'&&run.caught){
+    const m=run.caught,sp=Dex.species.get(m.species);
+    main.innerHTML=`<h3>¡Has capturado a ${nmSp(m.species)}!</h3><div style="display:flex;gap:14px;align-items:center;margin:10px 0"><div id="cimg"></div><div>${sp.types.map(tchip).join('')}<br>Habilidad: <b>${nmAb(m.ability)}</b><br><small>${esc(Dex.abilities.get(m.ability).shortDesc||'')}</small><br>Objeto: <b>${m.item?nmItem(m.item):'ninguno'}</b><br>Naturaleza: ${m.nature}<br>${run.team.includes(m)?'Se ha unido a tu equipo.':'Tu equipo está lleno: se ha enviado a la caja.'}</div></div><button class="btn gold" id="cOk">Continuar</button>`;
+    $('#cimg').append(iconEl(sp,100));$('#cOk').onclick=()=>{run.view='hub';run.caught=null;saveRun();renderRun()};
+    renderRunSide(side);return}
+  if(run.view==='shop'){
+    main.innerHTML=`<h3>🛒 Tienda</h3><p style="opacity:.8;font-size:13px">Dinero: <b>$${run.money}</b>. El stock cambia en cada tienda.</p><div id="shopl"></div><button class="btn gold" id="shopOk" style="margin-top:10px">Salir de la tienda</button>`;
+    run.stock.forEach((it,i)=>{const d=Dex.items.get(it.name),r=document.createElement('div');r.className='shopi';
+      r.innerHTML=`<div><b>${nmItem(it.name)}</b>${it.mega?` <span class="tchip" style="background:#8a4bff">✦ Mega para ${nmSp(it.mega)}</span>`:''}<small>${esc(d.shortDesc||'')}</small></div><button class="btn sm ${it.sold?'ghost':'gold'}" ${it.sold||run.money<it.price?'disabled':''}>${it.sold?'Vendido':'$'+it.price}</button>`;
+      r.querySelector('button').onclick=()=>{if(it.sold||run.money<it.price)return;run.money-=it.price;it.sold=true;run.bag.push(it.name);saveRun();renderRun()};
+      $('#shopl').append(r)});
+    $('#shopOk').onclick=()=>{run.stock=null;run.view='hub';run.sj++;if(run.sj>=st.steps.length)advanceStage();saveRun();renderRun()};
+    renderRunSide(side);return}
+  if(run.view==='over'||run.view==='win'){
+    const win=run.view==='win';
+    main.innerHTML=`<h2 style="color:${win?'#ffd24a':'#ff8a8a'}">${win?'🏆 ¡CAMPEÓN DE LA LIGA!':'💀 Fin de la aventura'}</h2><p style="margin:8px 0">${win?'Has completado el Randomlocke de Hoenn con':'Has llegado hasta'} <b>${esc(stageLabelOf({si:Math.min(run.si,STAGES.length-1)}))}</b> · ${run.badges} medallas · ${run.dead.length} Pokémon caídos.</p><div class="rlog">${run.log.slice(0,10).map(l=>`<p>${esc(l)}</p>`).join('')}</div><div style="margin-top:12px;display:flex;gap:10px"><button class="btn gold" id="rNew">Nueva aventura</button></div>`;
+    $('#rNew').onclick=()=>{run=null;store.set(pk('run'),null);renderRun()};
+    renderRunSide(side);return}
+  // ----- hub
+  const next=st.steps[run.sj];
+  main.innerHTML=`<h3>Etapa ${run.si+1}/${STAGES.length}: ${esc(st.n)}</h3><p style="opacity:.8;font-size:13px">Nivel recomendado: <b>Nv ${st.lvl}</b> · Medallas: ${'🏅'.repeat(run.badges)||'—'} · Dinero: <b>$${run.money}</b> · Reglas: ${run.perma?'muerte permanente':'sin muerte permanente'}</p>
+   <div style="margin:10px 0">${st.steps.map((x,k)=>`<div class="rstep ${k<run.sj?'done':k===run.sj?'cur':''}">${k<run.sj?'✓':k===run.sj?'▶':'○'} ${esc(stepLabel(st,k))}</div>`).join('')}</div>
+   <button class="btn gold" id="rGo">${next==='shop'?'🛒 Entrar a la tienda':next==='wild'?'🌿 Buscar Pokémon salvaje':next==='leader'?'⚔ Desafiar':'⚔ Combatir'}</button>
+   <div class="rlog">${run.log.map(l=>`<p>${esc(l)}</p>`).join('')}</div>`;
+  $('#rGo').onclick=runContinue;
+  renderRunSide(side)}
+function renderRunSide(el){
+  el.innerHTML=`<h3>Tu equipo (${run.team.length}/6)</h3>${run.team.map(m=>monRow(m,'team')).join('')||'<p style="opacity:.7">Sin Pokémon</p>'}
+   ${run.box.length?`<h3 style="margin-top:12px">Caja (${run.box.length})</h3>${run.box.map(m=>monRow(m,'box')).join('')}`:''}
+   <h3 style="margin-top:12px">Mochila</h3><div class="chips">${run.bag.length?run.bag.map(n=>`<span>${nmItem(n)}</span>`).join(''):'<span>vacía</span>'}</div>
+   ${run.dead.length?`<h3 style="margin-top:12px">☠ Cementerio (${run.dead.length})</h3><div class="chips">${run.dead.map(d=>`<span>${nmSp(d.species)} Nv${d.level} · ${esc(d.where)}</span>`).join('')}</div>`:''}
+   <div style="margin-top:14px"><button class="btn sm ghost" id="rAb">Abandonar aventura</button></div>`;
+  [...run.team,...run.box].forEach(m=>{const h=el.querySelector(`[data-ic="${m.uid}"]`);if(h)h.append(iconEl(Dex.species.get(m.species),48))});
+  $$('#runTeam [data-it]').forEach(sl=>sl.onchange=()=>{
+    const m=run.team.find(x=>x.uid===sl.dataset.it);if(!m)return;const v=sl.value;
+    if(v===(m.item||''))return;
+    if(v){const bi=run.bag.indexOf(v);if(bi<0)return;run.bag.splice(bi,1)}
+    if(m.item)run.bag.push(m.item);m.item=v;saveRun();renderRun()});
+  $$('#runTeam [data-mv]').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.mv,ti=run.team.findIndex(x=>x.uid===id);
+    if(ti>=0){if(run.team.length<2)return;run.box.push(run.team.splice(ti,1)[0])}
+    else{const bi=run.box.findIndex(x=>x.uid===id);if(bi>=0&&run.team.length<6)run.team.push(run.box.splice(bi,1)[0])}
+    saveRun();renderRun()});
+  $('#rAb').onclick=()=>{if(confirm('¿Abandonar la aventura? Se perderá el progreso.')){run=null;store.set(pk('run'),null);renderRun()}}}
+$('#goRun').onclick=()=>show('run');
+
+window.__dbg={get run(){return run},newRun,runContinue,STAGES,genMon,prepEnemy,genStock,applyLevels,get M(){return M},get MY(){return MY},set MY(v){MY=v},saveTeam,defaultSet,POOL,suggestMoves,startMatch,renderTeam,TRAINERS,trainerSets};
 $('#loading').style.display='none';
-renderTeam();
+showProfiles();
 }
 </script>
 </body>
