@@ -10,6 +10,22 @@ Abre `index.html` en el navegador (necesita internet para los sprites).
 O sirve la carpeta: `python -m http.server` y entra en http://localhost:8000.
 Hay que mantener junta la carpeta del proyecto: `index.html` carga `lib/pkmn.bundle.js`.
 
+## Instalar en el móvil (app instalable / PWA)
+La web es una PWA: se instala con icono en la pantalla de inicio, a pantalla completa y funciona sin conexión
+una vez cargada (los sprites que ya has visto también se guardan). Para usarla desde el móvil hay que publicarla
+en una dirección web (HTTPS); la forma más sencilla es **GitHub Pages**:
+
+1. En GitHub abre el repositorio → **Settings → Pages**.
+2. En *Build and deployment* elige **Deploy from a branch**, rama `claude/determined-volta-xj4u9a` (o `main` si
+   la has fusionado) y carpeta **/ (root)** → *Save*.
+3. En uno o dos minutos la web estará en `https://<tu-usuario>.github.io/showdown/`.
+4. Ábrela en el móvil:
+   - **Android (Chrome):** botón **📲 Instalar app** de la pantalla de inicio, o menú ⋮ → *Instalar aplicación*.
+   - **iPhone/iPad (Safari):** **Compartir** ⬆️ → **Añadir a pantalla de inicio**.
+
+Se juega mejor en **horizontal** (en vertical aparece un aviso). Cualquier otro alojamiento estático sirve igual
+(Netlify, Cloudflare Pages, Vercel…): basta con subir la carpeta del proyecto.
+
 ## Jugadores y Randomlocke
 - Al entrar eliges **quién juega** (o creas un jugador nuevo): sin cuenta ni contraseña, los datos de cada
   jugador (equipo, medallas y aventura) se guardan por separado en este navegador.

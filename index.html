@@ -2,13 +2,23 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0e0c18">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Duelos">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>Pokémon Zafiro Alfa · Duelos</title>
 <style>
 :root{--navy:#0d1b3a;--sap:#2f7bff;--sky:#8fd0ff;--ink:#eaf3ff;--gold:#ffd24a}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;background:#06122b;color:var(--ink);font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;user-select:none}
-button{font:inherit;color:inherit;cursor:pointer;border:0}
+button{font:inherit;color:inherit;cursor:pointer;border:0;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+html,body{overscroll-behavior:none}
+.screen{-webkit-overflow-scrolling:touch}
 input,select,textarea{font:inherit}
 .screen{position:absolute;inset:0;display:none;overflow:auto;background:
   radial-gradient(1200px 500px at 80% -10%,#3b8cff55,transparent 60%),
@@ -283,6 +293,13 @@ body.sv #result{background:#07050dd9}
 .jaw{position:absolute;pointer-events:none;clip-path:polygon(0 0,100% 0,100% 28%,95% 100%,88% 34%,81% 100%,74% 34%,67% 100%,60% 34%,53% 100%,46% 34%,39% 100%,32% 34%,25% 100%,18% 34%,11% 100%,5% 34%,0 28%)}
 .crystal{position:absolute;inset:0;background:linear-gradient(115deg,var(--tc) 0%,#fff 14%,var(--tc) 28%,#ffffff66 46%,var(--tc) 62%,#fff 78%,var(--tc) 100%);background-size:280% 280%;mix-blend-mode:screen;opacity:.58;animation:shimmer 3.2s linear infinite;pointer-events:none}
 @keyframes shimmer{to{background-position:280% 280%}}
+#rotate{display:none;position:absolute;inset:0;z-index:60;background:#08060ff2;color:#fff;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;font-size:20px;padding:24px}
+#rotate .ic{font-size:64px;animation:rot 2.4s ease-in-out infinite}
+@keyframes rot{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
+@media (orientation:portrait) and (max-width:820px){#scr-battle.on #rotate:not(.off){display:flex}}
+@media (max-width:980px){.team-layout>.panel:last-child{position:static;max-height:none}.grid{max-height:58vh}.topbar h2{font-size:21px}.btn{padding:9px 16px}}
+@media (max-width:560px){.tgrid{grid-template-columns:1fr}.sgrid{width:auto}.logo{font-size:40px}.slots{grid-template-columns:1fr 1fr}.ed .row{gap:6px}}
+#installBtn{display:none}
 </style>
 </head>
 <body class="sv">
@@ -318,6 +335,8 @@ body.sv #result{background:#07050dd9}
     <button class="btn gold" data-league>🏆 Desafío de la Liga</button>
     <button class="btn" id="goRun" style="background:linear-gradient(#b86bff,#6a2fd1);box-shadow:0 4px 0 #3a1580">🎲 Randomlocke</button>
   </div>
+  <button class="btn" id="installBtn">📲 Instalar app en este dispositivo</button>
+  <div class="stats-line" id="installHint" style="display:none;max-width:420px;padding:0 14px"></div>
   <div id="whoami"></div>
   <div class="stats-line" id="dataStats"></div>
   <div class="waves"></div>
@@ -378,6 +397,7 @@ body.sv #result{background:#07050dd9}
 </section>
 
 <section id="scr-battle" class="screen">
+  <div id="rotate"><div class="ic">📱</div><div>Gira el móvil en horizontal para combatir</div><button class="btn sm ghost" id="rotateOk">Seguir en vertical</button></div>
   <div id="stage">
     <div id="flash"></div>
     <div id="scene">
@@ -1611,7 +1631,9 @@ function aiDecide(req,A){
 /* ================= COMBATE: PARTIDA ================= */
 const FMT='gen9customgame';
 const cleanSet=s=>({name:'',species:s.species,gender:'',item:s.item||'',ability:s.ability,moves:s.moves.slice(0,4),nature:s.nature,level:s.level||50,evs:s.evs,ivs:s.ivs,teraType:s.teraType});
+function mobileFS(){if(!matchMedia('(pointer:coarse)').matches)return;try{const d=document.documentElement;if(!document.fullscreenElement&&d.requestFullscreen)d.requestFullscreen().then(()=>screen.orientation&&screen.orientation.lock&&screen.orientation.lock('landscape')).catch(()=>{});else if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(()=>{})}catch(e){}}
 async function startMatch(opts){
+  mobileFS();
   if(!opts.mine)ensureTeam();
   const t=opts.trainer,L=opts.league||null;
   const oppSets=opts.sets||trainerSets(t);
@@ -1973,6 +1995,21 @@ window.__dbg={fx:{moveSpec,setSprite,teraFx0:teraFx,moveStyle,animMove,impactFx,
 $('#loading').style.display='none';
 showProfiles();
 }
+</script>
+<script>
+// App instalable (PWA): service worker, botón de instalación y aviso para iPhone
+if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+(function(){
+  document.getElementById('rotateOk').onclick=e=>e.target.parentNode.classList.add('off');
+  const standalone=matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone;
+  if(standalone)return;
+  let ev=null;const btn=document.getElementById('installBtn'),hint=document.getElementById('installHint');
+  addEventListener('beforeinstallprompt',e=>{e.preventDefault();ev=e;btn.style.display='inline-block'});
+  btn.onclick=async()=>{if(!ev)return;ev.prompt();await ev.userChoice;ev=null;btn.style.display='none'};
+  addEventListener('appinstalled',()=>{btn.style.display='none';hint.style.display='none'});
+  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  if(ios){hint.style.display='block';hint.innerHTML='📲 Para instalarla en iPhone/iPad: pulsa <b>Compartir</b> ⬆️ y luego <b>Añadir a pantalla de inicio</b>.'}
+})();
 </script>
 </body>
 </html>
