@@ -26,6 +26,14 @@ en una dirección web (HTTPS); la forma más sencilla es **GitHub Pages**:
 Se juega mejor en **horizontal** (en vertical aparece un aviso). Cualquier otro alojamiento estático sirve igual
 (Netlify, Cloudflare Pages, Vercel…): basta con subir la carpeta del proyecto.
 
+## APK de Android
+`dist/PokemonDuelos.apk` es la misma web empaquetada en una app de Android (una ventana WebView a pantalla
+completa; los sprites se descargan de internet). Para instalarla, descárgala en el móvil y ábrela (hay que permitir
+«instalar apps de orígenes desconocidos» para el navegador o el gestor de archivos). Va firmada con una clave de
+depuración incluida en `android/debug.keystore`, así que sirve para uso personal, no para Google Play.
+Para regenerarla tras cambiar la web: `android/build.sh` (necesita `aapt`, `apksigner`, `zipalign`, `zip`, un JDK y
+`android-sdk-platform-23`, todo disponible con `apt` en Ubuntu/Debian).
+
 ## Jugadores y Randomlocke
 - Al entrar eliges **quién juega** (o creas un jugador nuevo): sin cuenta ni contraseña, los datos de cada
   jugador (equipo, medallas y aventura) se guardan por separado en este navegador.

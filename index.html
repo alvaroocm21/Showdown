@@ -610,7 +610,7 @@ $('#ieExport').onclick=()=>{$('#ieText').value=Teams.export(MY)};
 $('#ieImport').onclick=()=>{try{const t=Teams.import($('#ieText').value);if(!t||!t.length)throw 0;MY=t.slice(0,6).map(s=>{const d=defaultSet(s.species);return{...d,...s,name:'',evs:{hp:0,atk:0,def:0,spa:0,spd:0,spe:0,...s.evs},ivs:{hp:31,atk:31,def:31,spa:31,spd:31,spe:31,...s.ivs},level:s.level||100,teraType:s.teraType||d.teraType,moves:s.moves.slice(0,4)}});sel=0;saveTeam();renderTeam()}catch(e){alert('No se pudo importar el equipo.')}};
 
 /* ================= PANTALLAS ================= */
-function show(n){$$('.screen').forEach(s=>s.classList.toggle('on',s.id==='scr-'+n));if(n==='battle')fit();if(n==='team')renderTeam();if(n==='trainers')renderTrainers();if(n==='run')renderRun();if(n==='title')renderWho()}
+function show(n){if(window.AndroidApp)try{AndroidApp.landscape(n==='battle')}catch(e){}$$('.screen').forEach(s=>s.classList.toggle('on',s.id==='scr-'+n));if(n==='battle')fit();if(n==='team')renderTeam();if(n==='trainers')renderTrainers();if(n==='run')renderRun();if(n==='title')renderWho()}
 $$('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
 $('#goTeam').onclick=()=>show('team');
 const ensureTeam=()=>{if(!MY.length)randomTeam()};
@@ -1631,7 +1631,7 @@ function aiDecide(req,A){
 /* ================= COMBATE: PARTIDA ================= */
 const FMT='gen9customgame';
 const cleanSet=s=>({name:'',species:s.species,gender:'',item:s.item||'',ability:s.ability,moves:s.moves.slice(0,4),nature:s.nature,level:s.level||50,evs:s.evs,ivs:s.ivs,teraType:s.teraType});
-function mobileFS(){if(!matchMedia('(pointer:coarse)').matches)return;try{const d=document.documentElement;if(!document.fullscreenElement&&d.requestFullscreen)d.requestFullscreen().then(()=>screen.orientation&&screen.orientation.lock&&screen.orientation.lock('landscape')).catch(()=>{});else if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(()=>{})}catch(e){}}
+function mobileFS(){if(!matchMedia('(pointer:coarse)').matches||window.AndroidApp)return;try{const d=document.documentElement;if(!document.fullscreenElement&&d.requestFullscreen)d.requestFullscreen().then(()=>screen.orientation&&screen.orientation.lock&&screen.orientation.lock('landscape')).catch(()=>{});else if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(()=>{})}catch(e){}}
 async function startMatch(opts){
   mobileFS();
   if(!opts.mine)ensureTeam();
@@ -1991,6 +1991,9 @@ function renderRunSide(el){
   $('#rAb').onclick=()=>{if(confirm('¿Abandonar la aventura? Se perderá el progreso.')){run=null;store.set(pk('run'),null);renderRun()}}}
 $('#goRun').onclick=()=>show('run');
 
+window.__back=()=>{const on=(document.querySelector('.screen.on')||{}).id,map={'scr-team':'title','scr-trainers':'title','scr-run':'title','scr-title':'profile'};
+  if(on==='scr-battle'){if(M&&M.opts&&M.opts.noQuit)return true;$('#quit').click();return true}
+  if(!map[on])return false;if(map[on]==='profile')showProfiles();else show(map[on]);return true};
 window.__dbg={fx:{moveSpec,setSprite,teraFx0:teraFx,moveStyle,animMove,impactFx,projectile,statusFx,arrowFx,healFx,teraFx,megaFx,ballThrow,recallAnim,animFaint,auraFx,shake,drawBG},get S(){return M&&M.S},get run(){return run},newRun,runContinue,STAGES,genMon,prepEnemy,genStock,applyLevels,get M(){return M},get MY(){return MY},set MY(v){MY=v},saveTeam,defaultSet,POOL,suggestMoves,startMatch,renderTeam,TRAINERS,trainerSets};
 $('#loading').style.display='none';
 showProfiles();
@@ -1998,7 +2001,7 @@ showProfiles();
 </script>
 <script>
 // App instalable (PWA): service worker, botón de instalación y aviso para iPhone
-if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)&&!/DuelosAPK/.test(navigator.userAgent))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 (function(){
   document.getElementById('rotateOk').onclick=e=>e.target.parentNode.classList.add('off');
   const standalone=matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone;
