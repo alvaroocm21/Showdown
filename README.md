@@ -31,11 +31,15 @@ Por defecto el juego usa el estilo **Escarlata/Púrpura** (el botón 🎨 de la 
   animados de Showdown. El estilo Zafiro Alfa usa los sprites animados de 6.ª gen.
 - **Escenarios** dibujados por código: pradera de Paldea (día o atardecer) y **estadios de gimnasio** con
   público, focos y suelo luminoso del tipo del líder.
-- **Animaciones de movimientos** que dependen de cada movimiento: carga de energía, rayos continuos
-  (Lanzallamas, Rayo Hielo, Hiperrayo…), esferas (Bola Sombra…), rayos del cielo, lluvia de meteoros o rocas
-  (Cometa Draco, Avalancha…), ondas por el suelo y olas (Terremoto, Surf), arañazos, mordiscos, puñetazos,
-  patadas con postimágenes, ondas de sonido, viento, explosiones, espirales de mejora y escudos (Protección).
-  Los impactos añaden destello de pantalla, anillos, líneas de velocidad, partículas del tipo, zoom y temblor.
+- **Animaciones de movimientos:** cada movimiento tiene su propia animación compuesta (no son las originales
+  de Nintendo). Hay animaciones hechas a medida para los más emblemáticos (Lanzallamas, Hidrobomba, Rayo, Trueno,
+  Hiperrayo, Rayo Solar, Bola Sombra, Psíquico, A Bocajarro, Envite Ígneo, Pájaro Osado, Cometa Draco, Fuerza Lunar,
+  Danza Espada, Terremoto, Surf, Roca Afilada, Huracán…), unas 35 familias (puñetazos, patadas, garras, mordiscos,
+  colas, agujas, chorros, vórtices, pilares, rocas que emergen, polvos, drenajes, confusión, hipnosis, pantallas,
+  clima, terrenos, zambullidas, giros, embestidas con aura, notas musicales…) asignadas a cientos de movimientos y,
+  para el resto, una variación propia generada a partir de la identidad del movimiento (tipo, forma de golpear,
+  número de proyectiles, trayectoria y decoración del impacto). Los impactos añaden destello, anillos, líneas de
+  velocidad, partículas del tipo, zoom y temblor de cámara.
 - **Interfaz:** paneles con barra de PS con estela de daño, estado, Teracristal y mejoras de estadísticas;
   menú de movimientos con iconos de tipo.
 - **Teracristalización** con cristales, estallido, brillo facetado sobre el modelo y corona del tipo.
