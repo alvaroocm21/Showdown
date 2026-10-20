@@ -1,3 +1,4 @@
 tools/node_modules/
 tools/exp*.js
 android/build/
+dist/*.idsig
