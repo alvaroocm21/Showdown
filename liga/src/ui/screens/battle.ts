@@ -281,7 +281,7 @@ export function mountBattle(root: HTMLElement, o: BattleScreenOptions): void {
           const damaging = isDamagingMove(m);
           const mult = m.category !== 'status' ? typeEffectiveness(m.type, target.types) : 1;
           const badge = mult !== 1 && m.category !== 'status' ? `<em class="eff e${mult === 0 ? '0' : mult > 1 ? 'up' : 'down'}">${EFFECT_BADGE[String(mult)] ?? ''}</em>` : '';
-          const est = damaging ? ` · ~${computeMoveDamage(user, target, m, { crit: false, roll: 92, power: expectedPower(m, user) })} PS` : '';
+          const est = damaging ? ` · ~${computeMoveDamage(user, target, m, { battle, crit: false, roll: 92, power: expectedPower(m, user) })} PS` : '';
           const info = moveEffectText(m);
           return `<button class="mv${info === 'sin efecto aún' ? ' inert' : ''}" data-s="${i}" style="--tc:${typeVar(m.type)}" ${legal.includes(i) ? '' : 'disabled'}>
             <b>${esc(m.name)}</b>${badge}

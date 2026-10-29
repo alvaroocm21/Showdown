@@ -75,7 +75,12 @@ const STAT_BY_ID: Record<number, string> = { 1: 'hp', 2: 'atk', 3: 'def', 4: 'sp
 /** Las mejoras de combate incluyen además precisión y evasión. */
 const STAGE_BY_ID: Record<number, string> = { ...STAT_BY_ID, 7: 'acc', 8: 'eva' };
 /** move_flags de PokéAPI que usa el motor. */
-const FLAG_IDS = { contact: 1, charge: 2, recharge: 3, sound: 9, defrost: 11 } as const;
+const FLAG_IDS = {
+  contact: 1, charge: 2, recharge: 3, reflectable: 5, punch: 8, sound: 9, defrost: 11, heal: 13, powder: 15, bite: 16,
+  pulse: 17, ballistics: 18, dance: 21,
+} as const;
+/** Habilidades que no se incluyen: dependen de la Teracristalización, que el juego no tiene. */
+const ABILITY_SKIP = new Set(['tera-shift', 'tera-shell', 'teraform-zero', 'embody-aspect']);
 const CATEGORY_BY_ID: Record<number, string> = { 1: 'status', 2: 'physical', 3: 'special' };
 
 /** language_id -> id -> texto, quedándose con la versión más reciente (para textos por version_group). */
@@ -268,13 +273,22 @@ async function main() {
     .filter((m) => !(m.pp === 1 && !REAL_ONE_PP_MOVES.has(m.slug)) && !m.slug.startsWith('max-'))
     .sort((a, b) => a.id - b.id);
 
+  // ---------- Movimientos Z (uno por tipo) ----------
+  const zOut: Record<string, string> = {};
+  for (const m of moves) {
+    if (!m.identifier!.endsWith('--physical')) continue;
+    const type = typeSlugById.get(Number(m.type_id));
+    if (type) zOut[type] = esMove.get(Number(m.id)) ?? enMove.get(Number(m.id)) ?? m.identifier!;
+  }
+  if (Object.keys(zOut).length !== 18) throw new Error(`Movimientos Z: se esperaban 18 tipos y hay ${Object.keys(zOut).length}`);
+
   // ---------- Habilidades ----------
   const esAbility = names(abilityNames, 'ability_id', ES);
   const enAbility = names(abilityNames, 'ability_id', EN);
   const esFlavor = latestFlavor(abilityFlavor, 'ability_id', ES);
   const enFlavor = latestFlavor(abilityFlavor, 'ability_id', EN);
   const abilitiesOut = abilities
-    .filter((a) => Number(a.generation_id) <= MAX_GEN && a.is_main_series === '1')
+    .filter((a) => Number(a.generation_id) <= MAX_GEN && a.is_main_series === '1' && !ABILITY_SKIP.has(a.identifier!))
     .map((a) => {
       const id = Number(a.id);
       return {
@@ -305,6 +319,7 @@ async function main() {
   await Promise.all([
     write('species.json', speciesOut),
     write('moves.json', movesOut),
+    write('zmoves.json', zOut),
     write('abilities.json', abilitiesOut),
     write('types.json', typesOut),
     write('natures.json', naturesOut),

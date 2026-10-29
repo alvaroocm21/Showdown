@@ -48,7 +48,7 @@ describe('IA con equipos', () => {
     expect(first.type).toBe('move');
     A(b).status = 'paralysis';
     // con el rival ya paralizado, Onda Trueno no vale nada
-    for (let seed = 1; seed <= 30; seed++) expect(chooseAction(b, 1, createRng(seed))).toEqual({ type: 'move', slot: 1 });
+    for (let seed = 1; seed <= 30; seed++) expect(chooseAction(b, 1, createRng(seed))).toMatchObject({ type: 'move', slot: 1 });
   });
 
   it('descansa o se cura cuando le quedan pocos PS', () => {

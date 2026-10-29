@@ -1,6 +1,7 @@
 import type { Rng } from '../rng';
 import type { Move } from '../types';
-import type { Battler, StatusName } from './state';
+import type { Battle, Battler, StatusName, Terrain, Weather } from './state';
+import { weatherFor } from './field';
 
 /** Ids de efecto de PokéAPI que el motor trata de forma especial. */
 export const EFFECT = {
@@ -29,16 +30,40 @@ const UNSUPPORTED: ReadonlySet<string> = new Set([
 ]);
 
 /** Ataques cuya potencia depende de la situación. */
-const VARIABLE_POWER: ReadonlySet<string> = new Set(['return', 'magnitude', 'flail', 'reversal']);
+const VARIABLE_POWER: ReadonlySet<string> = new Set(['return', 'magnitude', 'flail', 'reversal', 'weather-ball', 'terrain-pulse']);
+
+/** Ataques que provocan un clima o un terreno. */
+export const WEATHER_MOVES: Readonly<Record<string, Weather>> = {
+  'rain-dance': 'rain', 'sunny-day': 'sun', sandstorm: 'sand', hail: 'snow', snowscape: 'snow',
+};
+export const TERRAIN_MOVES: Readonly<Record<string, Terrain>> = {
+  'electric-terrain': 'electric', 'grassy-terrain': 'grassy', 'misty-terrain': 'misty', 'psychic-terrain': 'psychic',
+};
+/** Cambian al rival por otro Pokémon al azar. */
+export const FORCE_SWITCH_STATUS: ReadonlySet<string> = new Set(['roar', 'whirlwind']);
+export const FORCE_SWITCH_DAMAGE: ReadonlySet<string> = new Set(['dragon-tail', 'circle-throw']);
+/** Ataques de viento (Surcavientos, Energía Eólica) y cortantes (Cortante). PokéAPI no los marca. */
+export const WIND_MOVES: ReadonlySet<string> = new Set([
+  'gust', 'twister', 'whirlwind', 'hurricane', 'heat-wave', 'air-cutter', 'bleakwind-storm', 'sandsear-storm', 'springtide-storm',
+  'wildbolt-storm', 'petal-blizzard', 'icy-wind', 'fairy-wind', 'razor-wind', 'blizzard', 'tailwind', 'aeroblast',
+]);
+export const SLICING_MOVES: ReadonlySet<string> = new Set([
+  'cut', 'slash', 'night-slash', 'psycho-cut', 'x-scissor', 'leaf-blade', 'razor-shell', 'air-slash', 'aerial-ace', 'ceaseless-edge',
+  'cross-poison', 'sacred-sword', 'secret-sword', 'solar-blade', 'stone-axe', 'kowtow-cleave', 'bitter-blade', 'aqua-cutter',
+  'fury-cutter', 'razor-leaf', 'tachyon-cutter', 'mighty-cleave', 'psyblade', 'behemoth-blade', 'population-bomb', 'air-cutter',
+]);
 
 export type MoveKind = 'damage' | 'fixed' | 'ohko' | 'status' | 'none';
 
 function statusSupported(m: Move): boolean {
   if (m.effectId === EFFECT.rest) return true;
+  if (m.slug in WEATHER_MOVES || m.slug in TERRAIN_MOVES || FORCE_SWITCH_STATUS.has(m.slug)) return true;
+  if (m.slug === 'disable' || m.slug === 'perish-song') return true;
   switch (m.meta.category) {
-    case 1: return m.meta.ailmentId >= 1 && m.meta.ailmentId <= 5;
+    case 1: return m.meta.ailmentId >= 1 && m.meta.ailmentId <= 6;
     case 2: return m.meta.statChanges.length > 0;
     case 3: return m.meta.healing > 0;
+    case 5: return m.meta.statChanges.length > 0 && m.meta.ailmentId === 6; // Contoneo, Adulación
     default: return false;
   }
 }
@@ -52,6 +77,10 @@ export function moveKind(m: Move): MoveKind {
   if (m.category === 'status' && statusSupported(m)) return 'status';
   return 'none';
 }
+
+/** Un ataque con efecto secundario (para Fuerza Bruta). */
+export const hasSecondary = (m: Move): boolean =>
+  m.meta.ailmentChance > 0 || m.meta.flinchChance > 0 || ((m.meta.category === 6 || m.meta.category === 7) && m.meta.statChanges.length > 0);
 
 export const isMoveImplemented = (m: Move) => moveKind(m) !== 'none';
 /** Ataque de daño directo con la fórmula normal. */
@@ -72,8 +101,10 @@ export function statusOf(m: Move): StatusName | null {
   }
 }
 
-export function variablePower(move: Move, user: Battler, rng: Rng): number {
+export function variablePower(move: Move, user: Battler, rng: Rng, battle?: Battle): number {
   switch (move.slug) {
+    case 'weather-ball': return battle && weatherFor(battle, user) ? 100 : 50;
+    case 'terrain-pulse': return battle && battle.field.terrain ? 100 : 50;
     case 'return': return 102;
     case 'magnitude': {
       const r = rng.int(1, 100);
@@ -100,10 +131,11 @@ export function expectedPower(move: Move, user: Battler): number {
 }
 
 /** Número de golpes de un ataque multigolpe (2-5 golpes: 35 %, 35 %, 15 %, 15 %). */
-export function rollHitCount(move: Move, rng: Rng): number {
+export function rollHitCount(move: Move, rng: Rng, alwaysMax = false): number {
   const { minHits, maxHits } = move.meta;
   if (minHits === null || maxHits === null) return 1;
   if (minHits === maxHits) return minHits;
+  if (alwaysMax) return maxHits;
   const r = rng.next();
   return r < 0.35 ? 2 : r < 0.7 ? 3 : r < 0.85 ? 4 : 5;
 }

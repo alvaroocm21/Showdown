@@ -1,7 +1,9 @@
 import type { PokeType, StageKey } from '../types';
-import type { Side, StatusName } from './state';
+import type { Side, StatusName, Terrain, Weather } from './state';
 
-export type DamageCause = 'move' | 'recoil' | 'burn' | 'poison' | 'rough-skin' | 'liquid-ooze' | 'selfdestruct';
+export type DamageCause =
+  | 'move' | 'recoil' | 'burn' | 'poison' | 'rough-skin' | 'liquid-ooze' | 'selfdestruct'
+  | 'weather' | 'confusion' | 'perish' | 'ability' | 'bad-dreams' | 'disguise';
 export type CantMoveReason = 'sleep' | 'freeze' | 'paralysis' | 'flinch' | 'recharge' | 'truant';
 
 export type BattleEvent =
@@ -36,5 +38,17 @@ export type BattleEvent =
       maxHp: number;
       status: StatusName | null;
     }
+  | { type: 'weather'; weather: Weather | null; was: Weather | null }
+  | { type: 'terrain'; terrain: Terrain | null; was: Terrain | null }
+  /** Confusión, Canto Mortal o ataque bloqueado: on = empieza, !on = termina. */
+  | { type: 'volatile'; side: Side; pokemon: string; kind: 'confusion' | 'perish' | 'disable'; on: boolean; turns?: number }
+  /** Cambio de tipos (Cambio Color, Líbero, Mutatipo…). */
+  | { type: 'types'; side: Side; pokemon: string; types: PokeType[] }
+  /** Megaevolución: el Pokémon cambia de forma (sprite, tipos y PS máximos). */
+  | { type: 'mega'; side: Side; pokemon: string; speciesId: number; name: string; types: PokeType[]; hp: number; maxHp: number }
+  /** Impostor: se transforma en el rival. */
+  | { type: 'transform'; side: Side; pokemon: string; speciesId: number; name: string; types: PokeType[] }
+  /** Un Pokémon usa su movimiento Z. */
+  | { type: 'zmove'; side: Side; pokemon: string }
   | { type: 'faint'; side: Side; pokemon: string }
   | { type: 'win'; side: Side };

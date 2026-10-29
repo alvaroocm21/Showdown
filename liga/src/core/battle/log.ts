@@ -28,9 +28,33 @@ const CANT_MOVE: Record<string, string> = {
   freeze: '{p} está congelado y no puede moverse.',
   paralysis: '¡{p} está paralizado! ¡No se puede mover!',
   flinch: '¡{p} retrocedió y no pudo moverse!',
+  disabled: '¡El ataque de {p} está anulado!',
   recharge: '{p} debe recuperarse de su ataque.',
   truant: '{p} está holgazaneando.',
 };
+
+const WEATHER_START: Record<string, string> = {
+  sun: 'Hace mucho sol.', rain: 'Ha empezado a llover.', sand: 'Se levanta una tormenta de arena.', snow: 'Empieza a nevar.',
+  'harsh-sun': '¡Los rayos del sol se vuelven abrasadores!', 'heavy-rain': '¡Ha empezado a caer un diluvio!',
+  'strong-winds': '¡Soplan vientos misteriosos!',
+};
+const WEATHER_END: Record<string, string> = {
+  sun: 'Se acabó el sol.', rain: 'Ha dejado de llover.', sand: 'La tormenta de arena se ha calmado.', snow: 'Ha dejado de nevar.',
+  'harsh-sun': 'Los rayos del sol han vuelto a la normalidad.', 'heavy-rain': 'Ha dejado de caer el diluvio.',
+  'strong-winds': 'Los vientos misteriosos se han calmado.',
+};
+const WEATHER_TEXT = (weather: string | null, was: string | null): string | null =>
+  weather ? WEATHER_START[weather]! : was ? WEATHER_END[was]! : null;
+const TERRAIN_START: Record<string, string> = {
+  electric: 'Una corriente eléctrica recorre el campo.', grassy: 'Ha crecido hierba en el campo.',
+  misty: 'La niebla se extiende por el campo.', psychic: 'El campo se llena de una extraña sensación.',
+};
+const TERRAIN_END: Record<string, string> = {
+  electric: 'La corriente eléctrica se ha disipado.', grassy: 'La hierba ha desaparecido.',
+  misty: 'La niebla se ha disipado.', psychic: 'La extraña sensación ha desaparecido.',
+};
+const TERRAIN_TEXT = (terrain: string | null, was: string | null): string | null =>
+  terrain ? TERRAIN_START[terrain]! : was ? TERRAIN_END[was]! : null;
 
 /** Texto del registro de combate en español. `ownSide` es el bando del jugador (el otro se marca como rival). */
 export function describeEvent(e: BattleEvent, ownSide: Side = 0): string | null {
@@ -54,6 +78,12 @@ export function describeEvent(e: BattleEvent, ownSide: Side = 0): string | null 
         case 'poison': return `${who(e.side, e.pokemon)} sufrió por el veneno.`;
         case 'rough-skin': return `${who(e.side, e.pokemon)} resultó herido.`;
         case 'liquid-ooze': return `${who(e.side, e.pokemon)} absorbió el líquido tóxico.`;
+        case 'weather': return `${who(e.side, e.pokemon)} sufre la tormenta de arena.`;
+        case 'confusion': return '¡Está tan confuso que se hirió a sí mismo!';
+        case 'perish': return `${who(e.side, e.pokemon)} se debilita por la cuenta atrás.`;
+        case 'bad-dreams': return `${who(e.side, e.pokemon)} sufre pesadillas.`;
+        case 'ability': return `${who(e.side, e.pokemon)} sufrió daño.`;
+        case 'disguise': return `${who(e.side, e.pokemon)} perdió su disfraz.`;
         default: return null;
       }
     case 'heal': return `${who(e.side, e.pokemon)} recuperó PS.`;
@@ -74,6 +104,18 @@ export function describeEvent(e: BattleEvent, ownSide: Side = 0): string | null 
     case 'ability': return `¡${e.ability} de ${who(e.side, e.pokemon)}!${e.message ? ` ${e.message}` : ''}`;
     case 'recall': return e.side === ownSide ? `¡Vuelve, ${e.pokemon}!` : `El rival retiró a ${e.pokemon}.`;
     case 'switch': return e.side === ownSide ? `¡Adelante, ${e.pokemon}!` : `El rival sacó a ${e.pokemon}.`;
+    case 'weather': return WEATHER_TEXT(e.weather, e.was);
+    case 'terrain': return TERRAIN_TEXT(e.terrain, e.was);
+    case 'volatile': {
+      const name = who(e.side, e.pokemon);
+      if (e.kind === 'confusion') return e.on ? `¡${name} está confuso!` : `¡${name} ya no está confuso!`;
+      if (e.kind === 'perish') return e.on ? `La cuenta atrás de ${name}: ${e.turns}.` : null;
+      return e.on ? `¡El último ataque de ${name} ha sido anulado!` : `${name} puede volver a usar su ataque.`;
+    }
+    case 'types': return `${who(e.side, e.pokemon)} cambió de tipo.`;
+    case 'mega': return `¡${e.side === ownSide ? '' : 'El rival: '}${e.name} ha megaevolucionado!`;
+    case 'transform': return `${who(e.side, e.pokemon)} se transformó en ${e.name}.`;
+    case 'zmove': return `¡${who(e.side, e.pokemon)} se envuelve en un poder Z!`;
     case 'faint': return `¡${who(e.side, e.pokemon)} se debilitó!`;
     case 'win': return e.side === ownSide ? '¡Has ganado el combate!' : 'Has perdido el combate…';
   }

@@ -36,14 +36,14 @@ describe('subidas y bajadas de estadísticas', () => {
   it('las mejoras cambian el daño y un crítico ignora las bajadas del atacante', () => {
     const b = duel(['snorlax', ['body-slam']], ['blissey', ['light-screen']]);
     const move = moveOf(moveId('body-slam'));
-    const base = computeMoveDamage(A(b), B(b), move, { crit: false, roll: 100 });
+    const base = computeMoveDamage(A(b), B(b), move, { battle: b, crit: false, roll: 100 });
     A(b).stages.atk = 2;
-    expect(computeMoveDamage(A(b), B(b), move, { crit: false, roll: 100 })).toBeGreaterThan(base * 1.8);
+    expect(computeMoveDamage(A(b), B(b), move, { battle: b, crit: false, roll: 100 })).toBeGreaterThan(base * 1.8);
     A(b).stages.atk = -6;
-    expect(computeMoveDamage(A(b), B(b), move, { crit: false, roll: 100 })).toBeLessThan(base / 3);
-    const critBase = (() => { A(b).stages.atk = 0; return computeMoveDamage(A(b), B(b), move, { crit: true, roll: 100 }); })();
+    expect(computeMoveDamage(A(b), B(b), move, { battle: b, crit: false, roll: 100 })).toBeLessThan(base / 3);
+    const critBase = (() => { A(b).stages.atk = 0; return computeMoveDamage(A(b), B(b), move, { battle: b, crit: true, roll: 100 }); })();
     A(b).stages.atk = -6;
-    expect(computeMoveDamage(A(b), B(b), move, { crit: true, roll: 100 })).toBe(critBase);
+    expect(computeMoveDamage(A(b), B(b), move, { battle: b, crit: true, roll: 100 })).toBe(critBase);
   });
 
   it('Sofoco baja el At. Esp. del propio usuario tras golpear', () => {

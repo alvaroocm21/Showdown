@@ -9,7 +9,7 @@ import { A, B, abilityId, duel, has, makeSet, moveId, mv, sw, turn, types } from
 const NOOP = 'light-screen';
 const HIT = [0, 0.99, 0.99];
 const dmg = (b: ReturnType<typeof duel>, slug: string, crit = false) =>
-  computeMoveDamage(A(b), B(b), moveOf(moveId(slug)), { crit, roll: 100 });
+  computeMoveDamage(A(b), B(b), moveOf(moveId(slug)), { battle: b, crit, roll: 100 });
 
 describe('habilidades implementadas', () => {
   it('hay unas 50 y todas existen en el juego', () => {

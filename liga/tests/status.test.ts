@@ -54,9 +54,9 @@ describe('estados principales', () => {
 
     const c = duel(['snorlax', ['body-slam']], ['blissey', [NOOP]]);
     const move = moveOf(moveId('body-slam'));
-    const normal = computeMoveDamage(A(c), B(c), move, { crit: false, roll: 100 });
+    const normal = computeMoveDamage(A(c), B(c), move, { battle: c, crit: false, roll: 100 });
     A(c).status = 'burn';
-    expect(computeMoveDamage(A(c), B(c), move, { crit: false, roll: 100 })).toBe(Math.floor(normal / 2));
+    expect(computeMoveDamage(A(c), B(c), move, { battle: c, crit: false, roll: 100 })).toBe(Math.floor(normal / 2));
   });
 
   it('veneno 1/8 y veneno grave n/16 creciente', () => {

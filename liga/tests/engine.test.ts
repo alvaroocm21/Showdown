@@ -103,19 +103,19 @@ describe('IA', () => {
   it('prefiere el ataque superefectivo', () => {
     const b = createBattle([makeSet('venusaur', ['tackle'])], [makeSet('charizard', ['water-gun', 'flamethrower', 'tackle'])]);
     for (let seed = 1; seed <= 50; seed++) {
-      expect(chooseAction(b, 1, createRng(seed))).toEqual({ type: 'move', slot: 1 });
+      expect(chooseAction(b, 1, createRng(seed))).toMatchObject({ type: 'move', slot: 1 });
     }
   });
 
   it('no pierde el turno con un ataque sin efecto implementado si hay otro de daño', () => {
     const b = createBattle([makeSet('venusaur', ['tackle'])], [makeSet('charizard', ['light-screen', 'protect', 'tackle'])]);
-    expect(chooseAction(b, 1, createRng(3))).toEqual({ type: 'move', slot: 2 });
+    expect(chooseAction(b, 1, createRng(3))).toMatchObject({ type: 'move', slot: 2 });
   });
 
   it('no elige ataques sin PP y recurre a Forcejeo', () => {
     const b = createBattle([makeSet('venusaur', ['tackle'])], [makeSet('charizard', ['flamethrower'])]);
     activeOf(b, 1).moves[0]!.pp = 0;
-    expect(chooseAction(b, 1, createRng(1))).toEqual({ type: 'move', slot: -1 });
+    expect(chooseAction(b, 1, createRng(1))).toMatchObject({ type: 'move', slot: -1 });
   });
 });
 

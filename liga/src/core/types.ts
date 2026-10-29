@@ -45,6 +45,17 @@ export interface MoveFlags {
   recharge: boolean;
   sound: boolean;
   defrost: boolean;
+  /** Rebotable con Espejo Mágico. */
+  reflectable: boolean;
+  punch: boolean;
+  bite: boolean;
+  pulse: boolean;
+  /** Bombas, bolas y proyectiles (Antibalas). */
+  ballistics: boolean;
+  powder: boolean;
+  dance: boolean;
+  /** Ataques que curan al usuario (Médico). */
+  heal: boolean;
 }
 
 export interface MoveMeta {
