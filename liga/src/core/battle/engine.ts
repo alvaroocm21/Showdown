@@ -184,8 +184,9 @@ function endOfTurn(ctx: Ctx): void {
       if (b.hp <= 0 || b.types.some((t) => SAND_PROOF.includes(t)) || isWeatherDamageImmune(b)) continue;
       damageHp(ctx, b, Math.max(1, Math.floor(b.maxHp / 16)), 'weather');
       checkFaints(ctx, [side]);
-      if (finishIfOver(ctx)) return;
     }
+    // El final del turno se aplica a los dos Pokémon antes de decidir si el combate ha terminado
+    if (finishIfOver(ctx)) return;
   }
 
   // 2) Estados, habilidades, terreno y cuentas atrás de cada Pokémon
@@ -207,8 +208,8 @@ function endOfTurn(ctx: Ctx): void {
     }
     if (b.hp > 0 && b.slowStart > 0) b.slowStart--;
     checkFaints(ctx, [side]);
-    if (finishIfOver(ctx)) return;
   }
+  if (finishIfOver(ctx)) return;
 
   // 3) El clima y el terreno se agotan
   const f = battle.field;

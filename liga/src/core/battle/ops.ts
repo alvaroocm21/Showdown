@@ -187,3 +187,18 @@ export function changeAbility(ctx: Ctx, b: Battler, abilityId: number): void {
   refreshSuppression(ctx.battle);
   void defOf;
 }
+
+/** Impostor: el Pokémon se transforma en el rival (tipos, estadísticas salvo PS, ataques con 5 PP, habilidad y mejoras). */
+export function transformInto(ctx: Ctx, self: Battler, foe: Battler): void {
+  if (self.transformBackup || foe.transformBackup) return;
+  self.transformBackup = { speciesId: self.speciesId, name: self.name, stats: self.stats, moves: self.moves, types: [...self.types], abilityId: self.abilityId };
+  self.speciesId = foe.speciesId;
+  self.name = foe.name;
+  self.stats = { ...foe.stats, hp: self.stats.hp };
+  self.types = [...foe.types];
+  self.moves = foe.moves.map((m) => ({ moveId: m.moveId, pp: Math.min(5, m.maxPp), maxPp: Math.min(5, m.maxPp) }));
+  self.abilityId = foe.abilityId;
+  self.stages = { ...foe.stages };
+  emit(ctx, { type: 'transform', side: sideOf(ctx, self), pokemon: self.name, speciesId: self.speciesId, name: self.name, types: [...self.types] });
+  refreshSuppression(ctx.battle);
+}

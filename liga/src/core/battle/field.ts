@@ -1,4 +1,4 @@
-import { abilitySlug, fieldHasAbility } from './abilities';
+import { abilitySlug, fieldHasAbility, runFieldChange } from './abilities';
 import { emit, type Ctx } from './ops';
 import { activeOf, type Battle, type Battler, type Side, type Terrain, type Weather } from './state';
 
@@ -41,6 +41,7 @@ export function setWeather(ctx: Ctx, weather: Weather, source: Side | null): boo
   f.weatherTurns = isStrongWeather(weather) ? 0 : WEATHER_TURNS;
   f.weatherSource = isStrongWeather(weather) ? source : null;
   emit(ctx, { type: 'weather', weather, was });
+  runFieldChange(ctx);
   return true;
 }
 
@@ -52,6 +53,7 @@ export function clearWeather(ctx: Ctx): void {
   f.weatherTurns = 0;
   f.weatherSource = null;
   emit(ctx, { type: 'weather', weather: null, was });
+  runFieldChange(ctx);
 }
 
 export function setTerrain(ctx: Ctx, terrain: Terrain): boolean {
@@ -61,6 +63,7 @@ export function setTerrain(ctx: Ctx, terrain: Terrain): boolean {
   f.terrain = terrain;
   f.terrainTurns = TERRAIN_TURNS;
   emit(ctx, { type: 'terrain', terrain, was });
+  runFieldChange(ctx);
   return true;
 }
 
@@ -71,6 +74,7 @@ export function clearTerrain(ctx: Ctx): void {
   f.terrain = null;
   f.terrainTurns = 0;
   emit(ctx, { type: 'terrain', terrain: null, was });
+  runFieldChange(ctx);
 }
 
 /**

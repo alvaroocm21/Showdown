@@ -8,7 +8,7 @@ import {
 } from './abilities';
 import { computeMoveDamage, critChance, effectivenessOf } from './damage';
 import type { CantMoveReason } from './events';
-import { effectiveWeather, setTerrain, setWeather, weatherFor } from './field';
+import { effectiveWeather, isGrounded, setTerrain, setWeather, weatherFor } from './field';
 import {
   EFFECT, FORCE_SWITCH_DAMAGE, FORCE_SWITCH_STATUS, TERRAIN_MOVES, WEATHER_MOVES, hasSecondary, moveKind, rollHitCount, statusOf, targetsUser,
   variablePower, type MoveKind,
@@ -254,6 +254,11 @@ function resolveHit(ctx: Ctx, side: Side, user: Battler, target: Battler, move: 
     emit(ctx, { type: 'immune', side: targetSide, pokemon: target.name });
     return;
   }
+  // Terreno Psíquico: quien pisa el suelo está protegido de los ataques con prioridad
+  if (battle.field.terrain === 'psychic' && isGrounded(target) && priority > 0 && !targetsUser(move)) {
+    emit(ctx, { type: 'immune', side: targetSide, pokemon: target.name });
+    return failed();
+  }
   if (!struggle && abilityBlocksMove({ battle, user, target, move, effectiveness, priority, boostedStatus })) {
     runImmuneEffect(ctx, user, target, move);
     return failed();
@@ -328,6 +333,7 @@ function dealDamage(ctx: Ctx, user: Battler, target: Battler, move: Move, powerB
     runAfterHit(ctx, user, target, move, amount, crit);
   }
   if (landed > 1) emit(ctx, { type: 'hits', count: landed });
+  if (move.type === 'electric') user.charged = false; // se gasta la carga
   return { total, last };
 }
 

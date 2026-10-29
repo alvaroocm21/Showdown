@@ -103,6 +103,7 @@ export function computeMoveDamage(user: Battler, target: Battler, move: Move, op
   // Potencia: habilidades, terreno y clima
   let powerMult = m.power * (opts.powerBoost ?? 1);
   if (!struggle) {
+    if (user.charged && move.type === 'electric') powerMult *= 2; // Dinamo / Energía Eólica / Carga
     if (isGrounded(user)) {
       if (terrain === 'electric' && move.type === 'electric') powerMult *= 1.3;
       else if (terrain === 'grassy' && move.type === 'grass') powerMult *= 1.3;

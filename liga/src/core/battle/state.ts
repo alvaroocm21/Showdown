@@ -86,6 +86,8 @@ export interface Battler {
   transformBackup: { speciesId: number; name: string; stats: Stats; moves: BattleMove[]; types: PokeType[]; abilityId: number } | null;
   /** Potenciación de Protosíntesis / Impulso Cuark: la estadística más alta. */
   boosted: import('../types').StatKey | null;
+  /** Habilidad de «una vez por combate» ya usada (Espada Intrépida, Néctar Dulce…). */
+  abilityUsed: boolean;
   /** Último ataque que usó (para Anulación). */
   lastMoveId: number | null;
   /** Sale del campo al final del turno (Retirada / Huida de Emergencia). */
@@ -182,6 +184,7 @@ export function createBattler(set: PokemonSet): Battler {
     baseAbilityId: set.abilityId,
     transformBackup: null,
     boosted: null,
+    abilityUsed: false,
     lastMoveId: null,
     forceOut: false,
   };

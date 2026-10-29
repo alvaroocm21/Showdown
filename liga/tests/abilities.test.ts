@@ -1,23 +1,37 @@
 import { describe, expect, it } from 'vitest';
 import { computeMoveDamage } from '../src/core/battle/damage';
-import { IMPLEMENTED_ABILITIES, isAbilityImplemented } from '../src/core/battle/abilities';
+import { INAPPLICABLE, IMPLEMENTED_ABILITIES, inapplicableReason, isAbilityImplemented } from '../src/core/battle/abilities';
 import { effectiveSpeed } from '../src/core/battle/turnOrder';
 import { createBattle, moveOf } from '../src/core/battle/state';
 import { ABILITIES } from '../src/core/data';
-import { A, B, abilityId, duel, has, makeSet, moveId, mv, sw, turn, types } from './helpers';
+import { A, B, INERT_ABILITY_SLUG, abilityId, duel, has, makeSet, moveId, mv, sw, turn, types } from './helpers';
 
 const NOOP = 'light-screen';
 const HIT = [0, 0.99, 0.99];
 const dmg = (b: ReturnType<typeof duel>, slug: string, crit = false) =>
   computeMoveDamage(A(b), B(b), moveOf(moveId(slug)), { battle: b, crit, roll: 100 });
 
-describe('habilidades implementadas', () => {
-  it('hay unas 50 y todas existen en el juego', () => {
-    expect(IMPLEMENTED_ABILITIES.size).toBeGreaterThanOrEqual(40);
+describe('cobertura de habilidades', () => {
+  it('todas las habilidades del juego tienen efecto o están marcadas como no aplicables, con su motivo', () => {
     const slugs = new Set(ABILITIES.map((a) => a.slug));
-    for (const s of IMPLEMENTED_ABILITIES) expect(slugs.has(s), s).toBe(true);
-    expect(isAbilityImplemented('levitate')).toBe(true);
-    expect(isAbilityImplemented('drizzle')).toBe(false);
+    for (const a of ABILITIES) {
+      const implemented = isAbilityImplemented(a.slug);
+      const reason = inapplicableReason(a.slug);
+      expect(implemented || !!reason, `${a.slug} sin clasificar`).toBe(true);
+      expect(implemented && !!reason, `${a.slug} está en las dos listas`).toBe(false);
+    }
+    // ningún nombre inventado en el registro ni en la lista de «no aplica»
+    for (const s of [...IMPLEMENTED_ABILITIES, ...Object.keys(INAPPLICABLE)]) expect(slugs.has(s), s).toBe(true);
+    expect(IMPLEMENTED_ABILITIES.size).toBeGreaterThan(240);
+  });
+
+  it('las habilidades de Teracristalización no están en el juego', () => {
+    for (const s of ['tera-shift', 'tera-shell', 'teraform-zero', 'embody-aspect']) expect(ABILITIES.some((a) => a.slug === s), s).toBe(false);
+  });
+
+  it('la habilidad inerte de las pruebas realmente no hace nada', () => {
+    expect(isAbilityImplemented(INERT_ABILITY_SLUG)).toBe(false);
+    expect(inapplicableReason(INERT_ABILITY_SLUG)).toBeTruthy();
   });
 });
 
