@@ -1,9 +1,10 @@
+import { matchReward, rewardFor } from '../../core/game/economy';
 import { resultForMatch, simulateMatch } from '../../core/game/play';
 import { archiveSeason, champion, currentRound, findMatch, isSeasonComplete, allMatches } from '../../core/game/season';
 import { findProfile, recordMatch, startSeason, updateProfile } from '../../core/game/state';
 import { computeStandings } from '../../core/game/standings';
 import { MAX_PLAYERS, MIN_PLAYERS, type GameState, type Match, type Profile, type Season } from '../../core/game/types';
-import { avatarHtml, esc } from '../shared';
+import { avatarHtml, confetti, esc } from '../shared';
 import type { AppCtx } from '../app';
 
 type Tab = 'round' | 'table' | 'calendar';
@@ -13,6 +14,7 @@ let shown: number | null = null;
 /** Participantes marcados al preparar la temporada. Mientras el usuario no los toque, son los primeros perfiles. */
 let selected = new Set<string>();
 let selectionTouched = false;
+let confettiShownFor = 0;
 
 const fmtDate = (t: number) => new Date(t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
 
@@ -124,7 +126,8 @@ function mountSeason(ctx: AppCtx, state: GameState, season: Season): void {
     let caption = '';
     if (m.result) {
       middle = `<div class="mres"><span class="score">${m.result.faintedA} – ${m.result.faintedB}</span></div>`;
-      caption = `<div class="mcap">Pokémon debilitados · ${m.result.mode === 'played' ? 'jugado' : 'simulado'}</div>`;
+      const prize = rewardFor(m, m.result);
+      caption = `<div class="mcap">Pokémon debilitados · ${m.result.mode === 'played' ? 'jugado' : 'simulado'} · <b>+${prize.coins} 🪙 ${esc(prof(prize.profileId).name)}</b></div>`;
     } else {
       middle = '<div class="mres"><span class="vs">VS</span></div>';
       const bothNotMain = !a.main && !b.main;
@@ -210,6 +213,11 @@ function mountSeason(ctx: AppCtx, state: GameState, season: Season): void {
     ${tab === 'round' ? roundView() : tab === 'table' ? tableView() : calendarView()}`;
 
   const redraw = () => mountLeague(ctx);
+  if (complete && confettiShownFor !== season.number) {
+    confettiShownFor = season.number;
+    const box = ctx.root.querySelector<HTMLElement>('.champion');
+    if (box) confetti(box, 60);
+  }
   ctx.root.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach((b) =>
     b.addEventListener('click', () => {
       tab = b.dataset.tab as Tab;
@@ -279,13 +287,15 @@ function playMatch(ctx: AppCtx, matchId: string, meId: string): void {
     foeTeam: foe.team,
     title: `${me.name} vs ${foe.name}`,
     confirmExit: true,
+    reward: (outcome) => (outcome.winner === 0 ? `+${matchReward(outcome.fainted[0])} 🪙 para ${me.name}` : null),
     onExit: () => ctx.go({ name: 'league' }),
     onFinish: (outcome) => {
       try {
         const result = resultForMatch(match, me.id, outcome, 'played');
         ctx.store.commit(recordMatch(ctx.store.get(), matchId, result));
         shown = null;
-        ctx.toast(result.winner === me.id ? `¡Victoria de ${me.name}!` : `Derrota de ${me.name}`);
+        const prize = rewardFor(match, result);
+        ctx.toast(result.winner === me.id ? `¡Victoria de ${me.name}! +${prize.coins} 🪙` : `Derrota de ${me.name}`);
       } catch (e) {
         ctx.toast((e as Error).message);
       }

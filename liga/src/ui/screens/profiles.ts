@@ -15,6 +15,7 @@ export function mountProfiles(ctx: AppCtx): void {
           ${avatarHtml(p.avatar)}
           <div class="pname"><b>${esc(p.name)}</b>
             <small>${inSeason(state, p.id) ? '🏆 En la liga' : 'Sin competir'}</small></div>
+          <span class="coins">🪙 ${p.coins}</span>
           <button class="star${p.main ? ' on' : ''}" data-star="${esc(p.id)}" aria-label="Perfil principal" title="Perfil principal">★</button>
         </div>
         <div class="minis">${p.team.map((s, i) => `<img src="${spriteUrl(s.speciesId)}" alt="" loading="lazy" class="${i === 0 ? 'lead' : ''}" />`).join('')}</div>

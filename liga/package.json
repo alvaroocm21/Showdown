@@ -8,7 +8,8 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host",
     "test": "vitest run",
-    "fetch-data": "tsx scripts/fetch-data.ts"
+    "fetch-data": "tsx scripts/fetch-data.ts",
+    "make-icons": "tsx scripts/make-icons.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",

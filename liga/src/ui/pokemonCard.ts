@@ -8,7 +8,14 @@ const STAT_LABEL: Record<StatKey, string> = { hp: 'PS', atk: 'Ataque', def: 'Def
 const CATEGORY_LABEL: Record<MoveCategory, string> = { physical: 'Físico', special: 'Especial', status: 'Estado' };
 
 
-export function renderPokemonCard(set: PokemonSet, actions = '', badge = ''): string {
+/** `flash` resalta lo que acaba de cambiar tras una mejora. */
+export interface CardFlash {
+  slot?: number;
+  ability?: boolean;
+  pokemon?: boolean;
+}
+
+export function renderPokemonCard(set: PokemonSet, actions = '', badge = '', flash: CardFlash = {}): string {
   const species = getSpecies(set.speciesId);
   const ability = getAbility(set.abilityId);
   const stats = computeStats(set.speciesId, set.build);
@@ -21,11 +28,11 @@ export function renderPokemonCard(set: PokemonSet, actions = '', badge = ''): st
   }).join('');
 
   const moves = set.moveIds
-    .map((id) => {
+    .map((id, index) => {
       const m = getMove(id);
       const stab = m.category !== 'status' && (m.power ?? 0) > 0 && species.types.includes(m.type);
       const effect = moveEffectText(m);
-      return `<div class="move${stab ? ' stab' : ''}${moveNeedsWarning(id) ? ' inert' : ''}" style="--tc:${typeVar(m.type)}">
+      return `<div class="move${stab ? ' stab' : ''}${moveNeedsWarning(id) ? ' inert' : ''}${flash.slot === index || flash.pokemon ? ' flash' : ''}" style="--tc:${typeVar(m.type)}">
         <b>${esc(m.name)}</b>
         <small>${esc(TYPE_NAMES_ES[m.type])} · ${CATEGORY_LABEL[m.category]}${stab ? ' · STAB' : ''}</small><br />
         <small>Pot. ${m.power ?? '—'} · Prec. ${m.accuracy ?? '—'} · PP ${m.pp}</small>
@@ -44,7 +51,7 @@ export function renderPokemonCard(set: PokemonSet, actions = '', badge = ''): st
       </div>
     </div>
     <div class="body">
-      <div class="ability"><strong>${esc(ability.name)}</strong>${isAbilityImplemented(ability.slug) ? '' : ' <em class="inert-tag">sin efecto aún</em>'}<p>${esc(ability.description)}</p></div>
+      <div class="ability${flash.ability || flash.pokemon ? ' flash' : ''}"><strong>${esc(ability.name)}</strong>${isAbilityImplemented(ability.slug) ? '' : ' <em class="inert-tag">sin efecto aún</em>'}<p>${esc(ability.description)}</p></div>
       <div class="moves">${moves}</div>
       <div class="stats">${statRows}</div>
     </div>

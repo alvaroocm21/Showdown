@@ -1,5 +1,6 @@
 import type { Rng } from '../rng';
-import { createSeason, recordResult } from './season';
+import { rewardFor } from './economy';
+import { createSeason, findMatch, recordResult } from './season';
 import { MAX_PLAYERS, MIN_PLAYERS, type GameState, type MatchResult, type Profile } from './types';
 
 /** Operaciones sobre la partida: siempre devuelven un estado nuevo y lanzan un Error con un mensaje claro si no se pueden hacer. */
@@ -40,7 +41,16 @@ export function startSeason(state: GameState, participants: readonly string[], r
   return { ...state, season: createSeason(state.nextSeasonNumber, participants, rng, now) };
 }
 
+/** Anota el resultado de un combate y paga las monedas al ganador. */
 export function recordMatch(state: GameState, matchId: string, result: MatchResult, now = Date.now()): GameState {
   if (!state.season) throw new Error('No hay temporada en curso');
-  return { ...state, season: recordResult(state.season, matchId, result, now) };
+  const match = findMatch(state.season, matchId);
+  if (!match) throw new Error(`Combate desconocido: ${matchId}`);
+  const season = recordResult(state.season, matchId, result, now);
+  const { profileId, coins } = rewardFor(match, result);
+  return {
+    ...state,
+    season,
+    profiles: state.profiles.map((p) => (p.id === profileId ? { ...p, coins: p.coins + coins } : p)),
+  };
 }

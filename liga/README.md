@@ -10,6 +10,7 @@ npm run dev          # servidor local (también accesible desde el móvil en la 
 npm test             # tests unitarios (Vitest)
 npm run build        # comprueba tipos y genera dist/
 npm run fetch-data   # vuelve a descargar los datos de PokéAPI (solo si hace falta)
+npm run make-icons   # regenera los iconos de la app (public/icons)
 ```
 
 ## Datos
@@ -75,3 +76,29 @@ Lógica pura en `src/core/battle/`; la interfaz solo reproduce los eventos que d
   **exportar** la partida a un fichero JSON, **importarla** (se valida todo: Pokémon, ataques, habilidades, calendario…) o borrarla.
   El formato lleva versión (`version`) y hay un sitio para migraciones (`src/storage/save.ts`). Si la partida guardada
   está corrupta se avisa, se guarda una copia aparte (`pokeliga:backup`) y se empieza de cero.
+
+## Monedas y mejoras (fase 5)
+- **Ganar da monedas** al perfil vencedor, tanto si se juega como si se simula: **100 + 10 por cada Pokémon propio que
+  sobreviva** (de 100 a 160). El premio se ve al terminar el combate y en el pie de cada combate de la liga.
+- **Mejoras** (en la ficha de cada perfil, panel «🛒 Mejorar con monedas» de cada Pokémon). Todas son sorteos al azar y no se pueden deshacer:
+  | Mejora | Precio |
+  |---|---|
+  | Re-sortear 1 ataque (sigue siendo un set jugable: ≥ 2 ataques de daño y, si se puede, uno de su tipo) | 60 🪙 |
+  | Re-sortear la habilidad (entre todas las del juego) | 80 🪙 |
+  | Sustituir el Pokémon por otro nuevo (última etapa, que no esté ya en el equipo; conserva nivel e IVs/EVs/naturaleza) | 150 🪙 |
+- Las mejoras con monedas se pueden comprar también **durante la temporada**; los sorteos gratuitos del equipo no.
+- Precios y premios: `src/core/game/economy.ts`. La tienda es lógica pura: `src/core/game/shop.ts`.
+
+## App instalable y sin conexión (PWA)
+- Se instala desde el menú del navegador («Añadir a pantalla de inicio»); en Ajustes aparece además un botón «Instalar la app»
+  cuando el navegador lo permite.
+- `npm run build` genera `dist/sw.js` (service worker con la lista de ficheros y una versión que cambia con el contenido):
+  la app entera se guarda al abrirla la primera vez y arranca sin red.
+- Los **sprites 3D** se guardan a medida que se ven; en Ajustes hay un botón para **descargar los 186 de golpe** (≈ 26 MB).
+  Sin imagen guardada y sin red se muestra una Poké Ball. Los datos del juego (Pokémon, ataques, habilidades) ya van dentro de la app.
+- Los iconos se generan sin dependencias con `npm run make-icons`.
+- Para publicarla hace falta servir `dist/` por HTTPS (p. ej. GitHub Pages); el service worker no funciona desde `file://`.
+
+## Retoques visuales
+Cinco ambientes de arena al azar, sacudida de pantalla en los críticos, confeti al ganar y al coronar campeón, barra de PS que
+parpadea cuando queda poca vida, transición entre pantallas y respeto a «reducir movimiento».

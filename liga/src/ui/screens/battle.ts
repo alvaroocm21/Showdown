@@ -13,7 +13,7 @@ import type { BattleOutcome } from '../../core/game/play';
 import { outcomeOf } from '../../core/game/play';
 import { createRng, randomSeed } from '../../core/rng';
 import type { PokemonSet, PokeType, StageKey } from '../../core/types';
-import { STAGE_SHORT, esc, moveEffectText, typeChip, typeVar } from '../shared';
+import { STAGE_SHORT, confetti, esc, moveEffectText, typeChip, typeVar } from '../shared';
 
 export interface BattleScreenOptions {
   myTeam: PokemonSet[];
@@ -27,7 +27,12 @@ export interface BattleScreenOptions {
   onRematch?(): void;
   /** Pide confirmación al salir antes de que acabe el combate. */
   confirmExit?: boolean;
+  /** Texto del premio (monedas) que se muestra al terminar, si lo hay. */
+  reward?(outcome: BattleOutcome): string | null;
 }
+
+/** Ambientes de la arena (se elige uno al azar en cada combate). */
+const THEMES = ['day', 'sunset', 'night', 'cave', 'beach'] as const;
 
 const EFFECT_BADGE: Record<string, string> = { '4': '×4', '2': '×2', '0.5': '×½', '0.25': '×¼', '0': '×0' };
 
@@ -58,7 +63,7 @@ export function mountBattle(root: HTMLElement, o: BattleScreenOptions): void {
 
   root.innerHTML = `
     <div class="btop"><button class="alt small" id="exit">← Salir</button><span id="turnno">${esc(o.title)}</span></div>
-    <div class="arena">
+    <div class="arena theme-${THEMES[rng.int(0, THEMES.length - 1)]}">
       ${panel(1)}${slot(1)}${slot(0)}${panel(0)}
     </div>
     <div class="log" id="log"></div>
@@ -238,6 +243,14 @@ export function mountBattle(root: HTMLElement, o: BattleScreenOptions): void {
           await wait(300);
           break;
         }
+        case 'crit':
+          addLog(text!);
+          await anim($<HTMLElement>('.arena'), [
+            { transform: 'translate(0,0)' }, { transform: 'translate(-7px,3px)' }, { transform: 'translate(6px,-4px)' },
+            { transform: 'translate(-4px,-2px)' }, { transform: 'translate(0,0)' },
+          ], 320);
+          await wait(450);
+          break;
         default:
           if (text) {
             addLog(text);
@@ -323,13 +336,16 @@ export function mountBattle(root: HTMLElement, o: BattleScreenOptions): void {
     const won = battle.winner === 0;
     const left = battle.sides[0].team.filter((b) => b.hp > 0).length;
     const foeLeft = battle.sides[1].team.filter((b) => b.hp > 0).length;
+    const reward = o.reward?.(outcomeOf(battle)) ?? null;
     const end = $('#end');
     end.hidden = false;
     end.innerHTML = `<div class="endcard ${won ? 'won' : 'lost'}">
       <h2>${won ? '🏆 ¡Victoria!' : '💔 Derrota'}</h2>
       <p>Te quedan ${left} de ${size[0]} Pokémon · al rival ${foeLeft} de ${size[1]}.</p>
+      ${reward ? `<p class="reward">${esc(reward)}</p>` : ''}
       ${o.onFinish ? '<button class="main" id="next">Continuar ▶</button>' : '<button class="main" id="again">⚔️ Otro combate</button><button class="alt" id="back">← Volver</button>'}
     </div>`;
+    if (won) confetti(end);
     if (o.onFinish) $('#next').addEventListener('click', () => o.onFinish!(outcomeOf(battle)));
     else {
       $('#again').addEventListener('click', () => o.onRematch?.());

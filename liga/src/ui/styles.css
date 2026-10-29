@@ -301,3 +301,47 @@ button.wide { width: 100%; margin-top: 12px; }
 
 .mcap { text-align: center; font-size: .66rem; color: var(--muted); margin-top: 4px; }
 .mres { min-width: 52px; }
+
+/* ---------- Fase 5: monedas y tienda ---------- */
+.coins { flex: none; padding: 3px 10px; border-radius: 999px; background: linear-gradient(180deg, #fef08a, #facc15); color: #713f12; font-weight: 800; font-size: .85rem; box-shadow: inset 0 0 0 2px rgba(255,255,255,.55), 0 2px 0 #ca8a04; }
+.phead.big .coins { font-size: 1rem; }
+.reward { color: #b45309 !important; font-weight: 800; font-size: 1.1rem; }
+details.shop { margin: 0 12px 10px; border-radius: 14px; background: #fffbeb; box-shadow: inset 0 0 0 2px #fde68a; }
+details.shop summary { cursor: pointer; padding: 10px 12px; font-weight: 800; color: #92400e; list-style: none; }
+details.shop summary::-webkit-details-marker { display: none; }
+details.shop[open] summary { border-bottom: 2px dashed #fde68a; }
+.shoplist { display: grid; gap: 6px; padding: 10px; }
+.shopbtn { display: flex; justify-content: space-between; align-items: center; gap: 8px; text-align: left; padding: 9px 12px; font-size: .82rem; background: linear-gradient(180deg, #fff, #fef3c7); color: #78350f; box-shadow: 0 3px 0 #f59e0b; }
+.shopbtn b { flex: none; background: #fde047; border-radius: 999px; padding: 1px 9px; }
+.card > details.shop { width: auto; }
+.flash { animation: flash 1.6s ease-out 1; }
+@keyframes flash { 0% { box-shadow: 0 0 0 4px #fde047, 0 0 26px 6px #fde047; transform: scale(1.04); } 100% { box-shadow: none; transform: none; } }
+
+/* ---------- Retoques visuales ---------- */
+#screen.enter { animation: rise .28s ease-out; }
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.hp i.low { animation: lowhp 1s ease-in-out infinite; }
+@keyframes lowhp { 50% { filter: brightness(1.35); } }
+button { transition: filter .15s; }
+@media (hover: hover) { button:not(:disabled):hover { filter: brightness(1.06); } }
+
+/* Ambientes de la arena */
+.arena.theme-day { background: radial-gradient(ellipse 70% 22% at 72% 30%, rgba(255,255,255,.35), transparent 70%), radial-gradient(ellipse 80% 26% at 28% 80%, rgba(255,255,255,.3), transparent 70%), linear-gradient(180deg, #7dd3fc 0%, #bae6fd 42%, #86efac 42%, #4ade80 100%); }
+.arena.theme-sunset { background: radial-gradient(circle at 78% 22%, #fde68a 0 9%, transparent 10%), radial-gradient(ellipse 80% 26% at 28% 80%, rgba(255,255,255,.2), transparent 70%), linear-gradient(180deg, #fb923c 0%, #f472b6 44%, #a3e635 44%, #65a30d 100%); }
+.arena.theme-night { background: radial-gradient(circle at 80% 18%, #fef9c3 0 5%, transparent 6%), radial-gradient(circle at 20% 15%, #fff 0 .6%, transparent 1%), radial-gradient(circle at 55% 25%, #fff 0 .5%, transparent 1%), linear-gradient(180deg, #1e1b4b 0%, #4c1d95 46%, #166534 46%, #14532d 100%); }
+.arena.theme-cave { background: radial-gradient(ellipse 60% 30% at 50% 0%, rgba(253,224,71,.28), transparent 70%), linear-gradient(180deg, #44403c 0%, #57534e 50%, #78716c 50%, #a8a29e 100%); }
+.arena.theme-beach { background: linear-gradient(180deg, #67e8f9 0%, #a5f3fc 38%, #38bdf8 38%, #0ea5e9 52%, #fde68a 52%, #fcd34d 100%); }
+
+/* Confeti */
+.confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 40; border-radius: inherit; }
+.champion { position: relative; overflow: hidden; }
+.confetti i { position: absolute; top: -12px; left: var(--x); width: 9px; height: 15px; background: var(--c); border-radius: 2px; transform: rotate(var(--r)); animation: fall var(--t) var(--d) ease-in forwards; opacity: 0; }
+@keyframes fall { 0% { opacity: 1; transform: translateY(0) rotate(var(--r)); } 100% { opacity: 1; transform: translateY(120vh) rotate(calc(var(--r) + 540deg)); } }
+
+.progress.light { background: #ede9fe; margin: 4px 0; }
+.progress.light i { background: linear-gradient(90deg, #a78bfa, #7c3aed); }
+.card .progress { margin: 6px 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
