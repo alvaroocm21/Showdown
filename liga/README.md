@@ -22,6 +22,8 @@ Los sprites son los renders 3D de Pokémon HOME que aloja PokéAPI.
 - `src/core/` lógica pura sin DOM (RNG con semilla, datos, estadísticas, generador de equipos…).
 - `src/core/battle/` motor de combate: `damage` (fórmula 5.ª gen+), `typeEffect`, `turnOrder`, `stages`, `engine` (turno → eventos), `log` (texto en español).
 - `src/core/ai/` IA del rival.
+- `src/core/game/` perfiles, calendario, clasificación, temporadas y operaciones sobre la partida (todo puro y con tests).
+- `src/storage/` guardado en `localStorage`, validación, versionado y exportar/importar JSON.
 - `src/ui/` estilos y pantallas. `tests/` pruebas unitarias.
 
 ## Reglas del sorteo
@@ -59,3 +61,17 @@ Lógica pura en `src/core/battle/`; la interfaz solo reproduce los eventos que d
 - **IA** (`src/core/ai/`): valora daño esperado (tipos, STAB, precisión, golpes), estados, mejoras y curación con algo de ruido;
   cambia si no puede dañar al rival o está en clara desventaja con un compañero mucho mejor; elige el reemplazo con mejor enfrentamiento.
 - `simulateBattle` juega un combate completo IA contra IA (unos 4 ms): se usará para los combates de la liga que no juegue el usuario.
+
+## Liga y perfiles (fase 4)
+- **Perfiles:** cada uno con su nombre, avatar y un equipo de 6 Pokémon aleatorios. ★ marca los perfiles principales.
+  El primero de la lista es el que sale al combate; se puede reordenar. El equipo solo se puede re-sortear con la liga parada o terminada.
+- **Liga:** de 4 a 8 perfiles, todos contra todos a una vuelta (método del círculo; con número impar descansa uno por jornada).
+  3 puntos por victoria, 0 por derrota. Clasificación con PJ, PG, PP, DIF (Pokémon rivales debilitados − propios) y puntos;
+  desempata por DIF, luego por Pokémon rivales debilitados y por último por nombre.
+- **Cada combate:** juegas con el perfil que elijas de la pareja. Los combates donde no interviene ningún perfil principal ★
+  también se pueden **simular** (IA contra IA), uno a uno o toda la jornada; los de un perfil principal se juegan a mano.
+- **Fin de temporada:** campeón, historial de temporadas y botón para empezar otra.
+- **Guardado:** automático en `localStorage` (perfiles, equipos, liga, resultados e historial). En Ajustes se puede
+  **exportar** la partida a un fichero JSON, **importarla** (se valida todo: Pokémon, ataques, habilidades, calendario…) o borrarla.
+  El formato lleva versión (`version`) y hay un sitio para migraciones (`src/storage/save.ts`). Si la partida guardada
+  está corrupta se avisa, se guarda una copia aparte (`pokeliga:backup`) y se empieza de cero.

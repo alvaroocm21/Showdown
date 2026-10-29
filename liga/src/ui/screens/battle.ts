@@ -9,15 +9,24 @@ import { expectedPower, isDamagingMove } from '../../core/battle/moves';
 import { activeOf, createBattle, moveOf, type Battle, type Battler, type Side, type StatusName } from '../../core/battle/state';
 import { typeEffectiveness } from '../../core/battle/typeEffect';
 import { TYPE_NAMES_ES, spriteUrl } from '../../core/data';
-import { rollTeam } from '../../core/generator';
+import type { BattleOutcome } from '../../core/game/play';
+import { outcomeOf } from '../../core/game/play';
 import { createRng, randomSeed } from '../../core/rng';
 import type { PokemonSet, PokeType, StageKey } from '../../core/types';
 import { STAGE_SHORT, esc, moveEffectText, typeChip, typeVar } from '../shared';
 
 export interface BattleScreenOptions {
-  team: PokemonSet[];
+  myTeam: PokemonSet[];
+  foeTeam: PokemonSet[];
+  /** Título de la barra superior (p. ej. «Ana vs Beto»). */
+  title: string;
   onExit(): void;
-  onRematch(): void;
+  /** Combate de liga: al terminar solo se ofrece «Continuar», que entrega el resultado. */
+  onFinish?(outcome: BattleOutcome): void;
+  /** Combate amistoso: al terminar se ofrece repetir. */
+  onRematch?(): void;
+  /** Pide confirmación al salir antes de que acabe el combate. */
+  confirmExit?: boolean;
 }
 
 const EFFECT_BADGE: Record<string, string> = { '4': '×4', '2': '×2', '0.5': '×½', '0.25': '×¼', '0': '×0' };
@@ -36,20 +45,19 @@ interface SideView {
 
 export function mountBattle(root: HTMLElement, o: BattleScreenOptions): void {
   const rng = createRng(randomSeed());
-  const foeTeam = rollTeam(rng);
-  const battle: Battle = createBattle(o.team, foeTeam);
-  const size = [o.team.length, foeTeam.length];
+  const battle: Battle = createBattle(o.myTeam, o.foeTeam);
+  const size = [o.myTeam.length, o.foeTeam.length];
   // Estado visible de cada bando: se actualiza con los eventos para animar paso a paso
   const view: SideView[] = [0, 1].map((s) => {
     const b = battle.sides[s as Side].team[0]!;
     return { index: 0, name: b.name, level: b.level, types: b.types, speciesId: b.set.speciesId, hp: b.hp, maxHp: b.maxHp, status: null, stages: {} };
   });
-  const fainted: boolean[][] = [o.team.map(() => false), foeTeam.map(() => false)];
+  const fainted: boolean[][] = [o.myTeam.map(() => false), o.foeTeam.map(() => false)];
   let busy = true;
   let fast = false;
 
   root.innerHTML = `
-    <div class="btop"><button class="alt small" id="exit">← Equipo</button><span id="turnno">Combate 6 contra 6</span></div>
+    <div class="btop"><button class="alt small" id="exit">← Salir</button><span id="turnno">${esc(o.title)}</span></div>
     <div class="arena">
       ${panel(1)}${slot(1)}${slot(0)}${panel(0)}
     </div>
@@ -320,11 +328,13 @@ export function mountBattle(root: HTMLElement, o: BattleScreenOptions): void {
     end.innerHTML = `<div class="endcard ${won ? 'won' : 'lost'}">
       <h2>${won ? '🏆 ¡Victoria!' : '💔 Derrota'}</h2>
       <p>Te quedan ${left} de ${size[0]} Pokémon · al rival ${foeLeft} de ${size[1]}.</p>
-      <button class="main" id="again">⚔️ Otro combate</button>
-      <button class="alt" id="back">← Volver al equipo</button>
+      ${o.onFinish ? '<button class="main" id="next">Continuar ▶</button>' : '<button class="main" id="again">⚔️ Otro combate</button><button class="alt" id="back">← Volver</button>'}
     </div>`;
-    $('#again').addEventListener('click', o.onRematch);
-    $('#back').addEventListener('click', o.onExit);
+    if (o.onFinish) $('#next').addEventListener('click', () => o.onFinish!(outcomeOf(battle)));
+    else {
+      $('#again').addEventListener('click', () => o.onRematch?.());
+      $('#back').addEventListener('click', o.onExit);
+    }
   }
 
   async function afterTurn(): Promise<void> {
@@ -350,7 +360,10 @@ export function mountBattle(root: HTMLElement, o: BattleScreenOptions): void {
     await afterTurn();
   }
 
-  $('#exit').addEventListener('click', o.onExit);
+  $('#exit').addEventListener('click', () => {
+    if (o.confirmExit && battle.winner === null && !window.confirm('¿Salir del combate? No contará como jugado.')) return;
+    o.onExit();
+  });
   menu.innerHTML = '';
   void (async () => {
     addLog('¡Un entrenador rival quiere combatir!');

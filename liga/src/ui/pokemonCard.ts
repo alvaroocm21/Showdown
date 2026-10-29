@@ -1,21 +1,14 @@
-import { isAbilityImplemented } from '../../core/battle/abilities';
-import { TYPE_NAMES_ES, getAbility, getMove, getSpecies, spriteUrl } from '../../core/data';
-import { computeStats } from '../../core/stats';
-import { STAT_KEYS, type MoveCategory, type PokemonSet, type StatKey } from '../../core/types';
-import { esc, moveEffectText, moveNeedsWarning, typeChip, typeVar } from '../shared';
+import { isAbilityImplemented } from '../core/battle/abilities';
+import { TYPE_NAMES_ES, getAbility, getMove, getSpecies, spriteUrl } from '../core/data';
+import { computeStats } from '../core/stats';
+import { STAT_KEYS, type MoveCategory, type PokemonSet, type StatKey } from '../core/types';
+import { esc, moveEffectText, moveNeedsWarning, typeChip, typeVar } from './shared';
 
 const STAT_LABEL: Record<StatKey, string> = { hp: 'PS', atk: 'Ataque', def: 'Defensa', spa: 'At. Esp.', spd: 'Def. Esp.', spe: 'Velocidad' };
 const CATEGORY_LABEL: Record<MoveCategory, string> = { physical: 'Físico', special: 'Especial', status: 'Estado' };
 
-export interface TeamScreenOptions {
-  team: PokemonSet[];
-  seed: number;
-  onRollTeam(): void;
-  onReroll(index: number): void;
-  onFight(): void;
-}
 
-function renderPokemon(set: PokemonSet, index: number): string {
+export function renderPokemonCard(set: PokemonSet, actions = '', badge = ''): string {
   const species = getSpecies(set.speciesId);
   const ability = getAbility(set.abilityId);
   const stats = computeStats(set.speciesId, set.build);
@@ -45,7 +38,7 @@ function renderPokemon(set: PokemonSet, index: number): string {
     <div class="card-head" style="--c1:${typeVar(t1)};--c2:${typeVar(t2)}">
       <img src="${spriteUrl(species.id)}" alt="${esc(species.name)}" loading="lazy" width="96" height="96" />
       <div>
-        <div class="dex">#${String(species.id).padStart(3, '0')} · Nv. ${set.build.level}</div>
+        <div class="dex">#${String(species.id).padStart(3, '0')} · Nv. ${set.build.level}${badge}</div>
         <h2>${esc(species.name)}</h2>
         <div class="chips">${species.types.map(typeChip).join('')}</div>
       </div>
@@ -55,21 +48,7 @@ function renderPokemon(set: PokemonSet, index: number): string {
       <div class="moves">${moves}</div>
       <div class="stats">${statRows}</div>
     </div>
-    <button class="alt" data-reroll="${index}">🎲 Cambiar este Pokémon</button>
+    ${actions}
   </article>`;
 }
 
-export function mountTeam(root: HTMLElement, o: TeamScreenOptions): void {
-  root.innerHTML = `
-    <h1>Liga Pokémon Aleatoria</h1>
-    <p class="sub">Tu equipo de 6 para el combate</p>
-    <div class="toolbar">
-      <button class="alt" id="roll">🎲 Nuevo equipo</button>
-      <button class="main" id="fight">⚔️ Combate 6 contra 6</button>
-    </div>
-    <div class="seed">Semilla ${o.seed}</div>
-    <section class="team">${o.team.map(renderPokemon).join('')}</section>`;
-  root.querySelector('#roll')!.addEventListener('click', o.onRollTeam);
-  root.querySelectorAll<HTMLButtonElement>('[data-reroll]').forEach((b) => b.addEventListener('click', () => o.onReroll(Number(b.dataset.reroll))));
-  root.querySelector('#fight')!.addEventListener('click', o.onFight);
-}

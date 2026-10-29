@@ -42,3 +42,7 @@ export function moveEffectText(m: Move): string {
 }
 
 export const moveNeedsWarning = (id: number) => !isMoveImplemented(getMove(id));
+
+import type { Avatar } from '../core/game/types';
+
+export const avatarHtml = (a: Avatar, cls = '') => `<span class="avatar ${cls}" style="--h:${Math.round(a.hue)}">${esc(a.emoji)}</span>`;
