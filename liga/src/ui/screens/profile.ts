@@ -3,6 +3,7 @@ import { UPGRADE_COSTS } from '../../core/game/economy';
 import { applyUpgrade, type Upgrade } from '../../core/game/shop';
 import { rollPokemon, rollTeam } from '../../core/generator';
 import { moveTeamMember } from '../../core/game/profiles';
+import { drawOptionsOf } from '../../core/game/settings';
 import { canRerollTeam, findProfile, inSeason, removeProfile, updateProfile } from '../../core/game/state';
 import { renderPokemonCard, type CardFlash } from '../pokemonCard';
 import { esc, avatarHtml } from '../shared';
@@ -75,7 +76,7 @@ export function mountProfile(ctx: AppCtx, id: string): void {
   const friendly = (): void =>
     ctx.battle({
       myTeam: p.team,
-      foeTeam: rollTeam(ctx.rng()),
+      foeTeam: rollTeam(ctx.rng(), drawOptionsOf(ctx.store.get())),
       title: `${p.name} · amistoso`,
       onExit: () => ctx.go({ name: 'profile', id }),
       onRematch: friendly,
@@ -84,7 +85,7 @@ export function mountProfile(ctx: AppCtx, id: string): void {
 
   $('#reroll')?.addEventListener('click', () => {
     if (!window.confirm(`¿Sortear un equipo nuevo para ${p.name}? Se pierde el actual.`)) return;
-    ctx.store.commit(updateProfile(ctx.store.get(), id, (x) => ({ ...x, team: rollTeam(ctx.rng()) })));
+    ctx.store.commit(updateProfile(ctx.store.get(), id, (x) => ({ ...x, team: rollTeam(ctx.rng(), drawOptionsOf(ctx.store.get())) })));
     redraw();
   });
 
@@ -101,7 +102,7 @@ export function mountProfile(ctx: AppCtx, id: string): void {
       const i = Number(b.dataset.reroll);
       const cur = ctx.store.get().profiles.find((x) => x.id === id)!;
       const others = new Set(cur.team.filter((_, j) => j !== i).map((s) => s.speciesId));
-      const replacement = rollPokemon(ctx.rng(), others);
+      const replacement = rollPokemon(ctx.rng(), others, drawOptionsOf(ctx.store.get()));
       ctx.store.commit(updateProfile(ctx.store.get(), id, (x) => ({ ...x, team: x.team.map((s, j) => (j === i ? replacement : s)) })));
       redraw();
     }),

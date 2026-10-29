@@ -16,13 +16,37 @@ describe('rng', () => {
 });
 
 describe('generador de equipos', () => {
-  it('solo sortea Pokémon en su última etapa, sin legendarios, de las 3 primeras generaciones', () => {
-    for (const s of speciesPool()) {
+  it('por defecto solo sortea Pokémon en su última etapa y sin legendarios, de todas las generaciones', () => {
+    const pool = speciesPool();
+    for (const s of pool) {
       expect(s.finalStage).toBe(true);
       expect(s.legendary).toBe(false);
-      expect(s.generation).toBeLessThanOrEqual(3);
     }
-    expect(speciesPool({ allowLegendary: true }).length).toBeGreaterThan(speciesPool().length);
+    expect(new Set(pool.map((s) => s.generation))).toEqual(new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]));
+  });
+
+  it('los filtros de generación, legendarios y última etapa funcionan', () => {
+    const base = speciesPool().length;
+    expect(speciesPool({ allowLegendary: true }).length).toBeGreaterThan(base);
+    expect(speciesPool({ finalStageOnly: false }).length).toBeGreaterThan(base);
+    expect(speciesPool({ finalStageOnly: false, allowLegendary: true })).toHaveLength(1025);
+    for (const s of speciesPool({ generations: [4, 9] })) expect([4, 9]).toContain(s.generation);
+    expect(speciesPool({ generations: [] })).toHaveLength(0);
+    // con todo abierto salen Pokémon de las 9 generaciones, legendarios y sin evolucionar
+    const seen = new Set<number>();
+    let legendary = 0;
+    let unevolved = 0;
+    for (let seed = 1; seed <= 400; seed++) {
+      for (const p of rollTeam(createRng(seed), { allowLegendary: true, finalStageOnly: false })) {
+        const s = getSpecies(p.speciesId);
+        seen.add(s.generation);
+        if (s.legendary) legendary++;
+        if (!s.finalStage) unevolved++;
+      }
+    }
+    expect(seen.size).toBe(9);
+    expect(legendary).toBeGreaterThan(0);
+    expect(unevolved).toBeGreaterThan(0);
   });
 
   it('genera equipos válidos para muchas semillas', () => {

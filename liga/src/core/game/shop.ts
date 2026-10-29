@@ -3,6 +3,7 @@ import { buildSet, isPlayableMoveset, rollSpecies } from '../generator';
 import type { Rng } from '../rng';
 import type { PokemonSet } from '../types';
 import { UPGRADE_COSTS, type UpgradeKind } from './economy';
+import { drawOptionsOf } from './settings';
 import type { GameState, Profile } from './types';
 
 /** Una mejora que se compra con monedas: re-sortear un ataque, la habilidad o el Pokémon entero. */
@@ -71,7 +72,7 @@ export function applyUpgrade(state: GameState, profileId: string, upgrade: Upgra
     }
     case 'pokemon': {
       const taken = new Set(profile.team.map((s) => s.speciesId));
-      const species = rollSpecies(rng, taken);
+      const species = rollSpecies(rng, taken, drawOptionsOf(state));
       next = buildSet(species.id, rng, { build: set.build });
       before = getSpecies(set.speciesId).name;
       after = species.name;

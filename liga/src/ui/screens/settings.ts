@@ -1,8 +1,11 @@
-import { emptyGame } from '../../core/game/types';
+import { GENERATION_NAMES, poolSize, speciesPerGeneration, validateDraw } from '../../core/game/settings';
+import { updateDraw } from '../../core/game/state';
+import { ALL_GENERATIONS, emptyGame, type DrawSettings } from '../../core/game/types';
+import { SPECIES } from '../../core/data';
 import { exportGame, importGame, SaveError } from '../../storage/save';
 import type { AppCtx } from '../app';
 import { canInstall, isInstalled, promptInstall } from '../install';
-import { cachedSpriteCount, downloadSprites, estimatedMegabytes, offlineSupported } from '../offline';
+import { cachedSpriteCount, downloadSprites, estimatedMegabytes, neededSpriteIds, offlineSupported } from '../offline';
 
 function download(filename: string, text: string): void {
   const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
@@ -17,16 +20,31 @@ function download(filename: string, text: string): void {
 
 export function mountSettings(ctx: AppCtx): void {
   const state = ctx.store.get();
+  const draw = state.settings.draw;
+  const perGen = speciesPerGeneration();
+  const genChips = ALL_GENERATIONS.map(
+    (g) => `<label class="gen${draw.generations.includes(g) ? ' on' : ''}"><input type="checkbox" data-gen="${g}" ${draw.generations.includes(g) ? 'checked' : ''} />
+      <b>${g}</b><span>${GENERATION_NAMES[g]}</span><small>${perGen[g] ?? 0}</small></label>`,
+  ).join('');
+  const sprites = neededSpriteIds(state).length;
   ctx.root.innerHTML = `
     <h1>Ajustes</h1>
     <p class="sub">Partida · ${state.profiles.length} perfiles · ${state.history.length} temporadas jugadas</p>
+    <section class="card form" id="draw">
+      <h3>Pokémon del sorteo</h3>
+      <p class="muted">Qué Pokémon pueden salir en equipos nuevos, sorteos gratis y al comprar un Pokémon. Los equipos que ya existen no cambian. Ataques y habilidades salen siempre de <b>todos</b> los del juego (${SPECIES.length} Pokémon en total).</p>
+      <div class="gens">${genChips}</div>
+      <label class="check"><input type="checkbox" id="legend" ${draw.legendaries ? 'checked' : ''} /> Incluir legendarios y singulares</label>
+      <label class="check"><input type="checkbox" id="finalonly" ${draw.finalStageOnly ? 'checked' : ''} /> Solo Pokémon en su última etapa evolutiva</label>
+      <p class="okmsg" id="poolmsg">${poolSize(draw)} Pokémon distintos pueden salir</p>
+    </section>
     <section class="card form" id="offline">
       <h3>Instalar y jugar sin conexión</h3>
       <p class="muted" id="installmsg"></p>
       <button class="main" id="install" hidden>📲 Instalar la app</button>
       <p class="muted" id="offstatus">Comprobando imágenes guardadas…</p>
       <div class="progress light" id="offprog" hidden><i id="offbar"></i></div>
-      <button class="alt" id="offdl" hidden>⬇️ Descargar las imágenes (≈ ${estimatedMegabytes()} MB)</button>
+      <button class="alt" id="offdl" hidden>⬇️ Descargar las imágenes (≈ ${estimatedMegabytes(sprites)} MB)</button>
       <small class="muted">Los datos del juego ya van dentro de la app; solo las imágenes de los Pokémon se bajan de internet.</small>
     </section>
     <section class="card form">
@@ -48,6 +66,25 @@ export function mountSettings(ctx: AppCtx): void {
 
   const $ = <T extends HTMLElement>(sel: string) => ctx.root.querySelector<T>(sel)!;
 
+  // Ajustes del sorteo
+  const readDraw = (): DrawSettings => ({
+    generations: [...ctx.root.querySelectorAll<HTMLInputElement>('[data-gen]')].filter((c) => c.checked).map((c) => Number(c.dataset.gen)),
+    legendaries: $<HTMLInputElement>('#legend').checked,
+    finalStageOnly: $<HTMLInputElement>('#finalonly').checked,
+  });
+  const onDrawChange = (): void => {
+    const next = readDraw();
+    const error = validateDraw(next);
+    if (error) {
+      ctx.toast(error);
+      mountSettings(ctx);
+      return;
+    }
+    ctx.store.commit(updateDraw(ctx.store.get(), next));
+    mountSettings(ctx);
+  };
+  ctx.root.querySelectorAll<HTMLInputElement>('[data-gen], #legend, #finalonly').forEach((c) => c.addEventListener('change', onDrawChange));
+
   // Instalación
   const installMsg = $('#installmsg');
   if (isInstalled()) installMsg.textContent = '✅ Estás usando la app instalada.';
@@ -60,26 +97,29 @@ export function mountSettings(ctx: AppCtx): void {
     });
   } else installMsg.textContent = 'Para instalarla: menú del navegador → «Añadir a pantalla de inicio» (en iPhone: Compartir → Añadir a pantalla de inicio).';
 
-  // Imágenes sin conexión
+  // Imágenes sin conexión. Las referencias se guardan al principio: las comprobaciones son asíncronas y la
+  // pantalla puede haber cambiado cuando terminan.
   const status = $('#offstatus');
+  const dlButton = $<HTMLButtonElement>('#offdl');
+  const stillHere = () => dlButton.isConnected;
   if (!offlineSupported()) status.textContent = 'Este navegador no permite guardar imágenes para jugar sin conexión.';
   else {
-    void cachedSpriteCount().then(({ cached, total }) => {
+    void cachedSpriteCount(ctx.store.get()).then(({ cached, total }) => {
+      if (!stillHere()) return;
       status.textContent = cached >= total ? `✅ Las ${total} imágenes están guardadas: puedes jugar sin conexión.` : `Imágenes guardadas: ${cached} de ${total}. Las que faltan se ven como una Poké Ball sin conexión.`;
-      if (cached < total) $('#offdl').hidden = false;
+      if (cached < total) dlButton.hidden = false;
     });
-    $('#offdl').addEventListener('click', async () => {
-      const button = $<HTMLButtonElement>('#offdl');
+    dlButton.addEventListener('click', async () => {
       const prog = $('#offprog');
       const bar = $('#offbar');
-      button.disabled = true;
+      dlButton.disabled = true;
       prog.hidden = false;
-      const { saved, failed } = await downloadSprites((done, total) => {
+      const { saved, failed } = await downloadSprites(ctx.store.get(), (done, total) => {
         bar.style.width = `${Math.round((done / Math.max(1, total)) * 100)}%`;
         status.textContent = `Descargando… ${done} de ${total}`;
       });
       ctx.toast(failed ? `${saved} guardadas, ${failed} fallaron (¿sin conexión?)` : `Listo: ${saved} imágenes guardadas`);
-      mountSettings(ctx);
+      if (stillHere()) mountSettings(ctx); // solo si sigues en Ajustes
     });
   }
 

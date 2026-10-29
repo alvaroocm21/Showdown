@@ -4,7 +4,7 @@ import { createProfile } from '../src/core/game/profiles';
 import { addProfile, recordMatch, startSeason } from '../src/core/game/state';
 import { allMatches } from '../src/core/game/season';
 import { simulateMatch } from '../src/core/game/play';
-import { SAVE_VERSION, emptyGame, type GameState } from '../src/core/game/types';
+import { SAVE_VERSION, defaultSettings, emptyGame, type GameState } from '../src/core/game/types';
 import {
   BACKUP_KEY, EXPORT_FORMAT, STORAGE_KEY, SaveError, deserialize, exportGame, importGame, loadGame, migrate, saveGame, serialize,
   validateGameState, type KeyValueStore,
@@ -94,6 +94,63 @@ describe('guardado: serializar y validar', () => {
     expect(() => deserialize('[]')).toThrow(/objeto/);
     expect(() => deserialize('{}')).toThrow(/versión/);
     expect(() => validateGameState({ ...clone(emptyGame()), profiles: 'x' })).toThrow(/lista/);
+  });
+});
+
+describe('guardado: ajustes del sorteo', () => {
+  it('se guardan y se recuperan', () => {
+    const state = sampleGame();
+    state.settings.draw = { generations: [2, 5, 9], legendaries: false, finalStageOnly: false };
+    expect(deserialize(serialize(state)).settings.draw).toEqual(state.settings.draw);
+  });
+
+  it('rechaza ajustes inválidos', () => {
+    reject((s) => (s.settings.draw.generations = []), /al menos una/);
+    reject((s) => (s.settings.draw.generations = [1, 1]), /repetidas/);
+    reject((s) => (s.settings.draw.generations = [0]), /entero entre 1 y 9/);
+    reject((s) => (s.settings.draw.generations = [12]), /entero entre 1 y 9/);
+    reject((s) => (s.settings.draw.legendaries = 'sí'), /verdadero o falso/);
+    reject((s) => delete s.settings, /objeto/);
+  });
+});
+
+describe('guardado: migración de la versión 1', () => {
+  /** Una partida tal y como la guardaba la fase 5 (versión 1, sin ajustes). */
+  const v1 = () => {
+    const raw = clone(sampleGame(4)) as any;
+    delete raw.settings;
+    raw.version = 1;
+    return raw;
+  };
+
+  it('una partida v1 se carga con los ajustes por defecto y conserva todo lo demás', () => {
+    const raw = v1();
+    const migrated = deserialize(JSON.stringify(raw));
+    expect(migrated.version).toBe(SAVE_VERSION);
+    expect(migrated.settings).toEqual(defaultSettings());
+    expect(migrated.profiles).toEqual(raw.profiles);
+    expect(migrated.season).toEqual(raw.season);
+    expect(migrated.history).toEqual(raw.history);
+    expect(migrated.nextSeasonNumber).toBe(raw.nextSeasonNumber);
+  });
+
+  it('también al cargar desde localStorage y al importar un fichero exportado en v1', () => {
+    const raw = v1();
+    const store = memStore({ [STORAGE_KEY]: JSON.stringify(raw) });
+    const loaded = loadGame(store);
+    expect(loaded.problem).toBeNull();
+    expect(loaded.state.settings).toEqual(defaultSettings());
+    expect(loaded.state.profiles).toHaveLength(raw.profiles.length);
+    const file = JSON.stringify({ format: EXPORT_FORMAT, version: 1, exportedAt: 'x', state: raw });
+    expect(importGame(file).settings).toEqual(defaultSettings());
+  });
+
+  it('una vez cargada se guarda ya en la versión nueva', () => {
+    const store = memStore({ [STORAGE_KEY]: JSON.stringify(v1()) });
+    const { state } = loadGame(store);
+    saveGame(store, state);
+    expect(JSON.parse(store.data[STORAGE_KEY]!).version).toBe(SAVE_VERSION);
+    expect(JSON.parse(store.data[STORAGE_KEY]!).settings).toBeDefined();
   });
 });
 

@@ -1,4 +1,5 @@
 import { createProfile, validateName, MAX_NAME_LENGTH } from '../../core/game/profiles';
+import { drawOptionsOf } from '../../core/game/settings';
 import { addProfile, inSeason, updateProfile } from '../../core/game/state';
 import { spriteUrl } from '../../core/data';
 import { esc, avatarHtml } from '../shared';
@@ -54,7 +55,7 @@ export function mountProfiles(ctx: AppCtx): void {
       ctx.root.querySelector('#err')!.textContent = error;
       return;
     }
-    const profile = createProfile(name, ctx.rng(), ctx.store.get().profiles, { main });
+    const profile = createProfile(name, ctx.rng(), ctx.store.get().profiles, { main, generate: drawOptionsOf(ctx.store.get()) });
     ctx.store.commit(addProfile(ctx.store.get(), profile));
     formOpen = false;
     ctx.toast(`Perfil «${profile.name}» creado con su equipo aleatorio`);

@@ -6,6 +6,10 @@ import type { BuildConfig, Move, PokemonSet, Species } from '../types';
 export interface GenerateOptions {
   /** Permite legendarios y singulares (por defecto no). */
   allowLegendary?: boolean;
+  /** Generaciones de las que se sortea (por defecto, todas). */
+  generations?: readonly number[];
+  /** Solo Pokémon en su última etapa evolutiva (por defecto sí). */
+  finalStageOnly?: boolean;
   /** Ajustes de IVs/EVs/naturaleza/nivel con los que se construye cada Pokémon. */
   build?: BuildConfig;
 }
@@ -61,7 +65,13 @@ export function rollAbility(rng: Rng, exceptId?: number): number {
 }
 
 export function speciesPool(options: GenerateOptions = {}): Species[] {
-  return SPECIES.filter((s) => s.finalStage && (options.allowLegendary || !s.legendary));
+  const finalOnly = options.finalStageOnly ?? true;
+  return SPECIES.filter(
+    (s) =>
+      (!finalOnly || s.finalStage) &&
+      (options.allowLegendary || !s.legendary) &&
+      (!options.generations || options.generations.includes(s.generation)),
+  );
 }
 
 export function rollSpecies(rng: Rng, excludeIds: ReadonlySet<number> = new Set(), options: GenerateOptions = {}): Species {

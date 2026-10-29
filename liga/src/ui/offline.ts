@@ -1,4 +1,7 @@
-import { SPECIES, spriteUrl } from '../core/data';
+import { spriteUrl } from '../core/data';
+import { drawOptionsOf } from '../core/game/settings';
+import type { GameState } from '../core/game/types';
+import { speciesPool } from '../core/generator';
 
 /** Misma caché que usa el service worker (sw.template.js) para los sprites. */
 export const SPRITE_CACHE = 'pokeliga-sprites';
@@ -7,12 +10,16 @@ const AVG_SPRITE_KB = 144;
 
 export const offlineSupported = (): boolean => typeof caches !== 'undefined';
 
-/** Sprites que hacen falta para jugar: todos los Pokémon que se pueden sortear (última etapa). */
-export const neededSpriteIds = (): number[] => SPECIES.filter((s) => s.finalStage).map((s) => s.id);
-export const estimatedMegabytes = (count = neededSpriteIds().length): number => Math.round((count * AVG_SPRITE_KB) / 1024);
+/** Sprites que hacen falta para jugar: los Pokémon que pueden salir en el sorteo y los que ya están en algún equipo. */
+export function neededSpriteIds(state: GameState): number[] {
+  const ids = new Set(speciesPool(drawOptionsOf(state)).map((s) => s.id));
+  for (const p of state.profiles) for (const set of p.team) ids.add(set.speciesId);
+  return [...ids].sort((a, b) => a - b);
+}
+export const estimatedMegabytes = (count: number): number => Math.max(1, Math.round((count * AVG_SPRITE_KB) / 1024));
 
-export async function cachedSpriteCount(): Promise<{ cached: number; total: number }> {
-  const ids = neededSpriteIds();
+export async function cachedSpriteCount(state: GameState): Promise<{ cached: number; total: number }> {
+  const ids = neededSpriteIds(state);
   if (!offlineSupported()) return { cached: 0, total: ids.length };
   const cache = await caches.open(SPRITE_CACHE);
   let cached = 0;
@@ -22,12 +29,13 @@ export async function cachedSpriteCount(): Promise<{ cached: number; total: numb
 
 /** Descarga (de 6 en 6) los sprites que faltan. Devuelve cuántos se guardaron y cuántos fallaron. */
 export async function downloadSprites(
+  state: GameState,
   onProgress: (done: number, total: number) => void,
   signal?: AbortSignal,
 ): Promise<{ saved: number; failed: number }> {
   const cache = await caches.open(SPRITE_CACHE);
   const missing: number[] = [];
-  for (const id of neededSpriteIds()) if (!(await cache.match(spriteUrl(id)))) missing.push(id);
+  for (const id of neededSpriteIds(state)) if (!(await cache.match(spriteUrl(id)))) missing.push(id);
   let done = 0;
   let saved = 0;
   let failed = 0;

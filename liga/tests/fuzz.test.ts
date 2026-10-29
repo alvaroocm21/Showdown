@@ -3,7 +3,7 @@ import { chooseAction, chooseReplacement } from '../src/core/ai';
 import { executeTurn, legalMoveSlots, sendOut, startBattle } from '../src/core/battle/engine';
 import { simulateBattle, MAX_SIM_TURNS } from '../src/core/battle/sim';
 import { activeOf, createBattle, SIDES, type Battle } from '../src/core/battle/state';
-import { ABILITIES, MOVES } from '../src/core/data';
+import { ABILITIES, MOVES, SPECIES } from '../src/core/data';
 import { rollTeam } from '../src/core/generator';
 import { createRng } from '../src/core/rng';
 import { abilityId, makeSet } from './helpers';
@@ -56,6 +56,29 @@ describe('combates 6 contra 6 completos (IA contra IA)', () => {
       const b = createBattle(rollTeam(rng), rollTeam(rng));
       const { winner } = simulateBattle(b, rng);
       expect([0, 1]).toContain(winner);
+    }
+  });
+});
+
+describe('combates con todos los Pokémon posibles', () => {
+  it('equipos con legendarios y sin evolucionar, de las 9 generaciones, terminan sin errores', () => {
+    for (let seed = 1; seed <= 120; seed++) {
+      const rng = createRng(seed * 7);
+      const options = { allowLegendary: true, finalStageOnly: false } as const;
+      const b = createBattle(rollTeam(rng, options), rollTeam(rng, options));
+      const { winner } = simulateBattle(b, rng);
+      expect([0, 1]).toContain(winner);
+      checkInvariants(b);
+    }
+  });
+
+  it('cada Pokémon del juego se puede crear y entra en combate (1025 especies)', () => {
+    for (const species of SPECIES) {
+      const set = makeSet(species.slug, ['tackle', 'flamethrower', 'recover', 'swords-dance']);
+      const b = createBattle([set], [makeSet('snorlax', ['tackle'])]);
+      startBattle(b, createRng(species.id));
+      expect(activeOf(b, 0).hp).toBeGreaterThan(0);
+      expect(activeOf(b, 0).types.length).toBeGreaterThan(0);
     }
   });
 });

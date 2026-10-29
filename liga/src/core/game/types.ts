@@ -1,6 +1,6 @@
 import type { PokemonSet } from '../types';
 
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
 export const MIN_PLAYERS = 4;
 export const MAX_PLAYERS = 8;
 export const WIN_POINTS = 3;
@@ -71,8 +71,23 @@ export interface SeasonRecord {
   standings: (StandingRow & { name: string })[];
 }
 
+/** Qué Pokémon pueden salir en los sorteos (equipos nuevos, cambios gratis y Pokémon comprados). */
+export interface DrawSettings {
+  /** Generaciones (1-9) de las que se sortea. */
+  generations: number[];
+  /** Incluye legendarios y singulares. */
+  legendaries: boolean;
+  /** Solo Pokémon en su última etapa evolutiva. */
+  finalStageOnly: boolean;
+}
+
+export interface Settings {
+  draw: DrawSettings;
+}
+
 export interface GameState {
   version: number;
+  settings: Settings;
   profiles: Profile[];
   season: Season | null;
   history: SeasonRecord[];
@@ -80,4 +95,14 @@ export interface GameState {
   nextSeasonNumber: number;
 }
 
-export const emptyGame = (): GameState => ({ version: SAVE_VERSION, profiles: [], season: null, history: [], nextSeasonNumber: 1 });
+export const ALL_GENERATIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
+export const defaultSettings = (): Settings => ({ draw: { generations: [...ALL_GENERATIONS], legendaries: true, finalStageOnly: true } });
+
+export const emptyGame = (): GameState => ({
+  version: SAVE_VERSION,
+  settings: defaultSettings(),
+  profiles: [],
+  season: null,
+  history: [],
+  nextSeasonNumber: 1,
+});

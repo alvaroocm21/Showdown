@@ -1,18 +1,52 @@
 import { describe, expect, it } from 'vitest';
-import { ABILITIES, MOVES, NATURES, SPECIES, TYPE_CHART, getNature, getSpecies } from '../src/core/data';
+import { ABILITIES, MOVES, NATURES, SPECIES, TYPE_CHART, getNature, getSpecies, spriteUrl } from '../src/core/data';
 import { computeStats, DEFAULT_BUILD } from '../src/core/stats';
 import { TYPE_NAMES } from '../src/core/types';
 
 describe('datos descargados', () => {
-  it('contiene las 3 primeras generaciones', () => {
-    expect(SPECIES).toHaveLength(386);
-    expect(Math.max(...SPECIES.map((s) => s.id))).toBe(386);
-    expect(ABILITIES).toHaveLength(76);
-    expect(MOVES.length).toBeGreaterThan(300);
+  it('contienen todas las generaciones', () => {
+    expect(SPECIES).toHaveLength(1025);
+    expect(SPECIES.every((s, i) => s.id === i + 1)).toBe(true);
+    const perGen = new Map<number, number>();
+    for (const s of SPECIES) perGen.set(s.generation, (perGen.get(s.generation) ?? 0) + 1);
+    expect([...perGen.entries()].sort((a, b) => a[0] - b[0])).toEqual([
+      [1, 151], [2, 100], [3, 135], [4, 107], [5, 156], [6, 72], [7, 88], [8, 96], [9, 120],
+    ]);
+    expect(ABILITIES.length).toBeGreaterThan(300);
+    expect(MOVES.length).toBeGreaterThan(800);
+    expect(SPECIES.filter((s) => s.legendary).length).toBeGreaterThan(80);
+  });
+
+  it('no incluyen movimientos Z ni Dinamax (no se pueden usar sueltos)', () => {
+    expect(MOVES.filter((m) => m.pp === 1).map((m) => m.slug).sort()).toEqual(['revival-blessing', 'sketch']);
+    expect(MOVES.some((m) => m.slug.startsWith('max-') || /--(physical|special)$/.test(m.slug))).toBe(false);
+  });
+
+  it('cada Pokémon tiene tipos, estadísticas y un sprite que existe (1-1025)', () => {
+    for (const s of SPECIES) {
+      expect(s.types.length, s.slug).toBeGreaterThanOrEqual(1);
+      expect(s.types.length, s.slug).toBeLessThanOrEqual(2);
+      for (const k of ['hp', 'atk', 'def', 'spa', 'spd', 'spe'] as const) expect(s.baseStats[k], `${s.slug} ${k}`).toBeGreaterThan(0);
+    }
+    expect(spriteUrl(1025)).toMatch(/home\/1025\.png$/);
+  });
+
+  it('todos los ataques y habilidades tienen datos completos', () => {
+    for (const m of MOVES) {
+      expect(m.name, m.slug).toBeTruthy();
+      expect(m.pp, m.slug).toBeGreaterThan(0);
+      expect(TYPE_NAMES.includes(m.type), m.slug).toBe(true);
+    }
+    for (const a of ABILITIES) {
+      expect(a.name, a.slug).toBeTruthy();
+      expect(a.description, a.slug).toBeTruthy();
+    }
   });
 
   it('tiene nombres en español', () => {
     expect(getSpecies(25).name).toBe('Pikachu');
+    expect(getSpecies(1000).slug).toBe('gholdengo');
+    expect(getSpecies(1000).generation).toBe(9);
     expect(MOVES.find((m) => m.slug === 'flamethrower')?.name).toBe('Lanzallamas');
     expect(ABILITIES.find((a) => a.slug === 'intimidate')?.name).toBe('Intimidación');
   });

@@ -1,5 +1,9 @@
 import { ABILITIES, MOVES, NATURES, SPECIES } from '../core/data';
-import { MAX_PLAYERS, MIN_PLAYERS, SAVE_VERSION, emptyGame, type GameState, type Match, type Profile, type Season, type SeasonRecord } from '../core/game/types';
+import { validateDraw } from '../core/game/settings';
+import {
+  ALL_GENERATIONS, MAX_PLAYERS, MIN_PLAYERS, SAVE_VERSION, defaultSettings, emptyGame,
+  type GameState, type Match, type Profile, type Season, type SeasonRecord, type Settings,
+} from '../core/game/types';
 import { STAT_KEYS, type BuildConfig, type PokemonSet, type Stats } from '../core/types';
 
 export const STORAGE_KEY = 'pokeliga:save';
@@ -160,6 +164,22 @@ function recordOf(v: unknown, path: string): SeasonRecord {
   };
 }
 
+function settingsOf(v: unknown, path: string): Settings {
+  const o = obj(v, path);
+  const draw = obj(o.draw, `${path}.draw`);
+  const generations = arr(draw.generations, `${path}.draw.generations`).map((g, i) =>
+    int(g, `${path}.draw.generations[${i}]`, 1, ALL_GENERATIONS.length),
+  );
+  const parsed = {
+    generations,
+    legendaries: bool(draw.legendaries, `${path}.draw.legendaries`),
+    finalStageOnly: bool(draw.finalStageOnly, `${path}.draw.finalStageOnly`),
+  };
+  const error = validateDraw(parsed);
+  if (error) fail(`${path}.draw`, error);
+  return { draw: parsed };
+}
+
 /** Comprueba la estructura y los datos (Pokémon, ataques, habilidades…) y devuelve el estado limpio. */
 export function validateGameState(raw: unknown): GameState {
   const o = obj(raw, 'partida');
@@ -173,7 +193,7 @@ export function validateGameState(raw: unknown): GameState {
   const nextSeasonNumber = int(o.nextSeasonNumber, 'nextSeasonNumber', 1, 100000);
   if (season && season.number !== nextSeasonNumber) fail('nextSeasonNumber', 'no coincide con la temporada en curso');
   if (history.some((r) => r.number >= nextSeasonNumber)) fail('nextSeasonNumber', 'hay temporadas del historial con número posterior');
-  return { version: SAVE_VERSION, profiles, season, history, nextSeasonNumber };
+  return { version: SAVE_VERSION, settings: settingsOf(o.settings, 'settings'), profiles, season, history, nextSeasonNumber };
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -181,7 +201,11 @@ export function validateGameState(raw: unknown): GameState {
 // ---------------------------------------------------------------------------------------------
 
 /** migrations[n] convierte una partida de la versión n a la n+1. Se añaden aquí cuando cambie el formato. */
-const MIGRATIONS: Record<number, (state: Obj) => Obj> = {};
+const MIGRATIONS: Record<number, (state: Obj) => Obj> = {
+  // v1 → v2: aparecen los ajustes del sorteo. Las partidas antiguas pasan a los valores por defecto (todas las
+  // generaciones); sus equipos no cambian, solo los sorteos futuros.
+  1: (state) => ({ ...state, settings: defaultSettings() }),
+};
 
 export function migrate(raw: unknown): unknown {
   const o = obj(raw, 'partida');

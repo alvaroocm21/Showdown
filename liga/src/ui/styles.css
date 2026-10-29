@@ -345,3 +345,12 @@ button { transition: filter .15s; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* ---------- Ajustes del sorteo ---------- */
+.gens { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.gen { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 6px; padding: 7px 8px; border-radius: 12px; background: #f5f3ff; font-size: .8rem; cursor: pointer; box-shadow: inset 0 0 0 2px transparent; }
+.gen.on { background: #ede9fe; box-shadow: inset 0 0 0 2px #a78bfa; }
+.gen input { display: none; }
+.gen b { grid-row: span 2; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; background: #c4b5fd; color: #fff; font-size: .8rem; }
+.gen.on b { background: #7c3aed; }
+.gen span { font-weight: 700; } .gen small { color: var(--muted); font-size: .65rem; }

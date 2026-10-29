@@ -1,7 +1,8 @@
 import type { Rng } from '../rng';
 import { rewardFor } from './economy';
 import { createSeason, findMatch, recordResult } from './season';
-import { MAX_PLAYERS, MIN_PLAYERS, type GameState, type MatchResult, type Profile } from './types';
+import { validateDraw } from './settings';
+import { MAX_PLAYERS, MIN_PLAYERS, type DrawSettings, type GameState, type MatchResult, type Profile } from './types';
 
 /** Operaciones sobre la partida: siempre devuelven un estado nuevo y lanzan un Error con un mensaje claro si no se pueden hacer. */
 
@@ -53,4 +54,11 @@ export function recordMatch(state: GameState, matchId: string, result: MatchResu
     season,
     profiles: state.profiles.map((p) => (p.id === profileId ? { ...p, coins: p.coins + coins } : p)),
   };
+}
+
+/** Cambia qué Pokémon pueden salir en los sorteos futuros (los equipos que ya existen no cambian). */
+export function updateDraw(state: GameState, draw: DrawSettings): GameState {
+  const error = validateDraw(draw);
+  if (error) throw new Error(error);
+  return { ...state, settings: { ...state.settings, draw: { ...draw, generations: [...draw.generations].sort((a, b) => a - b) } } };
 }

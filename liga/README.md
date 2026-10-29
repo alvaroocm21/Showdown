@@ -14,7 +14,8 @@ npm run make-icons   # regenera los iconos de la app (public/icons)
 ```
 
 ## Datos
-`scripts/fetch-data.ts` descarga **una vez** los datos de PokéAPI (generaciones 1-3, nombres en español)
+`scripts/fetch-data.ts` descarga **una vez** los datos de PokéAPI (**todas las generaciones**: 1025 Pokémon, 846 ataques y
+314 habilidades, con nombres en español; solo 3 habilidades recientes aún no tienen traducción y salen en inglés)
 a `src/data/*.json`, que se guardan en el repositorio: el juego no necesita conexión para los datos.
 Usa los CSV oficiales de PokéAPI en GitHub (mismos datos que la API, en pocos ficheros).
 Los sprites son los renders 3D de Pokémon HOME que aloja PokéAPI.
@@ -28,7 +29,8 @@ Los sprites son los renders 3D de Pokémon HOME que aloja PokéAPI.
 - `src/ui/` estilos y pantallas. `tests/` pruebas unitarias.
 
 ## Reglas del sorteo
-- Solo Pokémon en su última etapa evolutiva (sin legendarios por defecto), 6 distintos por equipo.
+- 6 Pokémon distintos por equipo, de entre los que permitan los **ajustes del sorteo** (ver más abajo). Por defecto: las 9
+  generaciones, con legendarios y singulares, solo en su última etapa evolutiva (568 Pokémon posibles).
 - 4 ataques distintos de entre TODOS los del juego, repitiendo el sorteo si el set es injugable:
   mínimo 2 ataques de daño directo y, si es posible, al menos uno de un tipo del Pokémon.
 - 1 habilidad de entre todas las del juego.
@@ -45,13 +47,13 @@ Lógica pura en `src/core/battle/`; la interfaz solo reproduce los eventos que d
   envenenado (1/8), gravemente envenenado (n/16), dormido (1-3 turnos) y congelado (20 % de deshielo; el fuego descongela).
   Un solo estado principal a la vez, con las inmunidades por tipo (fuego/quemadura, eléctrico/parálisis, veneno y acero/veneno, hielo/congelación).
 - **Mejoras y bajadas** de -6 a +6 (Ataque, Defensa, At. Esp., Def. Esp., Velocidad, Precisión y Evasión); se pierden al cambiar.
-- **Ataques implementados (263 de 353, el 74,5 %):** daño directo, multigolpe, drenaje, retroceso, ataques de dos turnos
+- **Ataques implementados (645 de 846, el 76 %):** daño directo, multigolpe, drenaje, retroceso, ataques de dos turnos
   (Rayo Solar…), recarga (Hiperrayo…), Sorpresa, Explosión, daño fijo, KO de un golpe, potencia variable (Retorno, Magnitud, Plumas),
   estados, mejoras, curación y Descanso, además de efectos secundarios (estado, retroceso, bajadas/subidas de estadísticas).
 - **Sin efecto aún** (se muestran en el menú como «sin efecto aún» y no hacen nada): clima, pantallas, Protección, Sustituto,
   confusión, Dulce Aroma/Drenadoras, Contraataque/Venganza, Foco Energía, Metrónomo, Transformación, ataques de salida forzada…
   Los ataques de dos turnos no tienen invulnerabilidad (Vuelo/Excavar solo hacen la preparación y el golpe).
-- **Habilidades implementadas (54 de 76):** Intimidación, Levitación, Mar Llamas, Torrente, Espesura, Enjambre, Robustez,
+- **Habilidades implementadas (54 de 314):** las del bloque inicial, las más comunes y sencillas; Intimidación, Levitación, Mar Llamas, Torrente, Espesura, Enjambre, Robustez,
   Absorbe Agua/Electricidad/Fuego, Pararrayos, Electricidad Estática, Punto Tóxico, Cuerpo Llama, Esporas, Piel Tosca,
   Superguarda, Potencia, Poder Puro, Agallas, Escama Especial, Sebo, Impulso, Sincronía, Cura Natural, Muda, Cuerpo Puro, Humo Blanco,
   Garra Dura, Vista Lince, Flexibilidad, Insomnio, Espíritu Vital, Inmunidad, Velo Agua, Armadura Magma, Armadura Batalla, Caparazón,
@@ -94,7 +96,7 @@ Lógica pura en `src/core/battle/`; la interfaz solo reproduce los eventos que d
   cuando el navegador lo permite.
 - `npm run build` genera `dist/sw.js` (service worker con la lista de ficheros y una versión que cambia con el contenido):
   la app entera se guarda al abrirla la primera vez y arranca sin red.
-- Los **sprites 3D** se guardan a medida que se ven; en Ajustes hay un botón para **descargar los 186 de golpe** (≈ 26 MB).
+- Los **sprites 3D** se guardan a medida que se ven; en Ajustes hay un botón para **descargar de golpe todos los que pueden salir** (con los ajustes por defecto, 568 sprites ≈ 80 MB; se calcula según tus ajustes).
   Sin imagen guardada y sin red se muestra una Poké Ball. Los datos del juego (Pokémon, ataques, habilidades) ya van dentro de la app.
 - Los iconos se generan sin dependencias con `npm run make-icons`.
 - Para publicarla hace falta servir `dist/` por HTTPS (p. ej. GitHub Pages); el service worker no funciona desde `file://`.
@@ -102,3 +104,13 @@ Lógica pura en `src/core/battle/`; la interfaz solo reproduce los eventos que d
 ## Retoques visuales
 Cinco ambientes de arena al azar, sacudida de pantalla en los críticos, confeti al ganar y al coronar campeón, barra de PS que
 parpadea cuando queda poca vida, transición entre pantallas y respeto a «reducir movimiento».
+
+## Todos los Pokémon, ataques y habilidades
+- **Datos completos:** 1025 Pokémon (las 9 generaciones), 846 ataques y 314 habilidades. Se excluyen los movimientos Z y Dinamax,
+  que no se pueden usar sueltos (se necesita un objeto o una mecánica concreta), y los Pokémon de formas alternativas
+  (regionales, megaevoluciones…): se sortean las especies base.
+- **Ataques y habilidades:** salen siempre de **todos** los del juego. Los que el motor aún no implementa se muestran con «sin efecto aún».
+- **Ajustes del sorteo** (pestaña Ajustes → «Pokémon del sorteo»): qué generaciones entran, si se incluyen legendarios y singulares y si
+  solo salen Pokémon en su última etapa. Afecta a los equipos nuevos, a los sorteos gratis y a los Pokémon comprados con monedas;
+  los equipos que ya existen no cambian. Se guarda con la partida (formato versión 2; las partidas antiguas se migran solas).
+- Tras ampliar los datos, las pruebas automáticas usan cada una de las 1025 especies, los 846 ataques y las 314 habilidades en combate.

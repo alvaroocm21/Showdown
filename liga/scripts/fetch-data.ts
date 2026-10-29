@@ -1,5 +1,5 @@
 /**
- * Descarga UNA vez los datos de PokéAPI (generaciones 1-3) y los guarda como JSON en src/data.
+ * Descarga UNA vez los datos de PokéAPI (todas las generaciones) y los guarda como JSON en src/data.
  *
  * Usa los CSV oficiales del repositorio de PokéAPI (son exactamente los datos que sirve la API,
  * pero en pocos ficheros en lugar de ~1000 llamadas). Después el juego no necesita conexión.
@@ -13,7 +13,8 @@ import { fileURLToPath } from 'node:url';
 const BASE = 'https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/';
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'data');
 
-const MAX_GEN = 3;
+/** Última generación que se incluye (por defecto todas). Se puede limitar: MAX_GEN=3 npm run fetch-data */
+const MAX_GEN = Number(process.env.MAX_GEN) || 9;
 const ES = 7;
 const EN = 9;
 
@@ -49,6 +50,9 @@ async function csv(name: string): Promise<Row[]> {
 
 const num = (s: string | undefined): number | null => (s === undefined || s === '' ? null : Number(s));
 const clean = (s: string) => s.replace(/[\n\f­]+/g, ' ').replace(/\s+/g, ' ').trim();
+
+/** Ataques con 1 PP que sí son ataques normales. */
+const REAL_ONE_PP_MOVES = new Set(['sketch', 'revival-blessing']);
 
 const TYPE_SLUGS = [
   'normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel',
@@ -200,6 +204,9 @@ async function main() {
       };
     })
     .filter((m) => m.slug !== 'struggle')
+    // Movimientos Z (todos tienen 1 PP, salvo Esbozo y Plegaria Revivir, que son ataques normales) y movimientos Dinamax:
+    // solo se pueden usar con un objeto o una mecánica concreta, así que no entran en el sorteo.
+    .filter((m) => !(m.pp === 1 && !REAL_ONE_PP_MOVES.has(m.slug)) && !m.slug.startsWith('max-'))
     .sort((a, b) => a.id - b.id);
 
   // ---------- Habilidades ----------
@@ -243,6 +250,15 @@ async function main() {
     write('types.json', typesOut),
     write('natures.json', naturesOut),
   ]);
+  // Nombres que PokéAPI aún no tiene en español (se muestran en inglés)
+  const missingEs = {
+    Pokémon: speciesOut.filter((x) => !esSpecies.has(x.id)).map((x) => x.slug),
+    ataques: movesOut.filter((x) => !esMove.has(x.id)).map((x) => x.slug),
+    habilidades: abilitiesOut.filter((x) => !esAbility.has(x.id)).map((x) => x.slug),
+  };
+  for (const [kind, list] of Object.entries(missingEs)) {
+    if (list.length) console.log(`Sin nombre en español (${kind}): ${list.length} → ${list.slice(0, 12).join(', ')}${list.length > 12 ? '…' : ''}`);
+  }
   console.log(
     `Listo: ${speciesOut.length} especies (${speciesOut.filter((s) => s.finalStage).length} en su última etapa), ` +
       `${movesOut.length} ataques, ${abilitiesOut.length} habilidades, ${naturesOut.length} naturalezas → ${OUT}`,
