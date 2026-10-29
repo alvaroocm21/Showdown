@@ -172,55 +172,59 @@ export function useMove(ctx: Ctx, side: Side, req: MoveRequest, copied?: Move): 
   const { move, powerBoost } = resolveMove(battle, user, target, move0);
   emit(ctx, { type: 'move', side, pokemon: user.name, move: move.name, moveType: move.type });
 
-  const sunBeam = (move.slug === 'solar-beam' || move.slug === 'solar-blade') && ['sun', 'harsh-sun'].includes(weatherFor(battle, user) ?? '');
-  if (move.flags.charge && !releasing && !copied && !sunBeam) {
-    user.charging = slot;
-    emit(ctx, { type: 'charge', side, pokemon: user.name });
-    return;
-  }
-  if (isTruant(user)) user.loafing = true;
+  // El resto del ataque se ejecuta aparte para que el Bailarín actúe siempre al terminar (también con bailes que no apuntan al rival)
+  const run = (): void => {
+    const sunBeam = (move.slug === 'solar-beam' || move.slug === 'solar-blade') && ['sun', 'harsh-sun'].includes(weatherFor(battle, user) ?? '');
+    if (move.flags.charge && !releasing && !copied && !sunBeam) {
+      user.charging = slot;
+      emit(ctx, { type: 'charge', side, pokemon: user.name });
+      return;
+    }
+    if (isTruant(user)) user.loafing = true;
 
-  const kind = moveKind(move);
-  if (kind === 'none') {
-    emit(ctx, { type: 'noEffect' });
-    return;
-  }
+    const kind = moveKind(move);
+    if (kind === 'none') {
+      emit(ctx, { type: 'noEffect' });
+      return;
+    }
 
-  // Ataques que no apuntan al rival: clima, terreno y efectos sobre uno mismo
-  if (move.slug in WEATHER_MOVES || move.slug in TERRAIN_MOVES) {
-    const done =
-      move.slug in WEATHER_MOVES
-        ? setWeather(ctx, WEATHER_MOVES[move.slug]!, null)
-        : setTerrain(ctx, TERRAIN_MOVES[move.slug]!);
-    if (!done) emit(ctx, { type: 'failed' });
-    return;
-  }
-  if (kind === 'status' && targetsUser(move)) {
-    useSelfMove(ctx, user, move);
-    return;
-  }
+    // Ataques que no apuntan al rival: clima, terreno y efectos sobre uno mismo
+    if (move.slug in WEATHER_MOVES || move.slug in TERRAIN_MOVES) {
+      const done =
+        move.slug in WEATHER_MOVES
+          ? setWeather(ctx, WEATHER_MOVES[move.slug]!, null)
+          : setTerrain(ctx, TERRAIN_MOVES[move.slug]!);
+      if (!done) emit(ctx, { type: 'failed' });
+      return;
+    }
+    if (kind === 'status' && targetsUser(move)) {
+      useSelfMove(ctx, user, move);
+      return;
+    }
 
-  // Condiciones propias de algunos ataques
-  if ((move.effectId === EFFECT.fakeOut && !wasFirstTurn) || (move.effectId === EFFECT.dreamEater && target.status !== 'sleep')) {
-    emit(ctx, { type: 'failed' });
-    return;
-  }
-  if (move.effectId === EFFECT.selfDestruct) {
-    const damp = ([user, target] as const).find((b) => !b.suppressed && abilitySlug(b) === 'damp');
-    if (damp) {
-      abilityActivates(ctx, damp, 'Impide que se use ese ataque.');
+    // Condiciones propias de algunos ataques
+    if ((move.effectId === EFFECT.fakeOut && !wasFirstTurn) || (move.effectId === EFFECT.dreamEater && target.status !== 'sleep')) {
       emit(ctx, { type: 'failed' });
       return;
     }
-  }
+    if (move.effectId === EFFECT.selfDestruct) {
+      const damp = ([user, target] as const).find((b) => !b.suppressed && abilitySlug(b) === 'damp');
+      if (damp) {
+        abilityActivates(ctx, damp, 'Impide que se use ese ataque.');
+        emit(ctx, { type: 'failed' });
+        return;
+      }
+    }
 
-  // Rompemoldes: mientras dura este ataque, la habilidad del objetivo no estorba
-  setBreaking(hasMoldBreaker(user) || (kind === 'status' && !user.suppressed && abilitySlug(user) === 'mycelium-might'));
-  try {
-    resolveHit(ctx, side, user, target, move, move0, kind, powerBoost);
-  } finally {
-    setBreaking(false);
-  }
+    // Rompemoldes: mientras dura este ataque, la habilidad del objetivo no estorba
+    setBreaking(hasMoldBreaker(user) || (kind === 'status' && !user.suppressed && abilitySlug(user) === 'mycelium-might'));
+    try {
+      resolveHit(ctx, side, user, target, move, move0, kind, powerBoost);
+    } finally {
+      setBreaking(false);
+    }
+  };
+  run();
 
   // Bailarín: el otro Pokémon repite los ataques de baile
   if (move.flags.dance && !copied && target.hp > 0 && !target.suppressed && abilitySlug(target) === 'dancer' && battle.winner === null) {

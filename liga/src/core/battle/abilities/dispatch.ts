@@ -19,9 +19,10 @@ export const setBreaking = (on: boolean): void => {
 };
 export const isBreaking = (): boolean => breaking;
 /** Definición de la habilidad del objetivo, ignorada si el atacante tiene Rompemoldes (salvo las que no se pueden anular). */
-const targetDef = (b: Battler): AbilityDef | undefined => {
+const targetDef = (b: Battler, attacker: Battler | null = null): AbilityDef | undefined => {
   const d = defOf(b);
-  return d && breaking && d.breakable !== false ? undefined : d;
+  if (!d || d.breakable === false) return d;
+  return breaking || (attacker && !!defOf(attacker)?.moldBreaker) ? undefined : d;
 };
 
 export const ignoresBurnPenalty = (b: Battler): boolean => !!defOf(b)?.ignoresBurn;
@@ -85,7 +86,7 @@ export function damageMods(c: DamageCtx): ResolvedMods {
     if (m.crit) r.crit = Math.max(r.crit, m.crit);
   };
   apply(defOf(c.user)?.outgoing?.(c));
-  apply(targetDef(c.target)?.incoming?.(c));
+  apply(targetDef(c.target, c.user)?.incoming?.(c));
   return r;
 }
 
@@ -107,7 +108,7 @@ export function speedMultiplier(battle: Battle, self: Battler, weather: Weather 
 
 /** Factor de precisión: habilidad del atacante y evasión del objetivo (esta última se anula con Rompemoldes). */
 export function accuracyFactor(c: MoveCtx): number {
-  return (defOf(c.user)?.accuracy?.(c) ?? 1) * (targetDef(c.target)?.evasion?.(c) ?? 1);
+  return (defOf(c.user)?.accuracy?.(c) ?? 1) * (targetDef(c.target, c.user)?.evasion?.(c) ?? 1);
 }
 
 export const neverMisses = (user: Battler, target: Battler): boolean => !!(defOf(user)?.noGuard || defOf(target)?.noGuard);
@@ -130,7 +131,7 @@ export const sleepDecrement = (b: Battler): number => defOf(b)?.sleepDecrement ?
 // ---------------------------------------------------------------------------------------------
 
 /** ¿Anula el objetivo este ataque por su habilidad? (sin efectos: lo usa también la IA) */
-export const abilityBlocksMove = (c: BlockCtx): boolean => !!targetDef(c.target)?.immune?.(c);
+export const abilityBlocksMove = (c: BlockCtx): boolean => !!targetDef(c.target, c.user)?.immune?.(c);
 
 /** Efecto de haber anulado el ataque (absorber, subir una estadística…). */
 export function runImmuneEffect(ctx: Ctx, user: Battler, self: Battler, move: BlockCtx['move']): void {
