@@ -25,11 +25,24 @@ describe('generador de equipos', () => {
     expect(new Set(pool.map((s) => s.generation))).toEqual(new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]));
   });
 
+  it('las formas regionales se sortean y las megas nunca', () => {
+    const all = speciesPool({ finalStageOnly: false, allowLegendary: true });
+    expect(all.some((s) => s.slug === 'raichu-alola')).toBe(true);
+    expect(all.some((s) => s.form?.kind === 'mega')).toBe(false);
+    const pool = speciesPool();
+    expect(pool.some((s) => s.slug === 'ninetales-alola')).toBe(true); // última etapa
+    expect(pool.some((s) => s.slug === 'rattata-alola')).toBe(false); // se puede evolucionar
+    // por generación: Alola es de 7.ª, Hisui de 8.ª
+    expect(speciesPool({ generations: [7] }).some((s) => s.slug === 'ninetales-alola')).toBe(true);
+    expect(speciesPool({ generations: [1] }).some((s) => s.slug === 'ninetales-alola')).toBe(false);
+    for (let seed = 1; seed <= 300; seed++) for (const p of rollTeam(createRng(seed), { allowLegendary: true, finalStageOnly: false })) expect(getSpecies(p.speciesId).form?.kind).not.toBe('mega');
+  });
+
   it('los filtros de generación, legendarios y última etapa funcionan', () => {
     const base = speciesPool().length;
     expect(speciesPool({ allowLegendary: true }).length).toBeGreaterThan(base);
     expect(speciesPool({ finalStageOnly: false }).length).toBeGreaterThan(base);
-    expect(speciesPool({ finalStageOnly: false, allowLegendary: true })).toHaveLength(1025);
+    expect(speciesPool({ finalStageOnly: false, allowLegendary: true })).toHaveLength(1082); // 1025 + 57 formas regionales
     for (const s of speciesPool({ generations: [4, 9] })) expect([4, 9]).toContain(s.generation);
     expect(speciesPool({ generations: [] })).toHaveLength(0);
     // con todo abierto salen Pokémon de las 9 generaciones, legendarios y sin evolucionar

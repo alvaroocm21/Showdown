@@ -72,7 +72,7 @@ describe('combates con todos los Pokémon posibles', () => {
     }
   });
 
-  it('cada Pokémon del juego se puede crear y entra en combate (1025 especies)', () => {
+  it('cada Pokémon del juego se puede crear y entra en combate (1025 especies y sus formas)', () => {
     for (const species of SPECIES) {
       const set = makeSet(species.slug, ['tackle', 'flamethrower', 'recover', 'swords-dance']);
       const b = createBattle([set], [makeSet('snorlax', ['tackle'])]);

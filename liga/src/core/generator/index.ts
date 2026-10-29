@@ -1,4 +1,4 @@
-import { ABILITIES, MOVES, SPECIES, getMove, getSpecies } from '../data';
+import { ABILITIES, MOVES, SPECIES, getMove, getSpecies, isMega } from '../data';
 import type { Rng } from '../rng';
 import { cloneBuild, DEFAULT_BUILD } from '../stats';
 import type { BuildConfig, Move, PokemonSet, Species } from '../types';
@@ -68,6 +68,7 @@ export function speciesPool(options: GenerateOptions = {}): Species[] {
   const finalOnly = options.finalStageOnly ?? true;
   return SPECIES.filter(
     (s) =>
+      !isMega(s) &&
       (!finalOnly || s.finalStage) &&
       (options.allowLegendary || !s.legendary) &&
       (!options.generations || options.generations.includes(s.generation)),

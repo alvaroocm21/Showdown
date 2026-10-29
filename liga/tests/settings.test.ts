@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { drawOptions, drawOptionsOf, poolSize, speciesPerGeneration, validateDraw } from '../src/core/game/settings';
+import { drawOptions, drawOptionsOf, poolSize, speciesPerGeneration, totalDrawable, validateDraw } from '../src/core/game/settings';
 import { updateDraw } from '../src/core/game/state';
 import { createProfile } from '../src/core/game/profiles';
 import { applyUpgrade } from '../src/core/game/shop';
@@ -27,8 +27,12 @@ describe('ajustes del sorteo', () => {
 
   it('cuenta los Pokémon por generación', () => {
     const per = speciesPerGeneration();
-    expect(Object.values(per).reduce((a, b) => a + b, 0)).toBe(1025);
+    expect(Object.values(per).reduce((a, b) => a + b, 0)).toBe(1082); // 1025 + 57 formas regionales (las megas no se sortean)
     expect(per[1]).toBe(151);
+    expect(per[7]).toBe(88 + 18); // + Alola
+    expect(per[8]).toBe(96 + 19 + 16); // + Galar + Hisui
+    expect(per[9]).toBe(120 + 4); // + Paldea
+    expect(totalDrawable()).toBe(1082);
   });
 
   it('updateDraw cambia solo los ajustes (ordena las generaciones) y rechaza los inválidos', () => {

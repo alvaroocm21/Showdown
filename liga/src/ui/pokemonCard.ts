@@ -1,5 +1,5 @@
 import { isAbilityImplemented } from '../core/battle/abilities';
-import { TYPE_NAMES_ES, getAbility, getMove, getSpecies, spriteUrl } from '../core/data';
+import { TYPE_NAMES_ES, dexNumber, getAbility, getMove, getSpecies, spriteUrl } from '../core/data';
 import { computeStats } from '../core/stats';
 import { STAT_KEYS, type MoveCategory, type PokemonSet, type StatKey } from '../core/types';
 import { esc, moveEffectText, moveNeedsWarning, typeChip, typeVar } from './shared';
@@ -45,7 +45,7 @@ export function renderPokemonCard(set: PokemonSet, actions = '', badge = '', fla
     <div class="card-head" style="--c1:${typeVar(t1)};--c2:${typeVar(t2)}">
       <img src="${spriteUrl(species.id)}" alt="${esc(species.name)}" loading="lazy" width="96" height="96" />
       <div>
-        <div class="dex">#${String(species.id).padStart(3, '0')} · Nv. ${set.build.level}${badge}</div>
+        <div class="dex">#${String(dexNumber(species)).padStart(3, '0')} · Nv. ${set.build.level}${badge}</div>
         <h2>${esc(species.name)}</h2>
         <div class="chips">${species.types.map(typeChip).join('')}</div>
       </div>

@@ -57,6 +57,7 @@ describe('guardado: serializar y validar', () => {
   it('rechaza datos que no existen en el juego', () => {
     reject((s) => (s.profiles[0].team[0].speciesId = 99999), /Pokémon desconocido/);
     reject((s) => (s.profiles[0].team[0].abilityId = 99999), /habilidad desconocida/);
+    reject((s) => (s.profiles[0].team[0].speciesId = 10033), /megaevolución no puede estar en un equipo/);
     reject((s) => (s.profiles[0].team[0].moveIds[0] = 99999), /ataque desconocido/);
     reject((s) => (s.profiles[0].team[0].build.natureId = 9999), /naturaleza/);
   });

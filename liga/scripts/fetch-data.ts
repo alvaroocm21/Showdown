@@ -51,6 +51,19 @@ async function csv(name: string): Promise<Row[]> {
 const num = (s: string | undefined): number | null => (s === undefined || s === '' ? null : Number(s));
 const clean = (s: string) => s.replace(/[\n\f­]+/g, ' ').replace(/\s+/g, ' ').trim();
 
+/** Formas que se incluyen: regionales y megaevoluciones (no cosplay, tótems, formas de combate ni Gigamax). */
+const REGIONAL = /-(alola|galar|hisui|paldea)(-|$)/;
+const MEGA = /-mega(-|$)/;
+const FORM_SKIP = /totem|-cap|-zen|gmax|primal|eternamax/;
+const REGIONS: Record<string, { name: string; generation: number }> = {
+  alola: { name: 'Alola', generation: 7 }, galar: { name: 'Galar', generation: 8 },
+  hisui: { name: 'Hisui', generation: 8 }, paldea: { name: 'Paldea', generation: 9 },
+};
+const MEGA_QUALIFIER: Record<string, string> = {
+  x: 'X', y: 'Y', z: 'Z', male: 'Macho', female: 'Hembra', curly: 'Curvada', droopy: 'Lánguida', stretchy: 'Estirada', original: 'Original',
+};
+const REGIONAL_QUALIFIER: Record<string, string> = { combat: 'Combatiente', blaze: 'Ardiente', aqua: 'Acuática' };
+
 /** Ataques con 1 PP que sí son ataques normales. */
 const REAL_ONE_PP_MOVES = new Set(['sketch', 'revival-blessing']);
 
@@ -131,6 +144,52 @@ async function main() {
       };
     })
     .sort((a, b) => a.id - b.id);
+
+  // ---------- Formas: regionales y megaevoluciones ----------
+  const baseById = new Map(speciesOut.map((s) => [s.id, s]));
+  const formsOut = pokemon
+    .filter((p) => p.is_default === '0' && !FORM_SKIP.test(p.identifier!) && (REGIONAL.test(p.identifier!) || MEGA.test(p.identifier!)))
+    .flatMap((p) => {
+      const base = baseById.get(Number(p.species_id));
+      if (!base) return [];
+      const id = Number(p.id);
+      const rest = p.identifier!.slice(base.slug.length + 1); // p. ej. «alola», «mega-x», «paldea-blaze-breed»
+      const baseStats = Object.fromEntries(
+        pokemonStats.filter((r) => Number(r.pokemon_id) === id).map((r) => [STAT_BY_ID[Number(r.stat_id)], Number(r.base_stat)]),
+      );
+      const types = pokemonTypes
+        .filter((r) => Number(r.pokemon_id) === id)
+        .sort((a, b) => Number(a.slot) - Number(b.slot))
+        .map((r) => typeSlugById.get(Number(r.type_id))!);
+      if (!types.length || Object.keys(baseStats).length !== 6) throw new Error(`Forma incompleta: ${p.identifier}`);
+
+      const isMega = MEGA.test(p.identifier!);
+      const tokens = rest.split('-');
+      let name: string;
+      let label: string;
+      let generation: number;
+      if (isMega) {
+        const quals = tokens.filter((t) => t !== 'mega').map((t) => MEGA_QUALIFIER[t] ?? t);
+        const letter = quals.find((q) => ['X', 'Y', 'Z'].includes(q));
+        const other = quals.filter((q) => q !== letter);
+        name = `Mega-${base.name}${letter ? ` ${letter}` : ''}${other.length ? ` (${other.join(' ')})` : ''}`;
+        label = `Mega${letter ? ` ${letter}` : ''}${other.length ? ` (${other.join(' ')})` : ''}`;
+        generation = base.generation;
+      } else {
+        const region = REGIONS[tokens[0]!]!;
+        const extra = tokens.slice(1).map((t) => REGIONAL_QUALIFIER[t]).filter(Boolean);
+        name = `${base.name} de ${region.name}${extra.length ? ` (${extra.join(' ')})` : ''}`;
+        label = `${region.name}${extra.length ? ` (${extra.join(' ')})` : ''}`;
+        generation = region.generation;
+      }
+      return [{
+        id, slug: p.identifier!, name, generation, types, baseStats,
+        finalStage: base.finalStage, legendary: base.legendary,
+        form: { kind: isMega ? 'mega' : 'regional', baseId: base.id, label },
+      }];
+    })
+    .sort((a, b) => a.id - b.id);
+  speciesOut.push(...(formsOut as unknown as typeof speciesOut));
 
   // ---------- Tipos ----------
   const esType = names(typeNames, 'type_id', ES);
@@ -252,7 +311,7 @@ async function main() {
   ]);
   // Nombres que PokéAPI aún no tiene en español (se muestran en inglés)
   const missingEs = {
-    Pokémon: speciesOut.filter((x) => !esSpecies.has(x.id)).map((x) => x.slug),
+    Pokémon: speciesOut.filter((x) => !(x as { form?: unknown }).form && !esSpecies.has(x.id)).map((x) => x.slug),
     ataques: movesOut.filter((x) => !esMove.has(x.id)).map((x) => x.slug),
     habilidades: abilitiesOut.filter((x) => !esAbility.has(x.id)).map((x) => x.slug),
   };

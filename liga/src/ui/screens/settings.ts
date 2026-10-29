@@ -1,7 +1,6 @@
-import { GENERATION_NAMES, poolSize, speciesPerGeneration, validateDraw } from '../../core/game/settings';
+import { GENERATION_NAMES, poolSize, speciesPerGeneration, totalDrawable, validateDraw } from '../../core/game/settings';
 import { updateDraw } from '../../core/game/state';
 import { ALL_GENERATIONS, emptyGame, type DrawSettings } from '../../core/game/types';
-import { SPECIES } from '../../core/data';
 import { exportGame, importGame, SaveError } from '../../storage/save';
 import type { AppCtx } from '../app';
 import { canInstall, isInstalled, promptInstall } from '../install';
@@ -32,7 +31,7 @@ export function mountSettings(ctx: AppCtx): void {
     <p class="sub">Partida · ${state.profiles.length} perfiles · ${state.history.length} temporadas jugadas</p>
     <section class="card form" id="draw">
       <h3>Pokémon del sorteo</h3>
-      <p class="muted">Qué Pokémon pueden salir en equipos nuevos, sorteos gratis y al comprar un Pokémon. Los equipos que ya existen no cambian. Ataques y habilidades salen siempre de <b>todos</b> los del juego (${SPECIES.length} Pokémon en total).</p>
+      <p class="muted">Qué Pokémon pueden salir en equipos nuevos, sorteos gratis y al comprar un Pokémon. Los equipos que ya existen no cambian. Ataques y habilidades salen siempre de <b>todos</b> los del juego (${totalDrawable()} Pokémon en total, con las formas regionales).</p>
       <div class="gens">${genChips}</div>
       <label class="check"><input type="checkbox" id="legend" ${draw.legendaries ? 'checked' : ''} /> Incluir legendarios y singulares</label>
       <label class="check"><input type="checkbox" id="finalonly" ${draw.finalStageOnly ? 'checked' : ''} /> Solo Pokémon en su última etapa evolutiva</label>

@@ -1,4 +1,4 @@
-import { ABILITIES, MOVES, NATURES, SPECIES } from '../core/data';
+import { ABILITIES, MOVES, NATURES, SPECIES, getSpecies, isMega } from '../core/data';
 import { validateDraw } from '../core/game/settings';
 import {
   ALL_GENERATIONS, MAX_PLAYERS, MIN_PLAYERS, SAVE_VERSION, defaultSettings, emptyGame,
@@ -59,6 +59,7 @@ function setOf(v: unknown, path: string): PokemonSet {
   const o = obj(v, path);
   const speciesId = int(o.speciesId, `${path}.speciesId`, 1, 100000);
   if (!SPECIES_IDS.has(speciesId)) fail(`${path}.speciesId`, `Pokémon desconocido (${speciesId})`);
+  if (isMega(getSpecies(speciesId))) fail(`${path}.speciesId`, 'una megaevolución no puede estar en un equipo (solo existe en combate)');
   const abilityId = int(o.abilityId, `${path}.abilityId`, 1, 100000);
   if (!ABILITY_IDS.has(abilityId)) fail(`${path}.abilityId`, `habilidad desconocida (${abilityId})`);
   const moveIds = arr(o.moveIds, `${path}.moveIds`).map((m, i) => int(m, `${path}.moveIds[${i}]`, 1, 100000));

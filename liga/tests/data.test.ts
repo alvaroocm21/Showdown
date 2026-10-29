@@ -1,20 +1,74 @@
 import { describe, expect, it } from 'vitest';
-import { ABILITIES, MOVES, NATURES, SPECIES, TYPE_CHART, getNature, getSpecies, spriteUrl } from '../src/core/data';
+import { ABILITIES, MOVES, NATURES, SPECIES, TYPE_CHART, dexNumber, getNature, getSpecies, isMega, megasOf, spriteUrl } from '../src/core/data';
 import { computeStats, DEFAULT_BUILD } from '../src/core/stats';
 import { TYPE_NAMES } from '../src/core/types';
 
 describe('datos descargados', () => {
   it('contienen todas las generaciones', () => {
-    expect(SPECIES).toHaveLength(1025);
-    expect(SPECIES.every((s, i) => s.id === i + 1)).toBe(true);
+    const base = SPECIES.filter((s) => !s.form);
+    expect(base).toHaveLength(1025);
+    expect(base.every((s, i) => s.id === i + 1)).toBe(true);
     const perGen = new Map<number, number>();
-    for (const s of SPECIES) perGen.set(s.generation, (perGen.get(s.generation) ?? 0) + 1);
+    for (const s of base) perGen.set(s.generation, (perGen.get(s.generation) ?? 0) + 1);
     expect([...perGen.entries()].sort((a, b) => a[0] - b[0])).toEqual([
       [1, 151], [2, 100], [3, 135], [4, 107], [5, 156], [6, 72], [7, 88], [8, 96], [9, 120],
     ]);
     expect(ABILITIES.length).toBeGreaterThan(300);
     expect(MOVES.length).toBeGreaterThan(800);
-    expect(SPECIES.filter((s) => s.legendary).length).toBeGreaterThan(80);
+    expect(base.filter((s) => s.legendary).length).toBeGreaterThan(80);
+  });
+
+  it('incluyen las formas regionales y las megaevoluciones', () => {
+    const forms = SPECIES.filter((s) => s.form);
+    const regional = forms.filter((s) => s.form!.kind === 'regional');
+    const megas = forms.filter((s) => s.form!.kind === 'mega');
+    expect(regional).toHaveLength(57);
+    expect(megas).toHaveLength(97);
+    const region = (g: number, label: string) => regional.filter((s) => s.generation === g && s.form!.label.startsWith(label)).length;
+    expect([region(7, 'Alola'), region(8, 'Galar'), region(8, 'Hisui'), region(9, 'Paldea')]).toEqual([18, 19, 16, 4]);
+    expect(new Set(SPECIES.map((s) => s.slug)).size).toBe(SPECIES.length);
+    expect(new Set(SPECIES.map((s) => s.id)).size).toBe(SPECIES.length);
+    // no se cuelan formas que no son regionales ni mega
+    for (const f of forms) expect(f.slug, f.slug).toMatch(/-(alola|galar|hisui|paldea|mega)(-|$)/);
+    for (const f of forms) expect(f.slug, f.slug).not.toMatch(/totem|-cap|-zen|gmax|primal/);
+  });
+
+  it('cada forma apunta a una especie base real y conserva su etapa y su carácter de legendario', () => {
+    for (const f of SPECIES.filter((s) => s.form)) {
+      const base = getSpecies(f.form!.baseId);
+      expect(base.form, f.slug).toBeUndefined();
+      expect(f.finalStage, f.slug).toBe(base.finalStage);
+      expect(f.legendary, f.slug).toBe(base.legendary);
+      expect(f.id, f.slug).toBeGreaterThan(10000);
+      expect(f.name.length, f.slug).toBeGreaterThan(3);
+    }
+  });
+
+  it('las megaevoluciones suben el total de estadísticas y casi todas conservan los PS', () => {
+    const total = (s: { baseStats: Record<string, number> }) => Object.values(s.baseStats).reduce((a, b) => a + b, 0);
+    // Las dos megas de Leyendas Z-A que sí cambian los PS base (el motor lo tiene en cuenta al megaevolucionar)
+    const changesHp = new Set(['floette-mega', 'zygarde-mega']);
+    for (const m of SPECIES.filter((s) => s.form?.kind === 'mega')) {
+      const base = getSpecies(m.form!.baseId);
+      expect(total(m), m.slug).toBeGreaterThan(total(base));
+      if (changesHp.has(m.slug)) expect(m.baseStats.hp, m.slug).toBeGreaterThan(base.baseStats.hp);
+      else expect(m.baseStats.hp, m.slug).toBe(base.baseStats.hp);
+    }
+  });
+
+  it('datos concretos de formas y megas', () => {
+    const by = (slug: string) => SPECIES.find((s) => s.slug === slug)!;
+    expect(by('raichu-alola')).toMatchObject({ name: 'Raichu de Alola', types: ['electric', 'psychic'] });
+    expect(by('ninetales-alola').types).toEqual(['ice', 'fairy']);
+    expect(by('tauros-paldea-blaze-breed')).toMatchObject({ name: 'Tauros de Paldea (Ardiente)', types: ['fighting', 'fire'] });
+    expect(by('charizard-mega-x')).toMatchObject({ name: 'Mega-Charizard X', types: ['fire', 'dragon'] });
+    expect(by('charizard-mega-x').form).toEqual({ kind: 'mega', baseId: 6, label: 'Mega X' });
+    expect(megasOf(6).map((m) => m.slug)).toEqual(['charizard-mega-x', 'charizard-mega-y']);
+    expect(megasOf(by('charizard-mega-x').id)).toHaveLength(2); // también desde una forma
+    expect(megasOf(25)).toHaveLength(0);
+    expect(dexNumber(by('raichu-alola'))).toBe(26);
+    expect(isMega(by('venusaur-mega'))).toBe(true);
+    expect(isMega(by('raichu-alola'))).toBe(false);
   });
 
   it('no incluyen movimientos Z ni Dinamax (no se pueden usar sueltos)', () => {

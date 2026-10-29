@@ -13,7 +13,17 @@ export type StageKey = Exclude<StatKey, 'hp'> | 'acc' | 'eva';
 
 export type MoveCategory = 'physical' | 'special' | 'status';
 
+/** Forma alternativa de una especie: regional (se sortea) o megaevolución (solo en combate). */
+export interface SpeciesForm {
+  kind: 'regional' | 'mega';
+  /** Número de Pokédex de la especie base. */
+  baseId: number;
+  /** Etiqueta corta: «Alola», «Mega X»… */
+  label: string;
+}
+
 export interface Species {
+  /** Identificador del Pokémon: para las especies base coincide con su número de Pokédex; las formas usan el de PokéAPI (10000+). */
   id: number;
   slug: string;
   /** Nombre en español (o inglés si PokéAPI no lo tiene). */
@@ -24,6 +34,7 @@ export interface Species {
   /** Ninguna otra especie evoluciona a partir de ésta. */
   finalStage: boolean;
   legendary: boolean;
+  form?: SpeciesForm;
 }
 
 export interface MoveFlags {

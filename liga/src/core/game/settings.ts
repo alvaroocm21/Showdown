@@ -1,4 +1,4 @@
-import { SPECIES } from '../data';
+import { SPECIES, isMega } from '../data';
 import { speciesPool, TEAM_SIZE, type GenerateOptions } from '../generator';
 import { ALL_GENERATIONS, type DrawSettings, type GameState } from './types';
 
@@ -31,9 +31,12 @@ export function validateDraw(draw: DrawSettings): string | null {
   return null;
 }
 
-/** Cuántos Pokémon hay en cada generación (todos, sin filtrar). */
+/** Cuántos Pokémon sorteables hay en cada generación (sin filtrar; las megas no cuentan: solo existen en combate). */
 export const speciesPerGeneration = (): Record<number, number> => {
   const out: Record<number, number> = {};
-  for (const s of SPECIES) out[s.generation] = (out[s.generation] ?? 0) + 1;
+  for (const s of SPECIES) if (!isMega(s)) out[s.generation] = (out[s.generation] ?? 0) + 1;
   return out;
 };
+
+/** Total de Pokémon que se pueden sortear con todo abierto. */
+export const totalDrawable = (): number => SPECIES.filter((s) => !isMega(s)).length;

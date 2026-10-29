@@ -32,3 +32,15 @@ export const getNature = (id: number) => need(NATURES_BY_ID.get(id), 'Naturaleza
 /** Render 3D de Pokémon HOME alojado por PokéAPI. */
 export const spriteUrl = (speciesId: number) =>
   `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${speciesId}.png`;
+
+/** Una megaevolución: solo existe dentro del combate, nunca se sortea como Pokémon. */
+export const isMega = (s: Species): boolean => s.form?.kind === 'mega';
+/** Número de Pokédex (las formas comparten el de su especie base). */
+export const dexNumber = (s: Species): number => s.form?.baseId ?? s.id;
+
+const megaMap = new Map<number, Species[]>();
+for (const s of SPECIES) {
+  if (s.form?.kind === 'mega') megaMap.set(s.form.baseId, [...(megaMap.get(s.form.baseId) ?? []), s]);
+}
+/** Megaevoluciones posibles de una especie (vacío si no tiene). Se busca por el id del Pokémon base. */
+export const megasOf = (speciesId: number): Species[] => megaMap.get(getSpecies(speciesId).form?.baseId ?? speciesId) ?? [];
