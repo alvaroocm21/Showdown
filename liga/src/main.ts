@@ -25,15 +25,13 @@ function showTeam(): void {
       team[i] = rollPokemon(createRng(randomSeed()), others);
       showTeam();
     },
-    onFight: (i) => showBattle(i),
+    onFight: showBattle,
   });
   window.scrollTo(0, 0);
 }
 
-function showBattle(index: number): void {
-  const mine = team[index]!;
-  const foe = rollPokemon(createRng(randomSeed()), new Set([mine.speciesId]));
-  mountBattle(app, { mine, foe, onExit: showTeam, onRematch: () => showBattle(index) });
+function showBattle(): void {
+  mountBattle(app, { team, onExit: showTeam, onRematch: showBattle });
   window.scrollTo(0, 0);
 }
 

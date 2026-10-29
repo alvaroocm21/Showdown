@@ -8,6 +8,9 @@ export const STAT_KEYS = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'] as const;
 export type StatKey = (typeof STAT_KEYS)[number];
 export type Stats = Record<StatKey, number>;
 
+/** Estadísticas que pueden subir o bajar en combate (-6 a +6): las 5 de combate, precisión y evasión. */
+export type StageKey = Exclude<StatKey, 'hp'> | 'acc' | 'eva';
+
 export type MoveCategory = 'physical' | 'special' | 'status';
 
 export interface Species {
@@ -23,7 +26,19 @@ export interface Species {
   legendary: boolean;
 }
 
+export interface MoveFlags {
+  contact: boolean;
+  /** Ataque de dos turnos (se prepara un turno y golpea al siguiente). */
+  charge: boolean;
+  /** El usuario debe descansar el turno siguiente. */
+  recharge: boolean;
+  sound: boolean;
+  defrost: boolean;
+}
+
 export interface MoveMeta {
+  /** Categoría de efecto de PokéAPI (1 estado, 2 mejoras, 3 curar, 6 daño+bajar al rival, 7 daño+subir/bajar al usuario, 9 KO...). */
+  category: number;
   /** Estado que puede causar (id de ailment de PokéAPI: 1 parálisis, 2 sueño, 3 congelación, 4 quemadura, 5 veneno...). */
   ailmentId: number;
   ailmentChance: number;
@@ -34,7 +49,7 @@ export interface MoveMeta {
   healing: number;
   minHits: number | null;
   maxHits: number | null;
-  statChanges: { stat: StatKey; change: number }[];
+  statChanges: { stat: StageKey; change: number }[];
 }
 
 export interface Move {
@@ -51,6 +66,7 @@ export interface Move {
   target: number;
   effectId: number;
   effectChance: number | null;
+  flags: MoveFlags;
   meta: MoveMeta;
 }
 

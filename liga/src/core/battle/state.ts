@@ -1,12 +1,12 @@
 import { getMove, getSpecies } from '../data';
 import { computeStats } from '../stats';
-import type { Move, PokemonSet, PokeType, Stats, StatKey } from '../types';
+import type { Move, PokemonSet, PokeType, StageKey, Stats } from '../types';
 
 export type Side = 0 | 1;
 export const SIDES = [0, 1] as const;
 export const otherSide = (s: Side): Side => (s === 0 ? 1 : 0);
 
-export type StageKey = Exclude<StatKey, 'hp'> | 'acc' | 'eva';
+export type { StageKey };
 export type StatusName = 'burn' | 'paralysis' | 'poison' | 'toxic' | 'sleep' | 'freeze';
 
 export interface BattleMove {
@@ -25,20 +25,39 @@ export interface Battler {
   maxHp: number;
   moves: BattleMove[];
   abilityId: number;
-  /** Se aplicará en la fase 3. */
   status: StatusName | null;
+  /** Dormido: turnos que le quedan sin poder moverse. */
+  sleepTurns: number;
+  /** Gravemente envenenado: contador que sube cada turno (daño = n/16). */
+  toxicCount: number;
   stages: Record<StageKey, number>;
+  fainted: boolean;
+  flinched: boolean;
+  movedThisTurn: boolean;
+  /** Es su primer turno en el campo (Sorpresa solo funciona entonces). */
+  firstTurn: boolean;
+  /** Posición del ataque de dos turnos que está preparando. */
+  charging: number | null;
+  recharging: boolean;
+  /** Holgazán: este turno no hace nada. */
+  loafing: boolean;
+  /** Absorbe Fuego: sus ataques de fuego están potenciados. */
+  flashFire: boolean;
 }
 
 export interface BattleSide {
   team: Battler[];
   active: number;
+  /** Turno en el que entró el Pokémon activo (para que la IA no cambie sin parar). */
+  enteredTurn: number;
 }
 
 export interface Battle {
   sides: [BattleSide, BattleSide];
   turn: number;
   winner: Side | null;
+  /** El bando debe elegir un Pokémon de reemplazo (el activo se ha debilitado). */
+  pending: [boolean, boolean];
 }
 
 /** Forcejeo: se usa solo cuando no quedan PP. Sin tipo, 50 de potencia y retroceso de 1/4 de los PS máximos. */
@@ -56,8 +75,9 @@ export const STRUGGLE: Move = {
   target: 10,
   effectId: 0,
   effectChance: null,
+  flags: { contact: true, charge: false, recharge: false, sound: false, defrost: false },
   meta: {
-    ailmentId: 0, ailmentChance: 0, flinchChance: 0, statChance: 0, critRate: 0,
+    category: 0, ailmentId: 0, ailmentChance: 0, flinchChance: 0, statChance: 0, critRate: 0,
     drain: 0, healing: 0, minHits: null, maxHits: null, statChanges: [],
   },
 };
@@ -80,19 +100,44 @@ export function createBattler(set: PokemonSet): Battler {
     moves: set.moveIds.map((moveId) => ({ moveId, pp: getMove(moveId).pp, maxPp: getMove(moveId).pp })),
     abilityId: set.abilityId,
     status: null,
+    sleepTurns: 0,
+    toxicCount: 1,
     stages: newStages(),
+    fainted: false,
+    flinched: false,
+    movedThisTurn: false,
+    firstTurn: true,
+    charging: null,
+    recharging: false,
+    loafing: false,
+    flashFire: false,
   };
+}
+
+/** Lo que se pierde al salir del campo (las mejoras, los estados volátiles…). El estado principal se conserva. */
+export function resetVolatile(b: Battler): void {
+  b.stages = newStages();
+  b.flinched = false;
+  b.movedThisTurn = false;
+  b.firstTurn = true;
+  b.charging = null;
+  b.recharging = false;
+  b.loafing = false;
+  b.flashFire = false;
+  b.toxicCount = 1;
+  b.types = [...getSpecies(b.set.speciesId).types];
 }
 
 export function createBattle(team0: PokemonSet[], team1: PokemonSet[]): Battle {
   if (!team0.length || !team1.length) throw new Error('Cada bando necesita al menos un Pokémon');
   return {
     sides: [
-      { team: team0.map(createBattler), active: 0 },
-      { team: team1.map(createBattler), active: 0 },
+      { team: team0.map(createBattler), active: 0, enteredTurn: 0 },
+      { team: team1.map(createBattler), active: 0, enteredTurn: 0 },
     ],
     turn: 0,
     winner: null,
+    pending: [false, false],
   };
 }
 
@@ -100,5 +145,7 @@ export const activeOf = (battle: Battle, side: Side): Battler => {
   const s = battle.sides[side];
   return s.team[s.active]!;
 };
+
+export const sideOfBattler = (battle: Battle, b: Battler): Side => (battle.sides[0].team.includes(b) ? 0 : 1);
 
 export const hasAlive = (battle: Battle, side: Side) => battle.sides[side].team.some((b) => b.hp > 0);

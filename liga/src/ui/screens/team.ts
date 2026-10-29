@@ -1,7 +1,8 @@
+import { isAbilityImplemented } from '../../core/battle/abilities';
 import { TYPE_NAMES_ES, getAbility, getMove, getSpecies, spriteUrl } from '../../core/data';
 import { computeStats } from '../../core/stats';
 import { STAT_KEYS, type MoveCategory, type PokemonSet, type StatKey } from '../../core/types';
-import { esc, typeChip, typeVar } from '../shared';
+import { esc, moveEffectText, moveNeedsWarning, typeChip, typeVar } from '../shared';
 
 const STAT_LABEL: Record<StatKey, string> = { hp: 'PS', atk: 'Ataque', def: 'Defensa', spa: 'At. Esp.', spd: 'Def. Esp.', spe: 'Velocidad' };
 const CATEGORY_LABEL: Record<MoveCategory, string> = { physical: 'Físico', special: 'Especial', status: 'Estado' };
@@ -11,7 +12,7 @@ export interface TeamScreenOptions {
   seed: number;
   onRollTeam(): void;
   onReroll(index: number): void;
-  onFight(index: number): void;
+  onFight(): void;
 }
 
 function renderPokemon(set: PokemonSet, index: number): string {
@@ -30,10 +31,12 @@ function renderPokemon(set: PokemonSet, index: number): string {
     .map((id) => {
       const m = getMove(id);
       const stab = m.category !== 'status' && (m.power ?? 0) > 0 && species.types.includes(m.type);
-      return `<div class="move${stab ? ' stab' : ''}" style="--tc:${typeVar(m.type)}">
+      const effect = moveEffectText(m);
+      return `<div class="move${stab ? ' stab' : ''}${moveNeedsWarning(id) ? ' inert' : ''}" style="--tc:${typeVar(m.type)}">
         <b>${esc(m.name)}</b>
         <small>${esc(TYPE_NAMES_ES[m.type])} · ${CATEGORY_LABEL[m.category]}${stab ? ' · STAB' : ''}</small><br />
         <small>Pot. ${m.power ?? '—'} · Prec. ${m.accuracy ?? '—'} · PP ${m.pp}</small>
+        ${effect ? `<br /><small class="fx-text">${esc(effect)}</small>` : ''}
       </div>`;
     })
     .join('');
@@ -48,11 +51,10 @@ function renderPokemon(set: PokemonSet, index: number): string {
       </div>
     </div>
     <div class="body">
-      <div class="ability"><strong>${esc(ability.name)}</strong><p>${esc(ability.description)}</p></div>
+      <div class="ability"><strong>${esc(ability.name)}</strong>${isAbilityImplemented(ability.slug) ? '' : ' <em class="inert-tag">sin efecto aún</em>'}<p>${esc(ability.description)}</p></div>
       <div class="moves">${moves}</div>
       <div class="stats">${statRows}</div>
     </div>
-    <button data-fight="${index}">⚔️ Combatir con este</button>
     <button class="alt" data-reroll="${index}">🎲 Cambiar este Pokémon</button>
   </article>`;
 }
@@ -60,11 +62,14 @@ function renderPokemon(set: PokemonSet, index: number): string {
 export function mountTeam(root: HTMLElement, o: TeamScreenOptions): void {
   root.innerHTML = `
     <h1>Liga Pokémon Aleatoria</h1>
-    <p class="sub">Elige un Pokémon de tu equipo para un combate 1 contra 1</p>
-    <div class="toolbar"><button class="main" id="roll">🎲 Sortear equipo nuevo</button></div>
+    <p class="sub">Tu equipo de 6 para el combate</p>
+    <div class="toolbar">
+      <button class="alt" id="roll">🎲 Nuevo equipo</button>
+      <button class="main" id="fight">⚔️ Combate 6 contra 6</button>
+    </div>
     <div class="seed">Semilla ${o.seed}</div>
     <section class="team">${o.team.map(renderPokemon).join('')}</section>`;
   root.querySelector('#roll')!.addEventListener('click', o.onRollTeam);
   root.querySelectorAll<HTMLButtonElement>('[data-reroll]').forEach((b) => b.addEventListener('click', () => o.onReroll(Number(b.dataset.reroll))));
-  root.querySelectorAll<HTMLButtonElement>('[data-fight]').forEach((b) => b.addEventListener('click', () => o.onFight(Number(b.dataset.fight))));
+  root.querySelector('#fight')!.addEventListener('click', o.onFight);
 }

@@ -1,7 +1,6 @@
 import type { Rng } from '../rng';
-import type { Side } from './state';
 import { applyStage } from './stages';
-import type { Battler } from './state';
+import type { Battler, Side } from './state';
 
 export interface OrderEntry {
   side: Side;
@@ -18,4 +17,6 @@ export function orderActions(entries: readonly OrderEntry[], rng: Rng): Side[] {
   return sorted.map((e) => e.side);
 }
 
-export const effectiveSpeed = (b: Battler) => applyStage(b.stats.spe, b.stages.spe);
+/** Velocidad real: mejoras de estadística y parálisis (la mitad). */
+export const effectiveSpeed = (b: Battler) =>
+  Math.floor(applyStage(b.stats.spe, b.stages.spe) * (b.status === 'paralysis' ? 0.5 : 1));

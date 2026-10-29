@@ -1,4 +1,5 @@
 import type { Move } from '../types';
+import { attackMod, defenseMod, ignoresBurnPenalty, powerMod } from './abilities';
 import { applyStage } from './stages';
 import { STRUGGLE_ID, type Battler } from './state';
 import { typeEffectiveness } from './typeEffect';
@@ -34,15 +35,15 @@ export function calcDamage(i: DamageInput): number {
   return Math.max(1, d);
 }
 
-/** Un ataque "implementado" es el que hace daño directo con la fórmula normal. */
-export const isDamagingMove = (m: Move) => m.category !== 'status' && (m.power ?? 0) > 0;
-
-/** Daño de un ataque entre dos Pokémon en combate, teniendo en cuenta mejoras de estadísticas y quemadura. */
+/**
+ * Daño de un ataque entre dos Pokémon en combate: mejoras de estadísticas, quemadura y habilidades.
+ * `power` permite pasar una potencia calculada (ataques de potencia variable).
+ */
 export function computeMoveDamage(
   user: Battler,
   target: Battler,
   move: Move,
-  opts: { crit: boolean; roll: number },
+  opts: { crit: boolean; roll: number; power?: number },
 ): number {
   const physical = move.category === 'physical';
   const atkKey = physical ? 'atk' : 'spa';
@@ -53,14 +54,14 @@ export function computeMoveDamage(
   const struggle = move.id === STRUGGLE_ID;
   return calcDamage({
     level: user.level,
-    power: move.power ?? 0,
-    attack: applyStage(user.stats[atkKey], atkStage),
-    defense: Math.max(1, applyStage(target.stats[defKey], defStage)),
+    power: Math.max(1, Math.floor((opts.power ?? move.power ?? 0) * powerMod(user, move))),
+    attack: Math.floor(applyStage(user.stats[atkKey], atkStage) * attackMod(user, target, move)),
+    defense: Math.max(1, Math.floor(applyStage(target.stats[defKey], defStage) * defenseMod(target, move))),
     stab: !struggle && user.types.includes(move.type),
     effectiveness: struggle ? 1 : typeEffectiveness(move.type, target.types),
     crit: opts.crit,
     roll: opts.roll,
-    burned: user.status === 'burn',
+    burned: user.status === 'burn' && !ignoresBurnPenalty(user),
     physical,
   });
 }

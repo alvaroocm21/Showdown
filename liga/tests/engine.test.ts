@@ -61,8 +61,8 @@ describe('engine: un turno', () => {
     expect(describeEvent(ev.find((e) => e.type === 'immune')!, 0)).toBe('No afecta a Swampert rival…');
   });
 
-  it('un ataque de estado aún no implementado no hace nada', () => {
-    const b = createBattle([makeSet('jolteon', ['thunder-wave', 'tackle'])], [makeSet('blissey', ['tackle'])]);
+  it('un ataque sin efecto implementado no hace nada', () => {
+    const b = createBattle([makeSet('jolteon', ['light-screen', 'tackle'])], [makeSet('blissey', ['tackle'])]);
     const ev = executeTurn(b, [{ type: 'move', slot: 0 }, { type: 'move', slot: 0 }], scriptedRng(HIT_NO_CRIT_MAX));
     expect(kinds(ev)).toContain('noEffect');
   });
@@ -107,8 +107,8 @@ describe('IA', () => {
     }
   });
 
-  it('usa un ataque de estado solo si no hay otro de daño', () => {
-    const b = createBattle([makeSet('venusaur', ['tackle'])], [makeSet('charizard', ['thunder-wave', 'growl', 'tackle'])]);
+  it('no pierde el turno con un ataque sin efecto implementado si hay otro de daño', () => {
+    const b = createBattle([makeSet('venusaur', ['tackle'])], [makeSet('charizard', ['light-screen', 'protect', 'tackle'])]);
     expect(chooseAction(b, 1, createRng(3))).toEqual({ type: 'move', slot: 2 });
   });
 

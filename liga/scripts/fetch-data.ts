@@ -55,6 +55,10 @@ const TYPE_SLUGS = [
   'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy',
 ];
 const STAT_BY_ID: Record<number, string> = { 1: 'hp', 2: 'atk', 3: 'def', 4: 'spa', 5: 'spd', 6: 'spe' };
+/** Las mejoras de combate incluyen además precisión y evasión. */
+const STAGE_BY_ID: Record<number, string> = { ...STAT_BY_ID, 7: 'acc', 8: 'eva' };
+/** move_flags de PokéAPI que usa el motor. */
+const FLAG_IDS = { contact: 1, charge: 2, recharge: 3, sound: 9, defrost: 11 } as const;
 const CATEGORY_BY_ID: Record<number, string> = { 1: 'status', 2: 'physical', 3: 'special' };
 
 /** language_id -> id -> texto, quedándose con la versión más reciente (para textos por version_group). */
@@ -79,12 +83,12 @@ async function main() {
   console.log('Descargando CSV de PokéAPI…');
   const [
     pokemon, species, speciesNames, pokemonStats, pokemonTypes, typeEfficacy, typeNames,
-    moves, moveNames, moveMeta, moveMetaStats, abilities, abilityNames, abilityFlavor,
+    moves, moveNames, moveMeta, moveMetaStats, moveFlagMap, abilities, abilityNames, abilityFlavor,
     natures, natureNames,
   ] = await Promise.all([
     csv('pokemon'), csv('pokemon_species'), csv('pokemon_species_names'), csv('pokemon_stats'),
     csv('pokemon_types'), csv('type_efficacy'), csv('type_names'),
-    csv('moves'), csv('move_names'), csv('move_meta'), csv('move_meta_stat_changes'),
+    csv('moves'), csv('move_names'), csv('move_meta'), csv('move_meta_stat_changes'), csv('move_flag_map'),
     csv('abilities'), csv('ability_names'), csv('ability_flavor_text'),
     csv('natures'), csv('nature_names'),
   ]);
@@ -150,9 +154,14 @@ async function main() {
   for (const r of moveMetaStats) {
     const id = Number(r.move_id);
     const list = statChangesById.get(id) ?? [];
-    const stat = STAT_BY_ID[Number(r.stat_id)];
+    const stat = STAGE_BY_ID[Number(r.stat_id)];
     if (stat) list.push({ stat, change: Number(r.change) });
     statChangesById.set(id, list);
+  }
+  const flagsById = new Map<number, Set<number>>();
+  for (const r of moveFlagMap) {
+    const id = Number(r.move_id);
+    flagsById.set(id, (flagsById.get(id) ?? new Set()).add(Number(r.move_flag_id)));
   }
   const movesOut = moves
     .filter((m) => Number(m.generation_id) <= MAX_GEN && Number(m.id) < 10000 && typeSlugById.has(Number(m.type_id)))
@@ -172,7 +181,11 @@ async function main() {
         target: Number(m.target_id),
         effectId: Number(m.effect_id),
         effectChance: num(m.effect_chance),
+        flags: Object.fromEntries(
+          Object.entries(FLAG_IDS).map(([name, flagId]) => [name, flagsById.get(id)?.has(flagId) ?? false]),
+        ),
         meta: {
+          category: Number(meta?.meta_category_id ?? 0),
           ailmentId: Number(meta?.meta_ailment_id ?? 0),
           ailmentChance: Number(meta?.ailment_chance ?? 0),
           flinchChance: Number(meta?.flinch_chance ?? 0),
