@@ -9,7 +9,7 @@ import { STATUS_LABEL, describeEvent } from '../../core/battle/log';
 import { expectedPower, isDamagingMove } from '../../core/battle/moves';
 import { activeOf, createBattle, moveOf, type Battle, type Battler, type Side, type StatusName, type Terrain, type Weather } from '../../core/battle/state';
 import { typeEffectiveness } from '../../core/battle/typeEffect';
-import { TYPE_NAMES_ES, spriteUrl } from '../../core/data';
+import { TYPE_NAMES_ES, backSpriteUrls, spriteUrl } from '../../core/data';
 import type { BattleOutcome } from '../../core/game/play';
 import { outcomeOf } from '../../core/game/play';
 import { createRng, randomSeed } from '../../core/rng';
@@ -141,10 +141,28 @@ export function mountBattle(root: HTMLElement, o: BattleScreenOptions): void {
     renderHp(s);
     renderPips(s);
   }
+  /** Mi Pokémon se ve de espaldas (sprite de Showdown); si no hay, el render 3D. El rival siempre de frente. */
+  function showSprite(s: Side, speciesId: number): void {
+    const img = imgEl(s);
+    img.classList.remove('back', 'fallback');
+    if (s !== 0) {
+      img.src = spriteUrl(speciesId);
+      return;
+    }
+    const urls = [...backSpriteUrls(speciesId), spriteUrl(speciesId)];
+    let i = 0;
+    const load = () => {
+      img.classList.toggle('back', i < urls.length - 1);
+      img.classList.toggle('fallback', i === urls.length - 1);
+      img.onerror = () => { if (++i < urls.length) load(); else img.onerror = null; };
+      img.src = urls[i]!;
+    };
+    load();
+  }
   function setSprite(s: Side): void {
     slotEl(s).getAnimations().forEach((a) => a.cancel());
     imgEl(s).getAnimations().forEach((a) => a.cancel());
-    imgEl(s).src = spriteUrl(view[s]!.speciesId);
+    showSprite(s, view[s]!.speciesId);
     imgEl(s).alt = view[s]!.name;
     imgEl(s).style.opacity = '1';
   }
@@ -226,7 +244,7 @@ export function mountBattle(root: HTMLElement, o: BattleScreenOptions): void {
           const v = view[e.side]!;
           await megaFlash(e.side);
           Object.assign(v, { name: e.name, types: e.types, speciesId: e.speciesId, hp: e.hp, maxHp: e.maxHp });
-          imgEl(e.side).src = spriteUrl(e.speciesId);
+          showSprite(e.side, e.speciesId);
           renderPanel(e.side);
           void floatText(e.side, '✨ MEGA', 'abil');
           await wait(700);
@@ -235,7 +253,7 @@ export function mountBattle(root: HTMLElement, o: BattleScreenOptions): void {
         case 'transform': {
           addLog(text!);
           Object.assign(view[e.side]!, { name: e.name, types: e.types, speciesId: e.speciesId });
-          imgEl(e.side).src = spriteUrl(e.speciesId);
+          showSprite(e.side, e.speciesId);
           renderPanel(e.side);
           await wait(650);
           break;

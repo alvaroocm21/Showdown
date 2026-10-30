@@ -33,6 +33,14 @@ export const getNature = (id: number) => need(NATURES_BY_ID.get(id), 'Naturaleza
 export const spriteUrl = (speciesId: number) =>
   `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${speciesId}.png`;
 
+const SHOWDOWN_SPRITES = 'https://play.pokemonshowdown.com/sprites';
+
+/** Sprites de espaldas (como en Zafiro Alfa) de Pokémon Showdown, de mejor a peor; el último recurso es el render 3D. */
+export function backSpriteUrls(speciesId: number): string[] {
+  const id = getSpecies(speciesId).slug.replace(/[^a-z0-9]/g, '');
+  return [`${SHOWDOWN_SPRITES}/ani-back/${id}.gif`, `${SHOWDOWN_SPRITES}/gen5-back/${id}.png`];
+}
+
 /** Una megaevolución: solo existe dentro del combate, nunca se sortea como Pokémon. */
 export const isMega = (s: Species): boolean => s.form?.kind === 'mega';
 /** Número de Pokédex (las formas comparten el de su especie base). */
