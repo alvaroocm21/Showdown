@@ -354,3 +354,41 @@ button { transition: filter .15s; }
 .gen b { grid-row: span 2; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; background: #c4b5fd; color: #fff; font-size: .8rem; }
 .gen.on b { background: #7c3aed; }
 .gen span { font-weight: 700; } .gen small { color: var(--muted); font-size: .65rem; }
+
+/* ---------- Clima, terreno, megaevolución y movimiento Z ---------- */
+.st-confusion { background: #db2777; } .st-perish { background: #1f2937; }
+.fieldbar { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); z-index: 5; display: flex; gap: 6px; pointer-events: none; }
+.fieldbar span { background: rgba(31, 18, 53, .78); color: #fff; font-size: .68rem; font-weight: 800; padding: 3px 9px; border-radius: 999px; backdrop-filter: blur(3px); white-space: nowrap; }
+.weather-fx { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; transition: opacity .6s; }
+.arena[data-weather='sun'] .weather-fx, .arena[data-weather='harsh-sun'] .weather-fx { opacity: 1; background: radial-gradient(circle at 85% 8%, rgba(253, 224, 71, .55), transparent 55%), linear-gradient(rgba(251, 146, 60, .12), rgba(251, 146, 60, .12)); }
+.arena[data-weather='harsh-sun'] .weather-fx { background: radial-gradient(circle at 85% 8%, rgba(255, 237, 160, .75), transparent 60%), linear-gradient(rgba(239, 68, 68, .2), rgba(239, 68, 68, .2)); }
+.arena[data-weather='rain'] .weather-fx, .arena[data-weather='heavy-rain'] .weather-fx { opacity: 1; background: repeating-linear-gradient(100deg, rgba(255,255,255,.0) 0 14px, rgba(190, 220, 255, .55) 14px 15px), rgba(30, 64, 120, .18); background-size: 60px 60px, auto; animation: rain .5s linear infinite; }
+.arena[data-weather='heavy-rain'] .weather-fx { background-color: rgba(15, 40, 100, .3); animation-duration: .3s; }
+@keyframes rain { to { background-position: -24px 60px, 0 0; } }
+.arena[data-weather='sand'] .weather-fx { opacity: 1; background: linear-gradient(rgba(217, 164, 65, .3), rgba(217, 164, 65, .42)); animation: sand 3s ease-in-out infinite alternate; }
+@keyframes sand { to { opacity: .7; } }
+.arena[data-weather='snow'] .weather-fx { opacity: 1; background: radial-gradient(circle, rgba(255,255,255,.9) 0 2px, transparent 3px) 0 0 / 38px 38px, radial-gradient(circle, rgba(255,255,255,.7) 0 1.5px, transparent 2.5px) 19px 19px / 38px 38px, rgba(226, 240, 255, .16); animation: snow 3s linear infinite; }
+@keyframes snow { to { background-position: -6px 38px, 13px 57px, 0 0; } }
+.arena[data-weather='strong-winds'] .weather-fx { opacity: 1; background: repeating-linear-gradient(170deg, transparent 0 18px, rgba(255,255,255,.25) 18px 20px); animation: wind 1.2s linear infinite; }
+@keyframes wind { to { background-position: 80px 0; } }
+.arena[data-terrain] { box-shadow: 0 8px 24px rgba(0,0,0,.35), inset 0 0 0 3px rgba(255,255,255,.5); }
+.arena[data-terrain='electric'] { box-shadow: 0 8px 24px rgba(0,0,0,.35), inset 0 0 0 4px #fde047, inset 0 -40px 60px -30px rgba(253, 224, 71, .55); }
+.arena[data-terrain='grassy'] { box-shadow: 0 8px 24px rgba(0,0,0,.35), inset 0 0 0 4px #4ade80, inset 0 -40px 60px -30px rgba(34, 197, 94, .6); }
+.arena[data-terrain='misty'] { box-shadow: 0 8px 24px rgba(0,0,0,.35), inset 0 0 0 4px #f9a8d4, inset 0 -40px 60px -30px rgba(244, 114, 182, .5); }
+.arena[data-terrain='psychic'] { box-shadow: 0 8px 24px rgba(0,0,0,.35), inset 0 0 0 4px #c084fc, inset 0 -40px 60px -30px rgba(168, 85, 247, .55); }
+
+.gimmicks { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; }
+.gim { flex: 1 1 40%; padding: 9px 10px; font-size: .85rem; background: linear-gradient(180deg, #fff, #e9d5ff); color: #3b0764; box-shadow: 0 3px 0 #7e22ce; }
+.gim.mega.on { background: linear-gradient(180deg, #fbcfe8, #db2777); color: #fff; box-shadow: 0 3px 0 #831843, 0 0 14px #f472b6; text-shadow: 0 1px 2px rgba(0,0,0,.4); }
+.gim.zbtn.on { background: linear-gradient(180deg, #fef08a, #f59e0b); color: #78350f; box-shadow: 0 3px 0 #b45309, 0 0 16px #fde047; }
+.mv.zmv { box-shadow: 0 4px 0 color-mix(in srgb, var(--tc) 55%, #000), 0 0 16px 2px #fde047; animation: zpulse 1.1s ease-in-out infinite; }
+@keyframes zpulse { 50% { box-shadow: 0 4px 0 color-mix(in srgb, var(--tc) 55%, #000), 0 0 24px 6px #fde047; } }
+.slot.zaura::before { content: ''; position: absolute; inset: -14%; border-radius: 50%; z-index: 0; background: radial-gradient(circle, rgba(253, 224, 71, .9), rgba(245, 158, 11, .35) 55%, transparent 72%); animation: zaura .7s ease-out; }
+@keyframes zaura { from { transform: scale(.3); opacity: 0; } 40% { opacity: 1; } to { transform: scale(1.3); opacity: 0; } }
+
+.megainfo { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 12px; background: linear-gradient(120deg, #fdf2f8, #ede9fe); font-size: .78rem; }
+.megainfo > b { color: #9d174d; width: 100%; }
+.megaform { display: flex; align-items: center; gap: 6px; background: #fff; border-radius: 10px; padding: 3px 8px 3px 3px; box-shadow: 0 1px 4px rgba(0,0,0,.15); }
+.megaform img { width: 38px; height: 38px; object-fit: contain; }
+.megaform span { display: grid; font-weight: 800; color: #831843; } .megaform small { color: var(--muted); font-weight: 600; font-size: .64rem; }
+.inert-tag { max-width: 100%; white-space: normal; }

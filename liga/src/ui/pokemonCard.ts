@@ -1,5 +1,5 @@
-import { isAbilityImplemented } from '../core/battle/abilities';
-import { TYPE_NAMES_ES, dexNumber, getAbility, getMove, getSpecies, spriteUrl } from '../core/data';
+import { inapplicableReason, isAbilityImplemented } from '../core/battle/abilities';
+import { TYPE_NAMES_ES, dexNumber, getAbility, getMove, getSpecies, megasOf, spriteUrl } from '../core/data';
 import { computeStats } from '../core/stats';
 import { STAT_KEYS, type MoveCategory, type PokemonSet, type StatKey } from '../core/types';
 import { esc, moveEffectText, moveNeedsWarning, typeChip, typeVar } from './shared';
@@ -7,6 +7,22 @@ import { esc, moveEffectText, moveNeedsWarning, typeChip, typeVar } from './shar
 const STAT_LABEL: Record<StatKey, string> = { hp: 'PS', atk: 'Ataque', def: 'Defensa', spa: 'At. Esp.', spd: 'Def. Esp.', spe: 'Velocidad' };
 const CATEGORY_LABEL: Record<MoveCategory, string> = { physical: 'Físico', special: 'Especial', status: 'Estado' };
 
+
+/** Etiqueta de las habilidades sin efecto: «no aplica» con su motivo, o «sin efecto aún» si falta por implementar. */
+function abilityTag(slug: string): string {
+  if (isAbilityImplemented(slug)) return '';
+  const reason = inapplicableReason(slug);
+  return reason ? ` <em class="inert-tag" title="${esc(reason)}">no aplica · ${esc(reason)}</em>` : ' <em class="inert-tag">sin efecto aún</em>';
+}
+
+/** Megaevoluciones que puede hacer el Pokémon en combate (una por combate y bando). */
+function megaInfo(speciesId: number): string {
+  const megas = megasOf(speciesId);
+  if (!megas.length) return '';
+  return `<div class="megainfo"><b>✨ Megaevolución</b>${megas
+    .map((m) => `<span class="megaform"><img src="${spriteUrl(m.id)}" alt="" loading="lazy" /><span>${esc(m.form!.label)}<small>${m.types.map((t) => esc(TYPE_NAMES_ES[t])).join(' / ')}</small></span></span>`)
+    .join('')}</div>`;
+}
 
 /** `flash` resalta lo que acaba de cambiar tras una mejora. */
 export interface CardFlash {
@@ -51,8 +67,9 @@ export function renderPokemonCard(set: PokemonSet, actions = '', badge = '', fla
       </div>
     </div>
     <div class="body">
-      <div class="ability${flash.ability || flash.pokemon ? ' flash' : ''}"><strong>${esc(ability.name)}</strong>${isAbilityImplemented(ability.slug) ? '' : ' <em class="inert-tag">sin efecto aún</em>'}<p>${esc(ability.description)}</p></div>
+      <div class="ability${flash.ability || flash.pokemon ? ' flash' : ''}"><strong>${esc(ability.name)}</strong>${abilityTag(ability.slug)}<p>${esc(ability.description)}</p></div>
       <div class="moves">${moves}</div>
+      ${megaInfo(set.speciesId)}
       <div class="stats">${statRows}</div>
     </div>
     ${actions}

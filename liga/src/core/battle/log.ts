@@ -113,7 +113,7 @@ export function describeEvent(e: BattleEvent, ownSide: Side = 0): string | null 
       return e.on ? `¡El último ataque de ${name} ha sido anulado!` : `${name} puede volver a usar su ataque.`;
     }
     case 'types': return `${who(e.side, e.pokemon)} cambió de tipo.`;
-    case 'mega': return `¡${e.side === ownSide ? '' : 'El rival: '}${e.name} ha megaevolucionado!`;
+    case 'mega': return `¡${e.name}${e.side === ownSide ? '' : ' rival'} ha megaevolucionado!`;
     case 'transform': return `${who(e.side, e.pokemon)} se transformó en ${e.name}.`;
     case 'zmove': return `¡${who(e.side, e.pokemon)} se envuelve en un poder Z!`;
     case 'faint': return `¡${who(e.side, e.pokemon)} se debilitó!`;

@@ -114,3 +114,15 @@ parpadea cuando queda poca vida, transición entre pantallas y respeto a «reduc
   solo salen Pokémon en su última etapa. Afecta a los equipos nuevos, a los sorteos gratis y a los Pokémon comprados con monedas;
   los equipos que ya existen no cambian. Se guarda con la partida (formato versión 2; las partidas antiguas se migran solas).
 - Tras ampliar los datos, las pruebas automáticas usan cada una de las 1025 especies, los 846 ataques y las 314 habilidades en combate.
+
+## Formas regionales, megaevoluciones y movimientos Z
+
+- **Formas regionales** (Alola, Galar, Hisui, Paldea): 57 formas que salen en el sorteo como cualquier otra especie (sus generaciones se cuentan por la forma base).
+- **Megaevoluciones** (97 formas, incluidas Mega X/Y): no se sortean; son una mecánica de combate. Una vez por combate y bando, antes de atacar, el botón «✨ Mega-…» transforma al Pokémon (recalcula estadísticas y tipos; conserva su habilidad aleatoria y los PS perdidos). Dura hasta el final del combate, aunque se le cambie. Las tarjetas muestran las megas posibles.
+- **Movimientos Z**: una vez por combate y bando, el botón «⚡ Mov. Z» convierte los ataques de daño en su versión Z (potencia según el original, no fallan). Los de estado quedan bloqueados mientras está activo.
+- No hay Teracristalización, Dinamax ni Gigamax, ni formas Primigenias.
+
+### Habilidades
+310 habilidades: **252 implementadas** y **58 marcadas «no aplica»** con el motivo (dobles, objetos, bonus de dinero…); un test comprueba que todas están en un grupo u otro. También hay clima (sol, lluvia, arena, nieve y climas extremos), terrenos, confusión, Canto Mortal, Anulación y cambios forzados.
+
+Límites conocidos: los cambios de «Retirada»/«Pies Veloces» tipo Retirada Forzosa (Huida/Retirada) se resuelven al final del turno; no hay cambios elegidos a mitad de turno por ataques pivote.

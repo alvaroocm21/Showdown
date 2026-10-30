@@ -34,7 +34,12 @@ export function moveEffectText(m: Move): string {
     case 'status': {
       if (m.effectId === EFFECT.rest) return 'cura todo y duerme';
       if (m.meta.category === 3) return `cura ${m.meta.healing} % PS`;
-      if (m.meta.category === 1) return `provoca ${STATUS_NAME_ES[statusOf(m)!].toLowerCase()}`;
+      if (m.meta.category === 1) {
+        const st = statusOf(m);
+        if (st) return `provoca ${STATUS_NAME_ES[st].toLowerCase()}`;
+        if (m.meta.ailmentId === 6) return 'provoca confusión';
+        return 'efecto de estado';
+      }
       const who = targetsUser(m) ? 'propio' : 'rival';
       return `${m.meta.statChanges.map((c) => `${STAGE_SHORT[c.stat]} ${c.change > 0 ? '+' : ''}${c.change}`).join(' ')} ${who}`;
     }
