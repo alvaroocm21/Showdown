@@ -35,7 +35,13 @@ export interface BattleScreenOptions {
 /** Ambientes de la arena (se elige uno al azar en cada combate). */
 const THEMES = ['day', 'sunset', 'night', 'cave', 'beach'] as const;
 
-const EFFECT_BADGE: Record<string, string> = { '4': '×4', '2': '×2', '0.5': '×½', '0.25': '×¼', '0': '×0' };
+/** Etiqueta de la efectividad de un ataque contra el rival activo. */
+function effectLabel(mult: number): { text: string; cls: string } {
+  if (mult === 0) return { text: 'No afecta', cls: 'e0' };
+  if (mult > 1) return { text: mult >= 4 ? 'Muy superefectivo' : 'Superefectivo', cls: 'eup' };
+  if (mult < 1) return { text: mult <= 0.25 ? 'Muy poco efectivo' : 'Poco efectivo', cls: 'edown' };
+  return { text: 'Efectivo', cls: 'eneutral' };
+}
 
 interface SideView {
   index: number;
@@ -417,13 +423,15 @@ export function mountBattle(root: HTMLElement, o: BattleScreenOptions): void {
           const m = asZ ? { ...base, name: zMoveName(base.type), power: zPower(base.power) } : base;
           const damaging = isDamagingMove(base);
           const mult = m.category !== 'status' ? typeEffectiveness(m.type, target.types) : 1;
-          const badge = mult !== 1 && m.category !== 'status' ? `<em class="eff e${mult === 0 ? '0' : mult > 1 ? 'up' : 'down'}">${EFFECT_BADGE[String(mult)] ?? ''}</em>` : '';
+          const eff = m.category !== 'status' ? effectLabel(mult) : null;
+          const badge = eff ? `<small><em class="effl ${eff.cls}">${eff.text}</em></small>` : '';
           const est = damaging ? ` · ~${computeMoveDamage(user, target, m, { battle, crit: false, roll: 92, power: asZ ? m.power ?? 0 : expectedPower(m, user) })} PS` : '';
           const info = asZ ? 'movimiento Z · no falla' : moveEffectText(base);
           const blocked = !legal.includes(i) || (zOn && !asZ);
           return `<button class="mv${info === 'sin efecto aún' ? ' inert' : ''}${asZ ? ' zmv' : ''}" data-s="${i}" style="--tc:${typeVar(m.type)}" ${blocked ? 'disabled' : ''}>
-            <b>${esc(m.name)}</b>${badge}
+            <b>${esc(m.name)}</b>
             <small>${esc(TYPE_NAMES_ES[m.type])} · ${m.power ? `Pot. ${m.power}` : 'Estado'}${est}</small>
+            ${badge}
             <small>PP ${bm.pp}/${bm.maxPp}${info ? ` · ${esc(info)}` : ''}</small>
           </button>`;
         })
