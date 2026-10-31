@@ -99,6 +99,7 @@ Lógica pura en `src/core/battle/`; la interfaz solo reproduce los eventos que d
 - Los **sprites 3D** se guardan a medida que se ven; en Ajustes hay un botón para **descargar de golpe todos los que pueden salir** (con los ajustes por defecto, 568 sprites ≈ 80 MB; se calcula según tus ajustes).
   Sin imagen guardada y sin red se muestra una Poké Ball. Los datos del juego (Pokémon, ataques, habilidades) ya van dentro de la app.
 - Los iconos se generan sin dependencias con `npm run make-icons`.
+- **APK de Android**: `liga/releases/LigaPokemon.apk` (se regenera con `npm run build && android/build.sh`). Firmada con clave de depuración: para uso personal.
 - Para publicarla hace falta servir `dist/` por HTTPS (p. ej. GitHub Pages); el service worker no funciona desde `file://`.
 
 ## Retoques visuales
