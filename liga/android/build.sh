@@ -10,12 +10,12 @@ R8=${R8:-/tmp/r8lib.jar}
 B=build; rm -rf $B; mkdir -p $B/classes $B/dex $B/apk/assets/www out
 aapt2 compile --dir res -o $B/res.zip
 aapt2 link -o $B/base.apk -I "$ANDROID_JAR" --manifest AndroidManifest.xml \
-  --min-sdk-version 21 --target-sdk-version 30 --version-code 1 --version-name 1.0 $B/res.zip
+  --min-sdk-version 21 --target-sdk-version 34 --version-code 2 --version-name 1.1 $B/res.zip
 javac --release 8 -nowarn -cp "$ANDROID_JAR" -d $B/classes $(find src -name '*.java')
 java -cp "$R8" com.android.tools.r8.D8 --lib "$ANDROID_JAR" --min-api 21 --output $B/dex $(find $B/classes -name '*.class')
 cp -r ../dist/. $B/apk/assets/www/
 cp $B/dex/classes.dex $B/apk/
-(cd $B/apk && zip -qr0 ../base.apk classes.dex assets)
+(cd $B/apk && zip -qr ../base.apk classes.dex assets)
 zipalign -f -p 4 $B/base.apk $B/aligned.apk
 apksigner sign --ks debug.keystore --ks-pass pass:android --key-pass pass:android --ks-key-alias duelos \
   --out out/LigaPokemon.apk $B/aligned.apk
