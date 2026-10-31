@@ -76,15 +76,29 @@ export function mountBattle(root: HTMLElement, o: BattleScreenOptions): void {
   const fieldView: { weather: Weather | null; terrain: Terrain | null } = { weather: null, terrain: null };
 
   root.innerHTML = `
-    <div class="btop"><button class="alt small" id="exit">← Salir</button><span id="turnno">${esc(o.title)}</span></div>
-    <div class="arena theme-${THEMES[rng.int(0, THEMES.length - 1)]}" id="arena">
-      <div class="weather-fx" id="wfx"></div><div class="fieldbar" id="fieldbar"></div>
-      ${panel(1)}${slot(1)}${slot(0)}${panel(0)}
-    </div>
-    <div class="log" id="log"></div>
-    <div class="menu" id="menu"></div>
-    <div class="overlay" id="picker" hidden></div>
-    <div class="overlay" id="end" hidden></div>`;
+    <div class="bwrap"><div class="bstage" id="stage">
+      <div class="arena theme-${THEMES[rng.int(0, THEMES.length - 1)]}" id="arena">
+        <div class="weather-fx" id="wfx"></div><div class="fieldbar" id="fieldbar"></div>
+        ${panel(1)}${slot(1)}${slot(0)}${panel(0)}
+      </div>
+      <div class="btop"><span id="turnno">${esc(o.title)}</span><button class="alt small" id="exit">✕ Salir</button></div>
+      <div class="tbox"><div class="log" id="log"></div><div class="menu" id="menu"></div></div>
+      <div class="overlay" id="picker" hidden></div>
+      <div class="overlay" id="end" hidden></div>
+    </div></div>`;
+
+  // Escenario horizontal fijo de 960×540 que se escala a la pantalla (en vertical se gira 90°, como pidiendo girar el móvil)
+  const stageEl = root.querySelector<HTMLElement>('#stage')!;
+  const fit = () => {
+    if (!stageEl.isConnected) return window.removeEventListener('resize', fit);
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const portrait = h > w;
+    const k = Math.min((portrait ? h : w) / 960, (portrait ? w : h) / 540);
+    stageEl.style.transform = `translate(-50%, -50%)${portrait ? ' rotate(90deg)' : ''} scale(${k})`;
+  };
+  window.addEventListener('resize', fit);
+  fit();
 
   function panel(side: Side): string {
     return `<div class="bpanel ${side === 0 ? 'me' : 'foe'}" data-panel="${side}">
@@ -388,7 +402,7 @@ export function mountBattle(root: HTMLElement, o: BattleScreenOptions): void {
       ...megas.map((m) => `<button class="gim mega${megaChoice === m.id ? ' on' : ''}" data-mega="${m.id}">✨ ${esc(m.name)}</button>`),
       canZ || zOn ? `<button class="gim zbtn${zOn ? ' on' : ''}" data-z="1">⚡ Mov. Z</button>` : '',
     ].filter(Boolean);
-    const gimmickRow = gimmicks.length ? `<div class="gimmicks">${gimmicks.join('')}</div>` : '';
+    const gimmickRow = gimmicks.join('');
 
     let html: string;
     if (user.recharging) {
@@ -416,7 +430,7 @@ export function mountBattle(root: HTMLElement, o: BattleScreenOptions): void {
         .join('');
     }
     const switchBtn = `<button class="alt switchbtn" data-a="switch" ${canSwitch ? '' : 'disabled'}>🔄 ${isTrapped(battle, 0) ? 'Atrapado' : 'Cambiar Pokémon'}</button>`;
-    menu.innerHTML = gimmickRow + html + switchBtn;
+    menu.innerHTML = `<div class="mvgrid">${html}</div><div class="sidebtns">${gimmickRow}${switchBtn}</div>`;
     menu.querySelectorAll<HTMLButtonElement>('[data-s]').forEach((b) => b.addEventListener('click', () => turn(moveAction(Number(b.dataset.s)))));
     menu.querySelector('[data-a="rest"]')?.addEventListener('click', () => turn(moveAction(0, false)));
     menu.querySelectorAll<HTMLButtonElement>('[data-mega]').forEach((b) =>

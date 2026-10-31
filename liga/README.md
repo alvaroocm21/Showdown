@@ -120,6 +120,7 @@ parpadea cuando queda poca vida, transición entre pantallas y respeto a «reduc
 - **Formas regionales** (Alola, Galar, Hisui, Paldea): 57 formas que salen en el sorteo como cualquier otra especie (sus generaciones se cuentan por la forma base).
 - **Megaevoluciones** (97 formas, incluidas Mega X/Y): no se sortean; son una mecánica de combate. Una vez por combate y bando, antes de atacar, el botón «✨ Mega-…» transforma al Pokémon (recalcula estadísticas y tipos; conserva su habilidad aleatoria y los PS perdidos). Dura hasta el final del combate, aunque se le cambie. Las tarjetas muestran las megas posibles.
 - **Movimientos Z**: una vez por combate y bando, el botón «⚡ Mov. Z» convierte los ataques de daño en su versión Z (potencia según el original, no fallan). Los de estado quedan bloqueados mientras está activo.
+- El combate usa un escenario horizontal 960×540 como Zafiro Alfa (en vertical se gira solo; mejor con el móvil en horizontal): paneles de PS arriba-izquierda y abajo-derecha, cuadro de texto y ataques abajo, y tus Pokémon de espaldas.
 - No hay Teracristalización, Dinamax ni Gigamax, ni formas Primigenias.
 
 ### Habilidades

@@ -393,3 +393,46 @@ button { transition: filter .15s; }
 .megaform img { width: 38px; height: 38px; object-fit: contain; }
 .megaform span { display: grid; font-weight: 800; color: #831843; } .megaform small { color: var(--muted); font-weight: 600; font-size: .64rem; }
 .inert-tag { max-width: 100%; white-space: normal; }
+
+/* ---------- Combate horizontal (como Zafiro Alfa): escenario fijo de 960×540 ---------- */
+.bwrap { position: fixed; inset: 0; z-index: 15; background: #000; overflow: hidden; }
+.bstage { position: absolute; left: 50%; top: 50%; width: 960px; height: 540px; transform-origin: 50% 50%; overflow: hidden; background: #000; color: #fff; }
+.bstage .arena { position: absolute; inset: 0; height: auto; border-radius: 0; box-shadow: none; }
+.bstage .btop { position: absolute; top: 8px; right: 12px; left: auto; margin: 0; z-index: 9; gap: 10px; font-size: 14px; }
+.bstage .btop span { background: rgba(0,0,0,.45); padding: 4px 12px; border-radius: 999px; }
+.bstage .btop button { padding: 5px 12px; font-size: 13px; }
+.bstage .fieldbar { top: 10px; }
+.bstage .fieldbar span { font-size: 13px; }
+
+.bstage .bpanel { width: 330px; padding: 8px 14px 9px; font-size: 14px; border-radius: 8px 26px 8px 26px; background: linear-gradient(#26407a, #101d3e); color: #fff; border: 3px solid #9fd0ff; box-shadow: 0 4px 12px rgba(0,0,0,.45); z-index: 8; }
+.bstage .bpanel.foe { left: 22px; top: 22px; }
+.bstage .bpanel.me { left: auto; right: 22px; bottom: 172px; }
+.bstage .bname b { font-size: 19px; }
+.bstage .bname span, .bstage .hptext { color: #ffe08a; font-size: 14px; }
+.bstage .bpanel .chip { font-size: 11px; }
+.bstage .hp { height: 12px; background: #050a18; border: 2px solid #c8dcff; box-shadow: none; }
+.bstage .stg { font-size: 11px; }
+
+.bstage .slot.foe { width: 210px; height: 210px; right: 130px; top: 70px; }
+.bstage .slot.me { width: 290px; height: 290px; left: 100px; bottom: 150px; }
+
+.bstage .tbox { position: absolute; left: 0; right: 0; bottom: 0; height: 156px; z-index: 12; display: flex; gap: 10px; padding: 8px 10px; background: linear-gradient(#142a5c, #07122b); border-top: 4px solid #9fd0ff; }
+.bstage .log { flex: 1; min-width: 0; margin: 0; height: auto; font-size: 18px; line-height: 1.3; padding: 6px 12px; background: transparent; box-shadow: none; backdrop-filter: none; text-shadow: 0 2px 0 rgba(0,0,0,.6); }
+.bstage .log p:last-child { font-weight: 800; }
+.bstage .menu { display: flex; gap: 8px; width: 600px; flex: none; }
+.bstage .mvgrid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 6px; min-width: 0; }
+.bstage .mvgrid .wide { grid-column: 1 / -1; grid-row: 1 / -1; }
+.bstage .mv { padding: 4px 10px; border-radius: 10px; min-height: 0; overflow: hidden; line-height: 1.1; }
+.bstage .mv b { font-size: 15px; padding-right: 34px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bstage .mv small { font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bstage .eff { top: 4px; right: 6px; font-size: 11px; }
+.bstage .sidebtns { width: 150px; display: flex; flex-direction: column; gap: 6px; }
+.bstage .sidebtns button { flex: 1; padding: 4px 6px; font-size: 13px; border-radius: 10px; margin: 0; }
+.bstage .gim { flex: 1; }
+.bstage .switchbtn { padding: 4px 6px; }
+
+.bstage .overlay { position: absolute; z-index: 30; }
+.bstage .endcard { font-size: 15px; }
+.bstage .endcard.pick { width: 520px; max-height: 500px; }
+.bstage .plist { grid-template-columns: 1fr 1fr; }
+.bstage .float { font-size: 15px; }
