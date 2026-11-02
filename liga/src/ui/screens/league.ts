@@ -5,9 +5,10 @@ import { findProfile, recordMatch, startSeason, updateProfile } from '../../core
 import { computeStandings } from '../../core/game/standings';
 import { MAX_PLAYERS, MIN_PLAYERS, type GameState, type Match, type Profile, type Season } from '../../core/game/types';
 import { avatarHtml, confetti, esc } from '../shared';
+import { renderWhoAmI } from '../whoami';
 import type { AppCtx } from '../app';
 
-type Tab = 'round' | 'table' | 'calendar';
+type Tab = 'round' | 'table';
 let tab: Tab = 'round';
 /** Jornada que está mirando el usuario (null = la actual). */
 let shown: number | null = null;
@@ -18,10 +19,19 @@ let confettiShownFor = 0;
 
 const fmtDate = (t: number) => new Date(t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
 
-export function mountLeague(ctx: AppCtx): void {
+/** Pantalla que se está viendo: la liga (jornada y clasificación) o el calendario. */
+let mode: 'league' | 'calendar' = 'league';
+
+export function mountLeague(ctx: AppCtx, show: 'league' | 'calendar' = mode): void {
+  mode = show;
   const state = ctx.store.get();
-  if (!state.season) return mountSetup(ctx, state);
-  mountSeason(ctx, state, state.season);
+  if (!state.season) {
+    if (mode === 'calendar') {
+      ctx.root.innerHTML = `<h1>Calendario</h1><div class="card empty">Aún no hay ninguna temporada en marcha.<br /><br /><button class="main" id="tosetup">🏆 Ir a la liga</button></div>`;
+      ctx.root.querySelector('#tosetup')!.addEventListener('click', () => ctx.go({ name: 'league' }));
+    } else mountSetup(ctx, state);
+  } else mountSeason(ctx, state, state.season);
+  renderWhoAmI(ctx);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -195,7 +205,7 @@ function mountSeason(ctx: AppCtx, state: GameState, season: Season): void {
 
   const pct = Math.round((played / total) * 100);
   ctx.root.innerHTML = `
-    <h1>Liga · Temporada ${season.number}</h1>
+    <h1>${mode === 'calendar' ? 'Calendario' : 'Liga'} · Temporada ${season.number}</h1>
     <p class="sub">${complete ? 'Temporada terminada' : `Jornada ${(cur ?? 0) + 1} de ${season.rounds.length}`} · ${played} de ${total} combates</p>
     <div class="progress"><i style="width:${pct}%"></i></div>
     ${
@@ -205,12 +215,11 @@ function mountSeason(ctx: AppCtx, state: GameState, season: Season): void {
             <button class="main" id="newseason">🏁 Empezar nueva temporada</button></div>`
         : ''
     }
-    <div class="seg">
+    ${mode === 'calendar' ? '' : `<div class="seg">
       <button class="${tab === 'round' ? 'on' : ''}" data-tab="round">Jornada</button>
       <button class="${tab === 'table' ? 'on' : ''}" data-tab="table">Clasificación</button>
-      <button class="${tab === 'calendar' ? 'on' : ''}" data-tab="calendar">Calendario</button>
-    </div>
-    ${tab === 'round' ? roundView() : tab === 'table' ? tableView() : calendarView()}`;
+    </div>`}
+    ${mode === 'calendar' ? calendarView() : tab === 'round' ? roundView() : tableView()}`;
 
   const redraw = () => mountLeague(ctx);
   if (complete && confettiShownFor !== season.number) {

@@ -9,6 +9,7 @@ import type { Store } from './store';
 
 export type View =
   | { name: 'league' }
+  | { name: 'calendar' }
   | { name: 'profiles' }
   | { name: 'profile'; id: string }
   | { name: 'settings' };
@@ -21,13 +22,38 @@ export interface AppCtx {
   /** Muestra un combate a pantalla completa (sin barra de pestañas). */
   battle(options: BattleScreenOptions): void;
   rng(): Rng;
+  /** Perfil con el que se está jugando (null si aún no se ha elegido ninguno). */
+  activeId: string | null;
+  setActive(id: string | null): void;
 }
 
-const TABS: { name: View['name']; icon: string; label: string }[] = [
-  { name: 'league', icon: '🏆', label: 'Liga' },
-  { name: 'profiles', icon: '👥', label: 'Perfiles' },
-  { name: 'settings', icon: '⚙️', label: 'Ajustes' },
-];
+type TabName = 'league' | 'calendar' | 'profiles' | 'settings';
+const TAB_DEFS: Record<TabName, { icon: string; label: string }> = {
+  league: { icon: '🏆', label: 'Liga' },
+  calendar: { icon: '📅', label: 'Calendario' },
+  profiles: { icon: '👥', label: 'Perfiles' },
+  settings: { icon: '⚙️', label: 'Ajustes' },
+};
+/** Con un perfil elegido: Liga, Calendario y Ajustes. Sin perfil: solo elegirlo (o los Ajustes). */
+const TABS_WITH_PROFILE: TabName[] = ['league', 'calendar', 'settings'];
+const TABS_NO_PROFILE: TabName[] = ['profiles', 'settings'];
+const ACTIVE_KEY = 'pokeliga:active';
+
+function loadActive(): string | null {
+  try {
+    return window.localStorage.getItem(ACTIVE_KEY);
+  } catch {
+    return null;
+  }
+}
+function saveActive(id: string | null): void {
+  try {
+    if (id) window.localStorage.setItem(ACTIVE_KEY, id);
+    else window.localStorage.removeItem(ACTIVE_KEY);
+  } catch {
+    /* sin almacenamiento: se elegirá de nuevo al abrir */
+  }
+}
 
 /** Poké Ball dibujada en SVG: se muestra cuando una imagen no está disponible (sin conexión y sin guardar). */
 const BALL_SVG =
@@ -51,7 +77,9 @@ export function startApp(host: HTMLElement, store: Store): void {
   const tabs = host.querySelector<HTMLElement>('#tabs')!;
   const banner = host.querySelector<HTMLElement>('#banner')!;
   const toastEl = host.querySelector<HTMLElement>('#toast')!;
-  let view: View = { name: 'league' };
+  let activeId = loadActive();
+  if (!store.get().profiles.some((p) => p.id === activeId)) activeId = null;
+  let view: View = activeId ? { name: 'league' } : { name: 'profiles' };
   let toastTimer: number | undefined;
 
   const ctx: AppCtx = {
@@ -74,6 +102,13 @@ export function startApp(host: HTMLElement, store: Store): void {
       window.scrollTo(0, 0);
     },
     rng: () => createRng(randomSeed()),
+    get activeId() {
+      return activeId;
+    },
+    setActive(id) {
+      activeId = id;
+      saveActive(id);
+    },
   };
 
   // Si una imagen no se puede cargar (sin conexión y sin guardar), se pone una Poké Ball
@@ -108,16 +143,21 @@ export function startApp(host: HTMLElement, store: Store): void {
     screen.classList.remove('enter');
     void screen.offsetWidth; // reinicia la animación de entrada
     screen.classList.add('enter');
-    const active = view.name === 'profile' ? 'profiles' : view.name;
-    tabs.innerHTML = TABS.map(
-      (t) => `<button class="tab${t.name === active ? ' on' : ''}" data-tab="${t.name}"><span>${t.icon}</span>${t.label}</button>`,
-    ).join('');
+    // Si el perfil activo ya no existe (borrado o partida importada), hay que elegir otro
+    if (activeId && !store.get().profiles.some((p) => p.id === activeId)) ctx.setActive(null);
+    if (!activeId && (view.name === 'league' || view.name === 'calendar')) view = { name: 'profiles' };
+    const tabNames = activeId ? TABS_WITH_PROFILE : TABS_NO_PROFILE;
+    const active = view.name === 'profile' ? (view.id === activeId ? 'league' : 'profiles') : view.name;
+    tabs.innerHTML = tabNames
+      .map((n) => `<button class="tab${n === active ? ' on' : ''}" data-tab="${n}"><span>${TAB_DEFS[n].icon}</span>${TAB_DEFS[n].label}</button>`)
+      .join('');
     tabs.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach((b) =>
-      b.addEventListener('click', () => ctx.go({ name: b.dataset.tab as 'league' | 'profiles' | 'settings' })),
+      b.addEventListener('click', () => ctx.go({ name: b.dataset.tab as TabName } as View)),
     );
     renderBanner();
     switch (view.name) {
-      case 'league': return mountLeague(ctx);
+      case 'league': return mountLeague(ctx, 'league');
+      case 'calendar': return mountLeague(ctx, 'calendar');
       case 'profiles': return mountProfiles(ctx);
       case 'profile': return mountProfile(ctx, view.id);
       case 'settings': return mountSettings(ctx);

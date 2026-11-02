@@ -441,3 +441,11 @@ button { transition: filter .15s; }
 .effl.edown { background: #fed7aa; color: #7c2d12; }
 .effl.e0 { background: #e5e7eb; color: #374151; }
 .effl.eneutral { background: rgba(255,255,255,.85); color: #1f2937; }
+
+/* ---------- Cabecera del perfil activo ---------- */
+.whoami { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 12px; padding: 8px 10px; border-radius: 16px; background: rgba(255,255,255,.14); color: #fff; box-shadow: inset 0 0 0 2px rgba(255,255,255,.25); }
+.whoami b { flex: 1; min-width: 80px; }
+.whoami .coins { font-weight: 800; }
+.pcard.current { box-shadow: 0 0 0 3px #fde047; }
+.pcard .cardbar { display: flex; gap: 8px; margin-top: 8px; }
+.pcard .cardbar button { flex: 1; }

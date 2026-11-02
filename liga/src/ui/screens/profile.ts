@@ -49,7 +49,7 @@ export function mountProfile(ctx: AppCtx, id: string): void {
     .join('');
 
   ctx.root.innerHTML = `
-    <div class="btop"><button class="alt small" id="back">← Perfiles</button></div>
+    <div class="btop"><button class="alt small" id="back">← ${id === ctx.activeId ? 'Volver' : 'Perfiles'}</button></div>
     <div class="phead big">
       ${avatarHtml(p.avatar, 'xl')}
       <div class="pname"><h1>${esc(p.name)}</h1>
@@ -67,7 +67,7 @@ export function mountProfile(ctx: AppCtx, id: string): void {
 
   const $ = (sel: string) => ctx.root.querySelector<HTMLElement>(sel);
   const redraw = () => mountProfile(ctx, id);
-  $('#back')!.addEventListener('click', () => ctx.go({ name: 'profiles' }));
+  $('#back')!.addEventListener('click', () => ctx.go({ name: id === ctx.activeId ? 'league' : 'profiles' }));
   $('#star')!.addEventListener('click', () => {
     ctx.store.commit(updateProfile(ctx.store.get(), id, (x) => ({ ...x, main: !x.main })));
     redraw();
