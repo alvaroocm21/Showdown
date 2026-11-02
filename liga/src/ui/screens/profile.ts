@@ -1,7 +1,8 @@
 import { getAbility, getMove, getSpecies } from '../../core/data';
 import { UPGRADE_COSTS } from '../../core/game/economy';
 import { applyUpgrade, type Upgrade } from '../../core/game/shop';
-import { rollPokemon, rollTeam } from '../../core/generator';
+import { pickLineup } from './lineup';
+import { ROSTER_SIZE, rollPokemon, rollTeam } from '../../core/generator';
 import { moveTeamMember } from '../../core/game/profiles';
 import { drawOptionsOf } from '../../core/game/settings';
 import { canRerollTeam, findProfile, inSeason, removeProfile, updateProfile } from '../../core/game/state';
@@ -73,19 +74,22 @@ export function mountProfile(ctx: AppCtx, id: string): void {
     redraw();
   });
 
-  const friendly = (): void =>
+  const friendly = async (): Promise<void> => {
+    const lineup = await pickLineup(ctx, { profile: p, unavailable: new Set(), title: `Equipo de ${p.name}`, subtitle: 'Combate amistoso', confirmLabel: '⚔️ ¡Al combate!' });
+    if (!lineup) return ctx.go({ name: 'profile', id });
     ctx.battle({
-      myTeam: p.team,
+      myTeam: lineup,
       foeTeam: rollTeam(ctx.rng(), drawOptionsOf(ctx.store.get())),
       title: `${p.name} · amistoso`,
       onExit: () => ctx.go({ name: 'profile', id }),
-      onRematch: friendly,
+      onRematch: () => void friendly(),
     });
-  $('#friendly')!.addEventListener('click', friendly);
+  };
+  $('#friendly')!.addEventListener('click', () => void friendly());
 
   $('#reroll')?.addEventListener('click', () => {
     if (!window.confirm(`¿Sortear un equipo nuevo para ${p.name}? Se pierde el actual.`)) return;
-    ctx.store.commit(updateProfile(ctx.store.get(), id, (x) => ({ ...x, team: rollTeam(ctx.rng(), drawOptionsOf(ctx.store.get())) })));
+    ctx.store.commit(updateProfile(ctx.store.get(), id, (x) => ({ ...x, team: rollTeam(ctx.rng(), drawOptionsOf(ctx.store.get()), ROSTER_SIZE) })));
     redraw();
   });
 

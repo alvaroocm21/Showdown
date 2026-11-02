@@ -1,6 +1,6 @@
 import type { PokemonSet } from '../types';
 
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 export const MIN_PLAYERS = 4;
 export const MAX_PLAYERS = 8;
 export const WIN_POINTS = 3;
@@ -28,6 +28,9 @@ export interface MatchResult {
   faintedB: number;
   /** Cómo se jugó. */
   mode: 'played' | 'simulated';
+  /** Pokémon (id de especie) de cada bando que se debilitaron: no pueden jugar la jornada siguiente. */
+  fallenA?: number[];
+  fallenB?: number[];
 }
 
 export interface Match {
@@ -85,12 +88,30 @@ export interface Settings {
   draw: DrawSettings;
 }
 
+/** Un combate de liga ya jugado, guardado aparte para consultar el historial entre dos cuentas. */
+export interface MatchLogEntry {
+  season: number;
+  /** Jornada (empezando en 0). */
+  round: number;
+  aId: string;
+  bId: string;
+  aName: string;
+  bName: string;
+  winnerId: string;
+  faintedA: number;
+  faintedB: number;
+  mode: MatchResult['mode'];
+  at: number;
+}
+
 export interface GameState {
   version: number;
   settings: Settings;
   profiles: Profile[];
   season: Season | null;
   history: SeasonRecord[];
+  /** Todos los combates de liga jugados (para el historial entre cuentas). */
+  matchLog: MatchLogEntry[];
   /** Número de la próxima temporada. */
   nextSeasonNumber: number;
 }
@@ -104,5 +125,6 @@ export const emptyGame = (): GameState => ({
   profiles: [],
   season: null,
   history: [],
+  matchLog: [],
   nextSeasonNumber: 1,
 });

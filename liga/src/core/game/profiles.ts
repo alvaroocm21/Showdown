@@ -1,4 +1,4 @@
-import { rollTeam, type GenerateOptions } from '../generator';
+import { rollTeam, ROSTER_SIZE, type GenerateOptions } from '../generator';
 import type { Rng } from '../rng';
 import type { Avatar, Profile } from './types';
 
@@ -24,7 +24,7 @@ function pickAvatar(existing: readonly Profile[], rng: Rng): Avatar {
 
 export const newProfileId = (rng: Rng) => `p${Date.now().toString(36)}${rng.int(0, 0xffff).toString(36)}`;
 
-/** Perfil nuevo con un equipo de 6 Pokémon aleatorios. */
+/** Perfil nuevo con una plantilla de 15 Pokémon aleatorios distintos. */
 export function createProfile(
   name: string,
   rng: Rng,
@@ -38,7 +38,7 @@ export function createProfile(
     name: name.trim(),
     avatar: pickAvatar(existing, rng),
     main: opts.main ?? false,
-    team: rollTeam(rng, opts.generate),
+    team: rollTeam(rng, opts.generate, ROSTER_SIZE),
     coins: 0,
   };
 }

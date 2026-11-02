@@ -449,3 +449,31 @@ button { transition: filter .15s; }
 .pcard.current { box-shadow: 0 0 0 3px #fde047; }
 .pcard .cardbar { display: flex; gap: 8px; margin-top: 8px; }
 .pcard .cardbar button { flex: 1; }
+
+/* ---------- Elegir alineación (6 de 15) ---------- */
+.lgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 80px; }
+.lpk { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; border-radius: 14px; background: rgba(255,255,255,.93); color: var(--ink); box-shadow: 0 3px 0 rgba(0,0,0,.2); font-weight: 500; text-align: center; }
+.lpk img { width: 64px; height: 64px; object-fit: contain; }
+.lpk b { font-size: .78rem; line-height: 1.1; }
+.lpk small { font-size: .62rem; color: var(--muted); }
+.lpk .chips { display: none; }
+.lpk.on { box-shadow: 0 0 0 3px #22c55e, 0 3px 0 rgba(0,0,0,.2); background: #f0fdf4; }
+.lpk.off { filter: grayscale(.9); opacity: .55; }
+.lnum { position: absolute; top: 4px; left: 4px; width: 22px; height: 22px; border-radius: 50%; background: #16a34a; color: #fff; font-style: normal; font-weight: 800; font-size: .75rem; display: grid; place-items: center; }
+.lrest { color: #b91c1c !important; font-weight: 700; }
+.lbar { position: fixed; left: 0; right: 0; bottom: calc(74px + env(safe-area-inset-bottom, 0px)); padding: 0 16px; z-index: 6; }
+.lbar button { width: 100%; }
+
+/* ---------- Historial entre cuentas ---------- */
+.hpick { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; margin: 10px 0; color: #fff; font-weight: 800; }
+.hpick select { width: 100%; padding: 10px; border-radius: 12px; border: 2px solid rgba(255,255,255,.5); background: #fff; color: var(--ink); font-size: .95rem; }
+.h2h { text-align: center; }
+.h2score { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; font-weight: 800; }
+.h2score b { font-size: 2rem; }
+.hlist { display: grid; gap: 8px; margin: 10px 0; }
+.hrow { display: grid; gap: 2px; padding: 8px 12px; border-radius: 14px; background: rgba(255,255,255,.93); color: var(--ink); border-left: 6px solid #9ca3af; }
+.hrow.won { border-left-color: #22c55e; }
+.hrow.lost { border-left-color: #ef4444; }
+.hwhen { font-size: .7rem; font-weight: 800; color: var(--muted); }
+.hres { font-size: .95rem; }
+.hrow small { color: var(--muted); }

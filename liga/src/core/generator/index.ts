@@ -15,7 +15,10 @@ export interface GenerateOptions {
 }
 
 export const MOVES_PER_POKEMON = 4;
+/** Pokémon que salen a combatir (la alineación de cada combate). */
 export const TEAM_SIZE = 6;
+/** Pokémon que tiene cada perfil en su plantilla (de ellos se eligen los 6 de cada combate). */
+export const ROSTER_SIZE = 15;
 
 /** Ataque que hace daño directo con la fórmula normal (excluye estado y daño fijo/OHKO sin potencia). */
 export const isDirectDamage = (m: Move) => m.category !== 'status' && (m.power ?? 0) > 0;

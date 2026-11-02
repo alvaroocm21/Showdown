@@ -2,7 +2,7 @@ import type { Rng } from '../rng';
 import { rewardFor } from './economy';
 import { createSeason, findMatch, recordResult } from './season';
 import { validateDraw } from './settings';
-import { MAX_PLAYERS, MIN_PLAYERS, type DrawSettings, type GameState, type MatchResult, type Profile } from './types';
+import { MAX_PLAYERS, MIN_PLAYERS, type DrawSettings, type GameState, type MatchLogEntry, type MatchResult, type Profile } from './types';
 
 /** Operaciones sobre la partida: siempre devuelven un estado nuevo y lanzan un Error con un mensaje claro si no se pueden hacer. */
 
@@ -49,9 +49,15 @@ export function recordMatch(state: GameState, matchId: string, result: MatchResu
   if (!match) throw new Error(`Combate desconocido: ${matchId}`);
   const season = recordResult(state.season, matchId, result, now);
   const { profileId, coins } = rewardFor(match, result);
+  const nameOf = (id: string) => state.profiles.find((p) => p.id === id)?.name ?? 'Perfil eliminado';
+  const entry: MatchLogEntry = {
+    season: state.season.number, round: match.round, aId: match.a, bId: match.b, aName: nameOf(match.a), bName: nameOf(match.b),
+    winnerId: result.winner, faintedA: result.faintedA, faintedB: result.faintedB, mode: result.mode, at: now,
+  };
   return {
     ...state,
     season,
+    matchLog: [...state.matchLog, entry],
     profiles: state.profiles.map((p) => (p.id === profileId ? { ...p, coins: p.coins + coins } : p)),
   };
 }

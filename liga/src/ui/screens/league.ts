@@ -1,10 +1,13 @@
 import { matchReward, rewardFor } from '../../core/game/economy';
+import { autoLineupFor, unavailableSpecies } from '../../core/game/lineup';
 import { resultForMatch, simulateMatch } from '../../core/game/play';
 import { archiveSeason, champion, currentRound, findMatch, isSeasonComplete, allMatches } from '../../core/game/season';
 import { findProfile, recordMatch, startSeason, updateProfile } from '../../core/game/state';
 import { computeStandings } from '../../core/game/standings';
 import { MAX_PLAYERS, MIN_PLAYERS, type GameState, type Match, type Profile, type Season } from '../../core/game/types';
 import { avatarHtml, confetti, esc } from '../shared';
+import { mountHistory } from './history';
+import { pickLineup } from './lineup';
 import { renderWhoAmI } from '../whoami';
 import type { AppCtx } from '../app';
 
@@ -21,16 +24,30 @@ const fmtDate = (t: number) => new Date(t).toLocaleDateString('es-ES', { day: 'n
 
 /** Pantalla que se está viendo: la liga (jornada y clasificación) o el calendario. */
 let mode: 'league' | 'calendar' = 'league';
+/** Dentro de Calendario: las jornadas de la temporada o el historial entre cuentas. */
+let calTab: 'rounds' | 'history' = 'rounds';
+
+const calSeg = (): string => `<div class="seg"><button class="${calTab === 'rounds' ? 'on' : ''}" data-cal="rounds">Jornadas</button><button class="${calTab === 'history' ? 'on' : ''}" data-cal="history">Historial</button></div>`;
 
 export function mountLeague(ctx: AppCtx, show: 'league' | 'calendar' = mode): void {
   mode = show;
   const state = ctx.store.get();
-  if (!state.season) {
+  const bindCal = () =>
+    ctx.root.querySelectorAll<HTMLButtonElement>('[data-cal]').forEach((b) =>
+      b.addEventListener('click', () => {
+        calTab = b.dataset.cal as 'rounds' | 'history';
+        mountLeague(ctx);
+      }),
+    );
+  if (mode === 'calendar' && calTab === 'history') mountHistory(ctx, calSeg(), bindCal);
+  else if (!state.season) {
     if (mode === 'calendar') {
-      ctx.root.innerHTML = `<h1>Calendario</h1><div class="card empty">Aún no hay ninguna temporada en marcha.<br /><br /><button class="main" id="tosetup">🏆 Ir a la liga</button></div>`;
+      ctx.root.innerHTML = `<h1>Calendario</h1>${calSeg()}<div class="card empty">Aún no hay ninguna temporada en marcha.<br /><br /><button class="main" id="tosetup">🏆 Ir a la liga</button></div>`;
+      bindCal();
       ctx.root.querySelector('#tosetup')!.addEventListener('click', () => ctx.go({ name: 'league' }));
     } else mountSetup(ctx, state);
   } else mountSeason(ctx, state, state.season);
+  if (mode === 'calendar' && calTab === 'rounds' && state.season) bindCal();
   renderWhoAmI(ctx);
 }
 
@@ -140,12 +157,14 @@ function mountSeason(ctx: AppCtx, state: GameState, season: Season): void {
       caption = `<div class="mcap">Pokémon debilitados · ${m.result.mode === 'played' ? 'jugado' : 'simulado'} · <b>+${prize.coins} 🪙 ${esc(prof(prize.profileId).name)}</b></div>`;
     } else {
       middle = '<div class="mres"><span class="vs">VS</span></div>';
-      const bothNotMain = !a.main && !b.main;
-      actions = `<div class="mact">
-          <button class="${a.main ? 'main' : 'alt'} small" data-play="${m.id}" data-as="${esc(a.id)}">Jugar con ${esc(a.name)}</button>
-          <button class="${b.main ? 'main' : 'alt'} small" data-play="${m.id}" data-as="${esc(b.id)}">Jugar con ${esc(b.name)}</button>
-          ${bothNotMain ? `<button class="alt small" data-sim="${m.id}">⚡ Simular</button>` : ''}
-        </div>`;
+      const rest = (id: string) => unavailableSpecies(season, id, m.round).size;
+      const restTxt = [a, b].filter((x) => rest(x.id) > 0).map((x) => `${esc(x.name)}: ${rest(x.id)}`).join(' · ');
+      if (restTxt) caption = `<div class="mcap">🤕 Descansan por haberse debilitado · ${restTxt}</div>`;
+      let buttons: string;
+      if (a.main && b.main) buttons = `<button class="main small" data-play="${m.id}" data-both="1">⚔️ Elegir equipos y jugar (local: ${esc(a.name)}, visitante: IA)</button>`;
+      else if (a.main || b.main) buttons = `<button class="main small" data-play="${m.id}" data-as="${esc((a.main ? a : b).id)}">Jugar con ${esc((a.main ? a : b).name)}</button>`;
+      else buttons = `<button class="alt small" data-sim="${m.id}">⚡ Simular</button>`;
+      actions = `<div class="mact">${buttons}</div>`;
     }
     return `<article class="match${m.result ? ' done' : ''}">
       <div class="mrow">
@@ -215,7 +234,7 @@ function mountSeason(ctx: AppCtx, state: GameState, season: Season): void {
             <button class="main" id="newseason">🏁 Empezar nueva temporada</button></div>`
         : ''
     }
-    ${mode === 'calendar' ? '' : `<div class="seg">
+    ${mode === 'calendar' ? calSeg() : `<div class="seg">
       <button class="${tab === 'round' ? 'on' : ''}" data-tab="round">Jornada</button>
       <button class="${tab === 'table' ? 'on' : ''}" data-tab="table">Clasificación</button>
     </div>`}
@@ -253,14 +272,15 @@ function mountSeason(ctx: AppCtx, state: GameState, season: Season): void {
 
   // Jugar un combate con el perfil elegido
   ctx.root.querySelectorAll<HTMLButtonElement>('[data-play]').forEach((b) =>
-    b.addEventListener('click', () => playMatch(ctx, b.dataset.play!, b.dataset.as!)),
+    b.addEventListener('click', () => void playMatch(ctx, b.dataset.play!, b.dataset.as ?? null)),
   );
 
   // Simular un combate (solo sin perfiles principales)
   const simulate = (matchId: string): void => {
     const s = ctx.store.get();
     const m = findMatch(s.season!, matchId)!;
-    const result = simulateMatch(findProfile(s, m.a)!, findProfile(s, m.b)!, ctx.rng());
+    const rng = ctx.rng();
+    const result = simulateMatch(findProfile(s, m.a)!, findProfile(s, m.b)!, rng, autoLineupFor(s, m.a, m.round, rng), autoLineupFor(s, m.b, m.round, rng));
     ctx.store.commit(recordMatch(s, matchId, result));
   };
   ctx.root.querySelectorAll<HTMLButtonElement>('[data-sim]').forEach((b) =>
@@ -285,19 +305,47 @@ function mountSeason(ctx: AppCtx, state: GameState, season: Season): void {
   if (shown !== null && cur !== null && shown < cur) shown = null;
 }
 
-function playMatch(ctx: AppCtx, matchId: string, meId: string): void {
+/**
+ * Juega un combate de liga. Con dos perfiles míos (★) se eligen los equipos de los dos y se juega con el local;
+ * el visitante lo lleva la IA. Con uno solo, se elige el suyo y el rival se alinea solo.
+ */
+async function playMatch(ctx: AppCtx, matchId: string, meId: string | null): Promise<void> {
   const state = ctx.store.get();
   const match = findMatch(state.season!, matchId);
   if (!match || match.result) return ctx.toast('Ese combate ya está jugado');
-  const me = findProfile(state, meId)!;
-  const foe = findProfile(state, meId === match.a ? match.b : match.a)!;
+  const both = meId === null;
+  const me = findProfile(state, meId ?? match.a)!;
+  const foe = findProfile(state, me.id === match.a ? match.b : match.a)!;
+  const round = match.round;
+  const back = () => ctx.go({ name: 'league' });
+
+  const mine = await pickLineup(ctx, {
+    profile: me,
+    unavailable: unavailableSpecies(state.season, me.id, round),
+    title: `Equipo de ${me.name}`,
+    subtitle: both ? `Local · jornada ${round + 1}` : `Jornada ${round + 1} · rival: ${foe.name}`,
+    confirmLabel: both ? `Siguiente: equipo de ${foe.name} ▶` : '⚔️ ¡Al combate!',
+  });
+  if (!mine) return back();
+  let theirs;
+  if (both) {
+    theirs = await pickLineup(ctx, {
+      profile: foe,
+      unavailable: unavailableSpecies(state.season, foe.id, round),
+      title: `Equipo de ${foe.name}`,
+      subtitle: 'Visitante · lo juega la IA',
+      confirmLabel: '⚔️ ¡Al combate!',
+    });
+    if (!theirs) return back();
+  } else theirs = autoLineupFor(state, foe.id, round, ctx.rng());
+
   ctx.battle({
-    myTeam: me.team,
-    foeTeam: foe.team,
-    title: `${me.name} vs ${foe.name}`,
+    myTeam: mine,
+    foeTeam: theirs,
+    title: both ? `${me.name} (local) vs ${foe.name} (IA)` : `${me.name} vs ${foe.name}`,
     confirmExit: true,
     reward: (outcome) => (outcome.winner === 0 ? `+${matchReward(outcome.fainted[0])} 🪙 para ${me.name}` : null),
-    onExit: () => ctx.go({ name: 'league' }),
+    onExit: back,
     onFinish: (outcome) => {
       try {
         const result = resultForMatch(match, me.id, outcome, 'played');
@@ -308,8 +356,7 @@ function playMatch(ctx: AppCtx, matchId: string, meId: string): void {
       } catch (e) {
         ctx.toast((e as Error).message);
       }
-      ctx.go({ name: 'league' });
+      back();
     },
   });
 }
-

@@ -164,13 +164,13 @@ describe('perfiles y partida', () => {
     expect(() => createProfile('ana', rng, [a])).toThrow(/Ya existe/);
   });
 
-  it('cada perfil recibe un equipo de 6 distintos y avatares diferentes', () => {
+  it('cada perfil recibe un plantilla de 15 distintos y avatares diferentes', () => {
     const rng = createRng(4);
     const profiles: ReturnType<typeof createProfile>[] = [];
     for (const n of ['a', 'b', 'c', 'd', 'e', 'f']) profiles.push(createProfile(n, rng, profiles));
     for (const p of profiles) {
-      expect(p.team).toHaveLength(6);
-      expect(new Set(p.team.map((s) => s.speciesId)).size).toBe(6);
+      expect(p.team).toHaveLength(15);
+      expect(new Set(p.team.map((s) => s.speciesId)).size).toBe(15);
       expect(p.coins).toBe(0);
       expect(p.main).toBe(false);
     }
@@ -184,7 +184,7 @@ describe('perfiles y partida', () => {
     const moved = moveTeamMember(p, 2, -1);
     expect(moved.team.map((s) => s.speciesId)).toEqual([ids0[0], ids0[2], ids0[1], ...ids0.slice(3)]);
     expect(moveTeamMember(p, 0, -1)).toBe(p);
-    expect(moveTeamMember(p, 5, 1)).toBe(p);
+    expect(moveTeamMember(p, 14, 1)).toBe(p);
   });
 
   it('reglas de la liga: no se borra ni re-sortea con la temporada en juego', () => {
@@ -227,8 +227,8 @@ describe('combates entre perfiles', () => {
     const rng = createRng(3);
     const a = createProfile('A', rng, []);
     const b = createProfile('B', rng, [a]);
-    expect(matchResultFrom(a, b, { winner: 1, fainted: [6, 2] }, 'played')).toEqual({ winner: b.id, faintedA: 6, faintedB: 2, mode: 'played' });
-    const battle = createBattle(a.team, b.team);
+    expect(matchResultFrom(a, b, { winner: 1, fainted: [6, 2], fallen: [[], []] }, 'played')).toEqual({ winner: b.id, faintedA: 6, faintedB: 2, mode: 'played', fallenA: [], fallenB: [] });
+    const battle = createBattle(a.team.slice(0, 6), b.team.slice(0, 6));
     expect(() => outcomeOf(battle)).toThrow(/no ha terminado/);
     simulateBattle(battle, createRng(8));
     const out = outcomeOf(battle);
@@ -241,14 +241,14 @@ export type { GameState };
 describe('resultado de un combate jugado por el usuario', () => {
   const match = { a: 'A', b: 'B' };
   it('con el perfil que figura como a', () => {
-    expect(resultForMatch(match, 'A', { winner: 0, fainted: [3, 6] }, 'played')).toEqual({ winner: 'A', faintedA: 3, faintedB: 6, mode: 'played' });
-    expect(resultForMatch(match, 'A', { winner: 1, fainted: [6, 2] }, 'played')).toEqual({ winner: 'B', faintedA: 6, faintedB: 2, mode: 'played' });
+    expect(resultForMatch(match, 'A', { winner: 0, fainted: [3, 6], fallen: [[], []] }, 'played')).toEqual({ winner: 'A', faintedA: 3, faintedB: 6, mode: 'played', fallenA: [], fallenB: [] });
+    expect(resultForMatch(match, 'A', { winner: 1, fainted: [6, 2], fallen: [[], []] }, 'played')).toEqual({ winner: 'B', faintedA: 6, faintedB: 2, mode: 'played', fallenA: [], fallenB: [] });
   });
   it('con el perfil que figura como b (el bando 0 del combate es b)', () => {
-    expect(resultForMatch(match, 'B', { winner: 0, fainted: [3, 6] }, 'played')).toEqual({ winner: 'B', faintedA: 6, faintedB: 3, mode: 'played' });
-    expect(resultForMatch(match, 'B', { winner: 1, fainted: [6, 2] }, 'played')).toEqual({ winner: 'A', faintedA: 2, faintedB: 6, mode: 'played' });
+    expect(resultForMatch(match, 'B', { winner: 0, fainted: [3, 6], fallen: [[], []] }, 'played')).toEqual({ winner: 'B', faintedA: 6, faintedB: 3, mode: 'played', fallenA: [], fallenB: [] });
+    expect(resultForMatch(match, 'B', { winner: 1, fainted: [6, 2], fallen: [[], []] }, 'played')).toEqual({ winner: 'A', faintedA: 2, faintedB: 6, mode: 'played', fallenA: [], fallenB: [] });
   });
   it('rechaza un perfil ajeno', () => {
-    expect(() => resultForMatch(match, 'Z', { winner: 0, fainted: [0, 6] }, 'played')).toThrow(/no participa/);
+    expect(() => resultForMatch(match, 'Z', { winner: 0, fainted: [0, 6], fallen: [[], []] }, 'played')).toThrow(/no participa/);
   });
 });

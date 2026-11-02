@@ -65,7 +65,7 @@ describe('guardado: serializar y validar', () => {
   it('rechaza equipos y sets mal formados', () => {
     reject((s) => (s.profiles[0].team[0].moveIds = [1, 2, 3]), /4 ataques/);
     reject((s) => (s.profiles[0].team[0].moveIds = [1, 1, 2, 3]), /repetidos/);
-    reject((s) => s.profiles[0].team.pop(), /6 Pokémon/);
+    reject((s) => (s.profiles[0].team.length = 5), /entre 6 y 15/);
     reject((s) => (s.profiles[0].team[1].speciesId = s.profiles[0].team[0].speciesId), /repetidos/);
     reject((s) => (s.profiles[0].team[0].build.level = 500), /entero entre 1 y 100/);
     reject((s) => (s.profiles[0].team[0].build.ivs.hp = 40), /entre 0 y 31/);

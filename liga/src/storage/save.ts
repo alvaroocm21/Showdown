@@ -1,8 +1,10 @@
 import { ABILITIES, MOVES, NATURES, SPECIES, getSpecies, isMega } from '../core/data';
+import { buildSet, rollSpecies, ROSTER_SIZE } from '../core/generator';
 import { validateDraw } from '../core/game/settings';
+import { createRng, randomSeed } from '../core/rng';
 import {
   ALL_GENERATIONS, MAX_PLAYERS, MIN_PLAYERS, SAVE_VERSION, defaultSettings, emptyGame,
-  type GameState, type Match, type Profile, type Season, type SeasonRecord, type Settings,
+  type GameState, type Match, type MatchLogEntry, type Profile, type Season, type SeasonRecord, type Settings,
 } from '../core/game/types';
 import { STAT_KEYS, type BuildConfig, type PokemonSet, type Stats } from '../core/types';
 
@@ -73,8 +75,8 @@ function profileOf(v: unknown, path: string): Profile {
   const o = obj(v, path);
   const avatar = obj(o.avatar, `${path}.avatar`);
   const team = arr(o.team, `${path}.team`).map((s, i) => setOf(s, `${path}.team[${i}]`));
-  if (team.length !== 6) fail(`${path}.team`, 'el equipo debe tener 6 Pokémon');
-  if (new Set(team.map((p) => p.speciesId)).size !== 6) fail(`${path}.team`, 'Pokémon repetidos en el equipo');
+  if (team.length < 6 || team.length > ROSTER_SIZE) fail(`${path}.team`, `la plantilla debe tener entre 6 y ${ROSTER_SIZE} Pokémon`);
+  if (new Set(team.map((p) => p.speciesId)).size !== team.length) fail(`${path}.team`, 'Pokémon repetidos en el equipo');
   return {
     id: str(o.id, `${path}.id`, 60),
     name: str(o.name, `${path}.name`, 40),
@@ -82,6 +84,31 @@ function profileOf(v: unknown, path: string): Profile {
     main: bool(o.main, `${path}.main`),
     team,
     coins: int(o.coins, `${path}.coins`, 0, 1_000_000),
+  };
+}
+
+function fallenOf(v: unknown, path: string): number[] {
+  const ids = arr(v, path).map((x, i) => int(x, `${path}[${i}]`, 1, 100000));
+  if (ids.length > 6) fail(path, 'demasiados Pokémon debilitados');
+  return ids;
+}
+
+function logEntryOf(v: unknown, path: string): MatchLogEntry {
+  const o = obj(v, path);
+  const mode = o.mode;
+  if (mode !== 'played' && mode !== 'simulated') fail(`${path}.mode`, 'modo desconocido');
+  return {
+    season: int(o.season, `${path}.season`, 1, 100000),
+    round: int(o.round, `${path}.round`, 0, 100),
+    aId: str(o.aId, `${path}.aId`, 60),
+    bId: str(o.bId, `${path}.bId`, 60),
+    aName: str(o.aName, `${path}.aName`, 60),
+    bName: str(o.bName, `${path}.bName`, 60),
+    winnerId: str(o.winnerId, `${path}.winnerId`, 60),
+    faintedA: int(o.faintedA, `${path}.faintedA`, 0, 6),
+    faintedB: int(o.faintedB, `${path}.faintedB`, 0, 6),
+    mode: mode as MatchLogEntry['mode'],
+    at: num(o.at, `${path}.at`),
   };
 }
 
@@ -102,6 +129,8 @@ function matchOf(v: unknown, path: string, participants: Set<string>, round: num
       faintedA: int(r.faintedA, `${path}.result.faintedA`, 0, 6),
       faintedB: int(r.faintedB, `${path}.result.faintedB`, 0, 6),
       mode: mode as 'played' | 'simulated',
+      ...(r.fallenA === undefined ? {} : { fallenA: fallenOf(r.fallenA, `${path}.result.fallenA`) }),
+      ...(r.fallenB === undefined ? {} : { fallenB: fallenOf(r.fallenB, `${path}.result.fallenB`) }),
     };
   }
   return { id: str(o.id, `${path}.id`, 60), round, a, b, result };
@@ -194,7 +223,8 @@ export function validateGameState(raw: unknown): GameState {
   const nextSeasonNumber = int(o.nextSeasonNumber, 'nextSeasonNumber', 1, 100000);
   if (season && season.number !== nextSeasonNumber) fail('nextSeasonNumber', 'no coincide con la temporada en curso');
   if (history.some((r) => r.number >= nextSeasonNumber)) fail('nextSeasonNumber', 'hay temporadas del historial con número posterior');
-  return { version: SAVE_VERSION, settings: settingsOf(o.settings, 'settings'), profiles, season, history, nextSeasonNumber };
+  const matchLog = arr(o.matchLog ?? [], 'matchLog').map((e, i) => logEntryOf(e, `matchLog[${i}]`));
+  return { version: SAVE_VERSION, settings: settingsOf(o.settings, 'settings'), profiles, season, history, matchLog, nextSeasonNumber };
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -206,6 +236,43 @@ const MIGRATIONS: Record<number, (state: Obj) => Obj> = {
   // v1 → v2: aparecen los ajustes del sorteo. Las partidas antiguas pasan a los valores por defecto (todas las
   // generaciones); sus equipos no cambian, solo los sorteos futuros.
   1: (state) => ({ ...state, settings: defaultSettings() }),
+  // v2 → v3: plantillas de 15 Pokémon (se completan con sorteos sin repetir, con los ajustes de la partida) y
+  // registro de combates; los de la temporada en curso ya jugados se pasan al registro.
+  2: (state) => {
+    const rng = createRng(randomSeed());
+    const draw = (state.settings as { draw?: { generations: number[]; legendaries: boolean; finalStageOnly: boolean } } | undefined)?.draw;
+    const options = draw ? { generations: draw.generations, allowLegendary: draw.legendaries, finalStageOnly: draw.finalStageOnly } : {};
+    const profiles = (Array.isArray(state.profiles) ? state.profiles : []).map((p: Obj) => {
+      const team = Array.isArray(p.team) ? [...(p.team as Obj[])] : [];
+      const taken = new Set(team.map((t) => t.speciesId as number));
+      try {
+        while (team.length < ROSTER_SIZE) {
+          const species = rollSpecies(rng, taken, options);
+          taken.add(species.id);
+          team.push(buildSet(species.id, rng) as unknown as Obj);
+        }
+      } catch {
+        /* sin Pokémon de sobra con esos ajustes: se queda con los que haya */
+      }
+      return { ...p, team };
+    });
+    const names = new Map(profiles.map((p: Obj) => [p.id as string, p.name as string]));
+    const season = state.season as Obj | null | undefined;
+    const matchLog: Obj[] = [];
+    if (season && Array.isArray(season.rounds)) {
+      for (const round of season.rounds as Obj[][]) {
+        for (const m of round) {
+          const r = m.result as Obj | null | undefined;
+          if (!r) continue;
+          matchLog.push({
+            season: season.number, round: m.round, aId: m.a, bId: m.b, aName: names.get(m.a as string) ?? 'Perfil eliminado', bName: names.get(m.b as string) ?? 'Perfil eliminado',
+            winnerId: r.winner, faintedA: r.faintedA, faintedB: r.faintedB, mode: r.mode, at: (season.startedAt as number) ?? 0,
+          });
+        }
+      }
+    }
+    return { ...state, profiles, matchLog };
+  },
 };
 
 export function migrate(raw: unknown): unknown {

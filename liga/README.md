@@ -128,3 +128,9 @@ parpadea cuando queda poca vida, transición entre pantallas y respeto a «reduc
 310 habilidades: **252 implementadas** y **58 marcadas «no aplica»** con el motivo (dobles, objetos, bonus de dinero…); un test comprueba que todas están en un grupo u otro. También hay clima (sol, lluvia, arena, nieve y climas extremos), terrenos, confusión, Canto Mortal, Anulación y cambios forzados.
 
 Límites conocidos: los cambios de «Retirada»/«Pies Veloces» tipo Retirada Forzosa (Huida/Retirada) se resuelven al final del turno; no hay cambios elegidos a mitad de turno por ataques pivote.
+
+## Plantilla de 15, alineaciones y historial
+- Cada perfil tiene **15 Pokémon distintos**. En cada combate salen **6**, que se eligen antes (el primero sale al campo). Las partidas antiguas se completan a 15 al abrirlas.
+- Un Pokémon **debilitado en un combate no puede jugar la jornada siguiente** (se ve en gris en el selector y en la jornada).
+- Combate entre **dos perfiles tuyos (★)**: eliges el equipo de los dos y juegas con el local; el visitante lo lleva la IA. Con un solo perfil tuyo eliges el tuyo y el rival se alinea solo. Los combates sin perfiles ★ se simulan con alineaciones automáticas (los 6 más fuertes disponibles).
+- **Calendario → Historial**: victorias, Pokémon derribados y lista de combates de liga entre dos cuentas (todas las temporadas, desde esta versión).

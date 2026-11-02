@@ -113,8 +113,8 @@ describe('mejoras con monedas', () => {
       const res = applyUpgrade(base, id(base), { kind: 'pokemon', pokemon: idx }, createRng(seed));
       const after = res.state.profiles[0]!.team;
       expect(res.state.profiles[0]!.coins).toBe(50);
-      expect(after).toHaveLength(6);
-      expect(new Set(after.map((s) => s.speciesId)).size).toBe(6);
+      expect(after).toHaveLength(15);
+      expect(new Set(after.map((s) => s.speciesId)).size).toBe(15);
       expect(after[idx]!.speciesId).not.toBe(team[idx]!.speciesId);
       expect(getSpecies(after[idx]!.speciesId).finalStage).toBe(true);
       expect(after[idx]!.build).toEqual(team[idx]!.build);
@@ -129,7 +129,7 @@ describe('mejoras con monedas', () => {
     for (let seed = 1; seed <= 1500; seed++) {
       const res = applyUpgrade(base, base.profiles[0]!.id, { kind: 'pokemon', pokemon: seed % 6 }, createRng(seed));
       const team = res.state.profiles[0]!.team;
-      expect(new Set(team.map((s) => s.speciesId)).size, `semilla ${seed}`).toBe(6);
+      expect(new Set(team.map((s) => s.speciesId)).size, `semilla ${seed}`).toBe(15);
       expect(taken.has(team[seed % 6]!.speciesId), `semilla ${seed}`).toBe(false);
     }
   });
@@ -146,7 +146,7 @@ describe('mejoras con monedas', () => {
   it('rechaza perfil, Pokémon o ataque inexistentes', () => {
     const base = rich(500);
     expect(() => applyUpgrade(base, 'nadie', { kind: 'ability', pokemon: 0 }, createRng(1))).toThrow(/Perfil/);
-    expect(() => applyUpgrade(base, id(base), { kind: 'ability', pokemon: 9 }, createRng(1))).toThrow(/Pokémon/);
+    expect(() => applyUpgrade(base, id(base), { kind: 'ability', pokemon: 99 }, createRng(1))).toThrow(/Pokémon/);
     expect(() => applyUpgrade(base, id(base), { kind: 'move', pokemon: 0, slot: 4 }, createRng(1))).toThrow(/Ataque/);
     expect(() => applyUpgrade(base, id(base), { kind: 'move', pokemon: 0, slot: -1 }, createRng(1))).toThrow(/Ataque/);
   });

@@ -1,5 +1,5 @@
 import { SPECIES, isMega } from '../data';
-import { speciesPool, TEAM_SIZE, type GenerateOptions } from '../generator';
+import { speciesPool, ROSTER_SIZE, type GenerateOptions } from '../generator';
 import { ALL_GENERATIONS, type DrawSettings, type GameState } from './types';
 
 /** Región de cada generación (para mostrarlo en la interfaz). */
@@ -8,7 +8,7 @@ export const GENERATION_NAMES: Record<number, string> = {
 };
 
 /** Hacen falta Pokémon de sobra para formar un equipo y poder sustituir (equipo + alternativas). */
-export const MIN_POOL = TEAM_SIZE * 2;
+export const MIN_POOL = ROSTER_SIZE * 2;
 
 export const drawOptions = (draw: DrawSettings): GenerateOptions => ({
   generations: draw.generations,
