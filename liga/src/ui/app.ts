@@ -6,6 +6,7 @@ import { mountProfiles } from './screens/profiles';
 import { mountSettings } from './screens/settings';
 import { watchInstall } from './install';
 import type { Store } from './store';
+import { startSync, type Sync } from './sync';
 
 export type View =
   | { name: 'league' }
@@ -22,6 +23,7 @@ export interface AppCtx {
   /** Muestra un combate a pantalla completa (sin barra de pestañas). */
   battle(options: BattleScreenOptions): void;
   rng(): Rng;
+  sync: Sync;
   /** Perfil con el que se está jugando (null si aún no se ha elegido ninguno). */
   activeId: string | null;
   setActive(id: string | null): void;
@@ -82,8 +84,10 @@ export function startApp(host: HTMLElement, store: Store): void {
   let view: View = activeId ? { name: 'league' } : { name: 'profiles' };
   let toastTimer: number | undefined;
 
+  const sync = startSync(store, (m) => ctx.toast(m), () => ctx.go(activeId && store.get().profiles.some((p) => p.id === activeId) ? { name: 'league' } : { name: 'profiles' }));
   const ctx: AppCtx = {
     store,
+    sync,
     root: screen,
     go(next) {
       view = next;

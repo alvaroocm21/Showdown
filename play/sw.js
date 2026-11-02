@@ -1,9 +1,9 @@
 /* Service worker de la Liga Pokémon. Lo genera el build (vite.config.ts), que rellena la versión y la lista de ficheros. */
-const VERSION = '8b0b5f2587';
+const VERSION = 'ef876c0133';
 const SHELL_CACHE = `pokeliga-shell-${VERSION}`;
 /** Sprites: se conserva entre versiones de la app. */
 const SPRITE_CACHE = 'pokeliga-sprites';
-const PRECACHE = ["./","assets/index-BqmfvzVl.js","assets/index-tnK3Nm6m.css","icons/apple-touch-icon.png","icons/icon-192.png","icons/icon-512.png","icons/maskable-512.png","manifest.webmanifest"];
+const PRECACHE = ["./","assets/index-X5jUawLw.js","assets/index-tnK3Nm6m.css","icons/apple-touch-icon.png","icons/icon-192.png","icons/icon-512.png","icons/maskable-512.png","manifest.webmanifest"];
 const SPRITE_HOST = 'raw.githubusercontent.com';
 
 /* El servidor puede mandar `Vary: Origin`; las peticiones de módulos/CSS son CORS y llevan `Origin`, la copia guardada no.

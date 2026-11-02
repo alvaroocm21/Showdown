@@ -1,6 +1,7 @@
 import { GENERATION_NAMES, poolSize, speciesPerGeneration, totalDrawable, validateDraw } from '../../core/game/settings';
 import { updateDraw } from '../../core/game/state';
 import { ALL_GENERATIONS, emptyGame, type DrawSettings } from '../../core/game/types';
+import { cloud } from '../../storage/cloud';
 import { exportGame, importGame, SaveError } from '../../storage/save';
 import type { AppCtx } from '../app';
 import { canInstall, isInstalled, promptInstall } from '../install';
@@ -46,6 +47,7 @@ export function mountSettings(ctx: AppCtx): void {
       <button class="alt" id="offdl" hidden>⬇️ Descargar las imágenes (≈ ${estimatedMegabytes(sprites)} MB)</button>
       <small class="muted">Los datos del juego ya van dentro de la app; solo las imágenes de los Pokémon se bajan de internet.</small>
     </section>
+    <section class="card form" id="account"></section>
     <section class="card form">
       <h3>Guardado</h3>
       <p class="${ctx.store.persisted ? 'okmsg' : 'err'}">${ctx.store.persisted ? '✅ Se guarda automáticamente en este navegador.' : '⚠️ No se puede guardar en este navegador.'}</p>
@@ -64,6 +66,56 @@ export function mountSettings(ctx: AppCtx): void {
     </section>`;
 
   const $ = <T extends HTMLElement>(sel: string) => ctx.root.querySelector<T>(sel)!;
+
+  // Cuenta: la partida se copia a tu correo y se recupera en cualquier móvil, aunque desinstales la app
+  const accountEl = $('#account');
+  const STATUS_TEXT = { off: '', sync: '⏳ Sincronizando…', ok: '✅ Copia al día', error: '⚠️ No se pudo sincronizar (sin conexión). Se reintentará al guardar.' };
+  function renderAccount(msg = ''): void {
+    const u = cloud.user();
+    if (u) {
+      accountEl.innerHTML = `<h3>Cuenta y copia en la nube</h3>
+        <p>Conectado como <b>${u.email ?? 'tu cuenta'}</b></p>
+        <p class="muted" id="syncstatus">${STATUS_TEXT[ctx.sync.status()]}</p>
+        <p class="muted">Tu partida se guarda en tu cuenta cada vez que cambia. Si desinstalas la app, entra con el mismo correo y se recupera.</p>
+        <button class="main" id="syncnow">🔄 Sincronizar ahora</button>
+        <button class="alt" id="signout">Cerrar sesión</button>`;
+      accountEl.querySelector('#syncnow')!.addEventListener('click', () => void ctx.sync.now());
+      accountEl.querySelector('#signout')!.addEventListener('click', async () => {
+        await cloud.signOut();
+        renderAccount();
+      });
+      return;
+    }
+    accountEl.innerHTML = `<h3>Cuenta y copia en la nube</h3>
+      <p class="muted">Entra con tu correo para guardar la partida en la nube y recuperarla aunque desinstales la app o cambies de móvil.</p>
+      <label>Correo<input id="accmail" type="email" autocomplete="email" inputmode="email" /></label>
+      <label>Contraseña<input id="accpass" type="password" autocomplete="current-password" /></label>
+      <small id="accmsg" class="err">${msg}</small>
+      <button class="main" id="accin">Entrar</button>
+      <button class="alt" id="acccreate">Crear cuenta</button>
+      ${cloud.googleOk() ? '<button class="alt" id="accgoogle">Entrar con Google</button>' : ''}
+      <button class="alt small" id="accreset">He olvidado la contraseña</button>`;
+    const val = () => ({ mail: ($<HTMLInputElement>('#accmail').value || '').trim(), pass: $<HTMLInputElement>('#accpass').value });
+    const done = (r: { error?: string }) => {
+      if (r.error) accountEl.querySelector('#accmsg')!.textContent = r.error;
+    };
+    accountEl.querySelector('#accin')!.addEventListener('click', async () => done(await cloud.signIn(val().mail, val().pass, false)));
+    accountEl.querySelector('#acccreate')!.addEventListener('click', async () => done(await cloud.signIn(val().mail, val().pass, true)));
+    accountEl.querySelector('#accgoogle')?.addEventListener('click', async () => done(await cloud.signInGoogle()));
+    accountEl.querySelector('#accreset')!.addEventListener('click', async () => {
+      const r = await cloud.resetPassword(val().mail);
+      const el = accountEl.querySelector('#accmsg')!;
+      el.className = r.error ? 'err' : 'okmsg';
+      el.textContent = r.error ?? 'Te hemos enviado un correo para cambiar la contraseña.';
+    });
+  }
+  renderAccount();
+  const offAuth = cloud.onChange(() => (accountEl.isConnected ? renderAccount() : offAuth()));
+  const offSync = ctx.sync.onStatus(() => {
+    if (!accountEl.isConnected) return offSync();
+    const el = accountEl.querySelector('#syncstatus');
+    if (el) el.textContent = STATUS_TEXT[ctx.sync.status()];
+  });
 
   // Ajustes del sorteo
   const readDraw = (): DrawSettings => ({
