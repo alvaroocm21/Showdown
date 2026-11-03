@@ -1,4 +1,4 @@
-import { ABILITIES, MOVES, NATURES, SPECIES, getSpecies, isMega } from '../core/data';
+import { ABILITIES, DRAWABLE_MOVES, MOVES, NATURES, SPECIES, getSpecies, isMega, isTeraMove, isTeraSpecies } from '../core/data';
 import { buildSet, rollSpecies, ROSTER_SIZE } from '../core/generator';
 import { validateDraw } from '../core/game/settings';
 import { createRng, randomSeed } from '../core/rng';
@@ -272,6 +272,39 @@ const MIGRATIONS: Record<number, (state: Obj) => Obj> = {
       }
     }
     return { ...state, profiles, matchLog };
+  },
+  // v3 → v4: se quita la Teracristalización: Terapagos y los ataques Teraexplosión / Tera Starstorm de los equipos
+  // se cambian por otros al azar.
+  3: (state) => {
+    const rng = createRng(randomSeed());
+    const draw = (state.settings as { draw?: { generations: number[]; legendaries: boolean; finalStageOnly: boolean } } | undefined)?.draw;
+    const options = draw ? { generations: draw.generations, allowLegendary: draw.legendaries, finalStageOnly: draw.finalStageOnly } : {};
+    const tera = new Set(MOVES.filter(isTeraMove).map((m) => m.id));
+    const teraSpecies = new Set(SPECIES.filter(isTeraSpecies).map((s) => s.id));
+    const profiles = (Array.isArray(state.profiles) ? state.profiles : []).map((p: Obj) => {
+      if (!Array.isArray(p.team)) return p;
+      const team = p.team as Obj[];
+      const taken = new Set(team.map((t) => t.speciesId as number));
+      return {
+        ...p,
+        team: team.map((t) => {
+          if (teraSpecies.has(t.speciesId as number)) {
+            try {
+              const species = rollSpecies(rng, taken, options);
+              taken.add(species.id);
+              return buildSet(species.id, rng, { build: t.build as never }) as unknown as Obj;
+            } catch {
+              return t;
+            }
+          }
+          const ids = Array.isArray(t.moveIds) ? (t.moveIds as number[]) : [];
+          if (!ids.some((id) => tera.has(id))) return t;
+          const spare = rng.shuffle(DRAWABLE_MOVES.filter((m) => !ids.includes(m.id)));
+          return { ...t, moveIds: ids.map((id) => (tera.has(id) ? spare.pop()!.id : id)) };
+        }),
+      };
+    });
+    return { ...state, profiles };
   },
 };
 

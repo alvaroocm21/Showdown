@@ -1,6 +1,6 @@
 import type { PokemonSet } from '../types';
 
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 export const MIN_PLAYERS = 4;
 export const MAX_PLAYERS = 8;
 export const WIN_POINTS = 3;

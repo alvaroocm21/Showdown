@@ -42,7 +42,7 @@ describe('generador de equipos', () => {
     const base = speciesPool().length;
     expect(speciesPool({ allowLegendary: true }).length).toBeGreaterThan(base);
     expect(speciesPool({ finalStageOnly: false }).length).toBeGreaterThan(base);
-    expect(speciesPool({ finalStageOnly: false, allowLegendary: true })).toHaveLength(1082); // 1025 + 57 formas regionales
+    expect(speciesPool({ finalStageOnly: false, allowLegendary: true })).toHaveLength(1081); // 1025 + 57 formas regionales
     for (const s of speciesPool({ generations: [4, 9] })) expect([4, 9]).toContain(s.generation);
     expect(speciesPool({ generations: [] })).toHaveLength(0);
     // con todo abierto salen Pokémon de las 9 generaciones, legendarios y sin evolucionar

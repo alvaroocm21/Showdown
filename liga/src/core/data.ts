@@ -41,6 +41,13 @@ export function backSpriteUrls(speciesId: number): string[] {
   return [`${SHOWDOWN_SPRITES}/ani-back/${id}.gif`, `${SHOWDOWN_SPRITES}/gen5-back/${id}.png`];
 }
 
+/** Contenido de Teracristalización: no entra en el juego (ni en sorteos ni en la tienda). Sigue en los datos para no romper partidas antiguas. */
+const TERA_MOVES = new Set(['tera-blast', 'tera-starstorm']);
+export const isTeraMove = (m: Move): boolean => TERA_MOVES.has(m.slug);
+export const isTeraSpecies = (s: Species): boolean => s.slug.startsWith('terapagos');
+/** Ataques que se pueden sortear. */
+export const DRAWABLE_MOVES: Move[] = MOVES.filter((m) => !isTeraMove(m));
+
 /** Una megaevolución: solo existe dentro del combate, nunca se sortea como Pokémon. */
 export const isMega = (s: Species): boolean => s.form?.kind === 'mega';
 /** Número de Pokédex (las formas comparten el de su especie base). */

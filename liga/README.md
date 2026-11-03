@@ -122,7 +122,7 @@ parpadea cuando queda poca vida, transición entre pantallas y respeto a «reduc
 - **Megaevoluciones** (97 formas, incluidas Mega X/Y): no se sortean; son una mecánica de combate. Una vez por combate y bando, antes de atacar, el botón «✨ Mega-…» transforma al Pokémon (recalcula estadísticas y tipos; conserva su habilidad aleatoria y los PS perdidos). Dura hasta el final del combate, aunque se le cambie. Las tarjetas muestran las megas posibles.
 - **Movimientos Z**: una vez por combate y bando, el botón «⚡ Mov. Z» convierte los ataques de daño en su versión Z (potencia según el original, no fallan). Los de estado quedan bloqueados mientras está activo.
 - El combate usa un escenario horizontal 960×540 como Zafiro Alfa (en vertical se gira solo; mejor con el móvil en horizontal): paneles de PS arriba-izquierda y abajo-derecha, cuadro de texto y ataques abajo, y tus Pokémon de espaldas.
-- No hay Teracristalización, Dinamax ni Gigamax, ni formas Primigenias.
+- No hay Teracristalización (ni Terapagos ni los ataques Tera Blast y Tera Starstorm: no se sortean y se cambian en partidas antiguas), Dinamax ni Gigamax, ni formas Primigenias.
 
 ### Habilidades
 310 habilidades: **252 implementadas** y **58 marcadas «no aplica»** con el motivo (dobles, objetos, bonus de dinero…); un test comprueba que todas están en un grupo u otro. También hay clima (sol, lluvia, arena, nieve y climas extremos), terrenos, confusión, Canto Mortal, Anulación y cambios forzados.

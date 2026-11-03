@@ -27,12 +27,12 @@ describe('ajustes del sorteo', () => {
 
   it('cuenta los Pokémon por generación', () => {
     const per = speciesPerGeneration();
-    expect(Object.values(per).reduce((a, b) => a + b, 0)).toBe(1082); // 1025 + 57 formas regionales (las megas no se sortean)
+    expect(Object.values(per).reduce((a, b) => a + b, 0)).toBe(1081); // 1025 + 57 formas regionales − Terapagos (las megas no se sortean)
     expect(per[1]).toBe(151);
     expect(per[7]).toBe(88 + 18); // + Alola
     expect(per[8]).toBe(96 + 19 + 16); // + Galar + Hisui
-    expect(per[9]).toBe(120 + 4); // + Paldea
-    expect(totalDrawable()).toBe(1082);
+    expect(per[9]).toBe(120 + 4 - 1); // + Paldea, sin Terapagos
+    expect(totalDrawable()).toBe(1081);
   });
 
   it('updateDraw cambia solo los ajustes (ordena las generaciones) y rechaza los inválidos', () => {

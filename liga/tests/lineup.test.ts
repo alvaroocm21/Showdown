@@ -9,6 +9,8 @@ import { recordMatch, startSeason, addProfile } from '../src/core/game/state';
 import { emptyGame, type GameState } from '../src/core/game/types';
 import { deserialize, migrate, serialize, validateGameState } from '../src/storage/save';
 import { createRng } from '../src/core/rng';
+import { MOVES, SPECIES } from '../src/core/data';
+import { rollTeam } from '../src/core/generator';
 
 function league(): GameState {
   const rng = createRng(21);
@@ -110,5 +112,27 @@ describe('guardado v3', () => {
     }
     expect(upgraded.matchLog).toHaveLength(1);
     expect(upgraded.matchLog[0]!.aId).toBe(m.a);
+  });
+});
+
+describe('sin Teracristalización', () => {
+  it('no se sortean sus ataques ni Terapagos, y una partida v3 con ellos se limpia', () => {
+    const terapagos = SPECIES.find((s) => s.slug.startsWith('terapagos'))!;
+    const blast = MOVES.find((m) => m.slug === 'tera-blast')!;
+    for (let seed = 1; seed <= 200; seed++) {
+      for (const p of rollTeam(createRng(seed), { allowLegendary: true, finalStageOnly: false })) {
+        expect(p.speciesId).not.toBe(terapagos.id);
+        expect(p.moveIds).not.toContain(blast.id);
+      }
+    }
+    const state = league();
+    const raw = JSON.parse(serialize(state));
+    raw.version = 3;
+    raw.profiles[0].team[0].moveIds[0] = blast.id;
+    raw.profiles[0].team[1].speciesId = terapagos.id;
+    const clean = validateGameState(migrate(raw));
+    expect(clean.profiles[0]!.team[0]!.moveIds).not.toContain(blast.id);
+    expect(clean.profiles[0]!.team.some((s) => s.speciesId === terapagos.id)).toBe(false);
+    expect(new Set(clean.profiles[0]!.team.map((s) => s.speciesId)).size).toBe(15);
   });
 });

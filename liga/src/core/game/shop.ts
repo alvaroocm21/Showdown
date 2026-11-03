@@ -1,4 +1,4 @@
-import { ABILITIES, MOVES, getAbility, getMove, getSpecies } from '../data';
+import { ABILITIES, DRAWABLE_MOVES as MOVES, getAbility, getMove, getSpecies } from '../data';
 import { buildSet, isPlayableMoveset, rollSpecies } from '../generator';
 import type { Rng } from '../rng';
 import type { PokemonSet } from '../types';
