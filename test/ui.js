@@ -44,6 +44,10 @@ Level: 30
   await pg.click("#lgOpen"); await pg.waitForSelector(".lg-ok", { timeout: 15000 });
   console.log("rom:", await pg.innerText(".lg-ok"));
   await pg.click(".lg-p:nth-child(1) [data-act=slot]"); await pg.fill(".lg-in", "Liam"); await pg.click(".lg-opt");
+  await pg.click("#lgBlock"); await pg.fill(".lg-in", "Kaudan");
+  assert.match(await pg.innerText(".lg-opt"), /N\./, "se ve el equipo del entrenador");
+  await pg.click(".lg-opt");
+  assert.equal(await pg.locator(".lg-slot.ok").count(), 2, "el bloque asigna a todos");
   await pg.click("#lgSug");
   console.log("slots:", await pg.locator(".lg-slot").allInnerTexts());
   await pg.screenshot({ path: S + "/liga-rom.png", fullPage: true });
