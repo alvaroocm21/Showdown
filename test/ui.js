@@ -62,6 +62,15 @@ Level: 30
   await pg.click("#lgJnew");
   assert.equal(await pg.locator("#lgJ option").count(), 2);
   assert.match(await pg.innerText(".lg-p:nth-child(1) [data-act=team]"), /\(2\/6\)/);
+  // resultados: Ana gana a Beto en la jornada 2 y empatan en la 1
+  await pg.selectOption("#lgMR", "a"); await pg.click("#lgMAdd");
+  assert.equal(await pg.locator(".lg-m").count() >= 2, true);
+  assert.match(await pg.innerText(".lg-t tbody tr:first-child"), /Ana\s+1\s+1\s+0\s+0\s+3/);
+  await pg.selectOption("#lgJ", { index: 0 }); await pg.selectOption("#lgMR", "d"); await pg.click("#lgMAdd");
+  assert.match(await pg.innerText(".lg-t tbody tr:first-child"), /Ana\s+2\s+1\s+1\s+0\s+4/);
+  assert.match(await pg.innerText("#ligaRoot"), /Ana 1 – 0 Beto|Beto 0 – 1 Ana|Ana\s+1\s+–\s+0\s+Beto/);
+  await pg.reload(); await pg.waitForSelector("#pname", { timeout: 60000 }); await pg.click(".pcard"); await pg.click("#goLiga");
+  assert.match(await pg.innerText(".lg-t tbody tr:first-child"), /Ana\s+2/, "los resultados se guardan");
   const sw = await pg.evaluate(() => document.documentElement.scrollWidth); assert.ok(sw <= 390, "scroll horizontal " + sw);
   await pg.screenshot({ path: S + "/liga-j2.png", fullPage: true });
   await br.close(); srv.close();

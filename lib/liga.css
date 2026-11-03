@@ -43,3 +43,11 @@
 .lg-opt:disabled{opacity:.4}
 .lg-empty{opacity:.7;padding:10px}
 .lg-chk{display:flex;gap:8px;align-items:center;font-size:13px;margin:8px 0}
+
+.lg-mlist{display:flex;flex-direction:column;gap:4px;margin:6px 0}
+.lg-m{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#07183a;border:1px solid #5aa6ff44;border-radius:8px;padding:6px 10px;font-size:13px}
+.lg-m .lg-x{width:22px;height:22px}
+.lg-tw{overflow-x:auto}
+.lg-t{width:100%;border-collapse:collapse;font-size:13px}
+.lg-t th,.lg-t td{padding:5px 6px;text-align:center;border-bottom:1px solid #ffffff22;font-variant-numeric:tabular-nums}
+.lg-t td:nth-child(2),.lg-t th:nth-child(2){text-align:left}
