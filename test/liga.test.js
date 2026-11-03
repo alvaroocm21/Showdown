@@ -96,6 +96,20 @@ Level: 20
     assert.equal(r.trainers[0].team[0].species, 9);
     console.log("MOD OK");
   }
+  // ---- Nombres de entrenadores en los textos ----
+  {
+    const g = await open(S + "/um.3ds");
+    const out = await Core.buildNames(g.rom, g.cfg, { 1: "Álvaro ♀", 2: "Beto" });
+    assert.deepEqual(Object.keys(out).sort(), ["a/0/3/2", "a/0/3/6"], "solo los idiomas que hay en la ROM");
+    const mem = { async readFile(p) { return out[p] || g.rom.readFile(p); }, titleId: g.rom.titleId };
+    for (const l of [6, 2]) {
+      const t = await Core.loadText(mem, g.cfg, l);
+      assert.deepEqual(t.trainers, ["", "Álvaro ♀", "Beto"]);
+    }
+    const before = await Core.loadText(g.rom, g.cfg, 6), after = await Core.loadText(mem, g.cfg, 6);
+    assert.deepEqual(after.moves, before.moves); assert.deepEqual(after.classes, before.classes);
+    console.log("NOMBRES OK");
+  }
   // ---- Formas ----
   {
     const g = await open(S + "/um.3ds");

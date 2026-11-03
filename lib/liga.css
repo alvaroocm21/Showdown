@@ -42,3 +42,4 @@
 .lg-opt small{opacity:.7;font-size:11px}
 .lg-opt:disabled{opacity:.4}
 .lg-empty{opacity:.7;padding:10px}
+.lg-chk{display:flex;gap:8px;align-items:center;font-size:13px;margin:8px 0}
