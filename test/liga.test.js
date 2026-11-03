@@ -101,6 +101,8 @@ Level: 20
     const g = await open(S + "/um.3ds");
     const out = await Core.buildNames(g.rom, g.cfg, { 1: "Álvaro ♀", 2: "Beto" });
     assert.deepEqual(Object.keys(out).sort(), ["a/0/3/2", "a/0/3/6"], "solo los idiomas que hay en la ROM");
+    const es = await Core.buildNames(g.rom, g.cfg, { 1: "Álvaro" }, [6]);
+    assert.deepEqual(Object.keys(es), ["a/0/3/6"], "solo español");
     const mem = { async readFile(p) { return out[p] || g.rom.readFile(p); }, titleId: g.rom.titleId };
     for (const l of [6, 2]) {
       const t = await Core.loadText(mem, g.cfg, l);

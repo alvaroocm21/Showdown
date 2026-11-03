@@ -94,7 +94,7 @@ descifrada, con o sin mod en .zip). Aquí no hay combates: se preparan los equip
    que añaden Pokémon de 8.ª/9.ª gen. Lo que no existe en la ROM se omite y se avisa.
 4. **Exportar**: descarga un `.zip` con `<TitleID>/romfs/...` (solo los dos archivos de entrenadores) para `load/mods/` de Azahar
    o `luma/titles/` de una 3DS; en Chrome de escritorio también puede guardar directamente en una carpeta.
-   Las megaevoluciones se escriben como el Pokémon base con su megapiedra.
+   Los nombres de los entrenadores se escriben solo en los textos en español (el .zip pesa mucho menos). Las megaevoluciones se escriben como el Pokémon base con su megapiedra.
 
 5. **Resultados y monedas:** anota quién gana cada combate (clasificación e historial cara a cara) y cada resultado da monedas
    (victoria 100, empate 50, derrota 25; configurable). Con ellas se compran retoques a los Pokémon de la jornada: habilidad al azar,
