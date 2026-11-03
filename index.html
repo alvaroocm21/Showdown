@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Duelos">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="lib/liga.css">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>Pokémon Zafiro Alfa · Duelos</title>
@@ -334,6 +335,7 @@ body.sv #result{background:#07050dd9}
     <button class="btn" id="goTrainers">Ir a combatir</button>
     <button class="btn gold" data-league>🏆 Desafío de la Liga</button>
     <button class="btn" id="goRun" style="background:linear-gradient(#b86bff,#6a2fd1);box-shadow:0 4px 0 #3a1580">🎲 Randomlocke</button>
+    <button class="btn" id="goLiga" style="background:linear-gradient(#2fcf8a,#12945e);box-shadow:0 4px 0 #0a5a3a">🏟 Liga ROM</button>
   </div>
   <button class="btn" id="installBtn">📲 Instalar app en este dispositivo</button>
   <div class="stats-line" id="installHint" style="display:none;max-width:420px;padding:0 14px"></div>
@@ -345,8 +347,8 @@ body.sv #result{background:#07050dd9}
 <section id="scr-team" class="screen">
   <div class="wrap">
     <div class="topbar">
-      <button class="btn ghost" data-go="title">← Inicio</button>
-      <h2>Tu equipo</h2>
+      <button class="btn ghost" data-go="title" id="teamBack">← Inicio</button>
+      <h2 id="teamTitle">Tu equipo</h2>
       <button class="btn ghost" id="randTeam">🎲 Aleatorio</button>
       <button class="btn ghost" id="ieBtn">📋 Importar / Exportar</button>
       <button class="btn gold" id="teamOk" disabled>Elegir rival →</button>
@@ -396,6 +398,11 @@ body.sv #result{background:#07050dd9}
   <div class="waves"></div>
 </section>
 
+<section id="scr-liga" class="screen">
+  <div class="wrap lg-wrap" id="ligaRoot"></div>
+  <div class="waves"></div>
+</section>
+
 <section id="scr-battle" class="screen">
   <div id="rotate"><div class="ic">📱</div><div>Gira el móvil en horizontal para combatir</div><button class="btn sm ghost" id="rotateOk">Seguir en vertical</button></div>
   <div id="stage">
@@ -419,6 +426,9 @@ body.sv #result{background:#07050dd9}
 </section>
 
 <script src="lib/pkmn.bundle.js"></script>
+<script src="lib/romcore.js"></script>
+<script src="lib/ligamap.js"></script>
+<script src="lib/liga.js"></script>
 <script>
 'use strict';
 if(typeof PKMN==='undefined'){document.getElementById('loading').innerHTML='No se pudo cargar <b>lib/pkmn.bundle.js</b>.<br>Abre la carpeta completa del proyecto (no solo index.html).'}
@@ -522,10 +532,19 @@ const calcStat=(k,base,iv,ev,lvl,nat)=>{const x=Math.floor((2*base+iv+Math.floor
 /* ================= EQUIPO ================= */
 let MY=[];
 let sel=0,filT=null,filG=null,LEARN=false;
-const saveTeam=()=>{if(PID)store.set(pk('team'),MY);$('#teamOk').disabled=!MY.length};
+let TEAMCTX=null; // al editar el equipo de un entrenador de la Liga ROM en vez del del jugador
+const saveTeam=()=>{if(TEAMCTX)TEAMCTX.save(MY);else if(PID)store.set(pk('team'),MY);$('#teamOk').disabled=!MY.length};
+function editExternalTeam(title,sets,save,back){
+  const keep={MY,sel};
+  TEAMCTX={title,save,back:()=>{TEAMCTX=null;MY=keep.MY;sel=keep.sel;back()}};
+  MY=sets.map(s=>({...s,item:s.item===undefined?'':s.item}));sel=0;show('team')}
 function randomTeam(){MY=[...POOL].sort(()=>Math.random()-.5).slice(0,6).map(s=>defaultSet(s.name));sel=0;saveTeam()}
 const ROMAN=['','I','II','III','IV','V','VI','VII','VIII','IX'];
 function renderTeam(){
+  $('#teamTitle').textContent=TEAMCTX?TEAMCTX.title:'Tu equipo';
+  $('#teamBack').textContent=TEAMCTX?'← Liga':'← Inicio';
+  $('#teamBack').onclick=()=>TEAMCTX?TEAMCTX.back():show('title');
+  $('#teamOk').textContent=TEAMCTX?'Guardar y volver ✔':'Elegir rival →';
   $('#gf').innerHTML=ROMAN.slice(1).map((r,i)=>`<span class="fchip g ${filG===i+1?'on':''}" data-g="${i+1}">${r}</span>`).join('');
   $$('#gf .fchip').forEach(c=>c.onclick=()=>{filG=filG===+c.dataset.g?null:+c.dataset.g;renderTeam()});
   $('#tf').innerHTML=Object.keys(TYPES).filter(t=>t!=='Stellar').map(t=>`<span class="fchip ${filT===t?'on':''}" data-t="${t}" style="background:${tCol(t)}">${tES(t)}</span>`).join('');
@@ -604,13 +623,13 @@ function renderEditor(){
   $$('[data-ev]').forEach(inp=>inp.onchange=()=>{m.evs[inp.dataset.ev]=Math.max(0,Math.min(252,+inp.value||0));upd()});
   $$('[data-iv]').forEach(inp=>inp.onchange=()=>{m.ivs[inp.dataset.iv]=Math.max(0,Math.min(31,inp.value===''?31:+inp.value));upd()})}
 $('#randTeam').onclick=()=>{randomTeam();renderTeam()};
-$('#teamOk').onclick=()=>show('trainers');
+$('#teamOk').onclick=()=>TEAMCTX?TEAMCTX.back():show('trainers');
 $('#ieBtn').onclick=()=>{const b=$('#ieBox');b.style.display=b.style.display==='block'?'none':'block'};
 $('#ieExport').onclick=()=>{$('#ieText').value=Teams.export(MY)};
 $('#ieImport').onclick=()=>{try{const t=Teams.import($('#ieText').value);if(!t||!t.length)throw 0;MY=t.slice(0,6).map(s=>{const d=defaultSet(s.species);return{...d,...s,name:'',evs:{hp:0,atk:0,def:0,spa:0,spd:0,spe:0,...s.evs},ivs:{hp:31,atk:31,def:31,spa:31,spd:31,spe:31,...s.ivs},level:s.level||100,teraType:s.teraType||d.teraType,moves:s.moves.slice(0,4)}});sel=0;saveTeam();renderTeam()}catch(e){alert('No se pudo importar el equipo.')}};
 
 /* ================= PANTALLAS ================= */
-function show(n){if(window.AndroidApp)try{AndroidApp.landscape(n==='battle')}catch(e){}$$('.screen').forEach(s=>s.classList.toggle('on',s.id==='scr-'+n));if(n==='battle')fit();if(n==='team')renderTeam();if(n==='trainers')renderTrainers();if(n==='run')renderRun();if(n==='title')renderWho()}
+function show(n){if(window.AndroidApp)try{AndroidApp.landscape(n==='battle')}catch(e){}$$('.screen').forEach(s=>s.classList.toggle('on',s.id==='scr-'+n));if(n==='battle')fit();if(n==='team')renderTeam();if(n==='trainers')renderTrainers();if(n==='run')renderRun();if(n==='title')renderWho();if(n==='liga')Liga.render()}
 $$('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
 $('#goTeam').onclick=()=>show('team');
 const ensureTeam=()=>{if(!MY.length)randomTeam()};
@@ -1990,8 +2009,12 @@ function renderRunSide(el){
     saveRun();renderRun()});
   $('#rAb').onclick=()=>{if(confirm('¿Abandonar la aventura? Se perderá el progreso.')){run=null;store.set(pk('run'),null);renderRun()}}}
 $('#goRun').onclick=()=>show('run');
+Liga.init({Dex,Teams,NAMES,store,esc,nmSp,iconEl,show,editTeam:editExternalTeam,
+  profileTeams:()=>profiles().map(p=>({id:p.id,name:p.name,emoji:p.emoji,team:store.get(`zaf3.${p.id}.team`,[])}))});
+$('#goLiga').onclick=()=>show('liga');
 
-window.__back=()=>{const on=(document.querySelector('.screen.on')||{}).id,map={'scr-team':'title','scr-trainers':'title','scr-run':'title','scr-title':'profile'};
+window.__back=()=>{const on=(document.querySelector('.screen.on')||{}).id,map={'scr-team':'title','scr-trainers':'title','scr-run':'title','scr-liga':'title','scr-title':'profile'};
+  if(on==='scr-team'&&TEAMCTX){TEAMCTX.back();return true}
   if(on==='scr-battle'){if(M&&M.opts&&M.opts.noQuit)return true;$('#quit').click();return true}
   if(!map[on])return false;if(map[on]==='profile')showProfiles();else show(map[on]);return true};
 window.__dbg={fx:{moveSpec,setSprite,teraFx0:teraFx,moveStyle,animMove,impactFx,projectile,statusFx,arrowFx,healFx,teraFx,megaFx,ballThrow,recallAnim,animFaint,auraFx,shake,drawBG},get S(){return M&&M.S},get run(){return run},newRun,runContinue,STAGES,genMon,prepEnemy,genStock,applyLevels,get M(){return M},get MY(){return MY},set MY(v){MY=v},saveTeam,defaultSet,POOL,suggestMoves,startMatch,renderTeam,TRAINERS,trainerSets};

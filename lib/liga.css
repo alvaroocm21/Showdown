@@ -1,0 +1,44 @@
+/* Liga ROM */
+.lg-wrap{max-width:820px}
+.lg-intro,.lg-note{font-size:13px;opacity:.85;margin:4px 0 8px;line-height:1.4}
+.lg-pan{margin-bottom:12px;display:block}
+.lg-pan>b,.lg-pan>summary{display:block;font-size:16px;margin-bottom:6px;cursor:pointer}
+.lg-row{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0;align-items:center}
+.lg-row select,.lg-row input,.lg-add input,.lg-in,#scr-liga textarea{background:#04122f;color:#fff;border:2px solid #5aa6ff88;border-radius:8px;padding:7px 9px;user-select:text;min-width:0}
+.lg-row select,.lg-row input{flex:1;min-width:130px}
+.lg-f{display:flex;flex-direction:column;gap:3px;font-size:12px;margin:6px 0}
+.lg-f input{color:#cfe3ff;font-size:12px}
+.lg-p{background:#07183a;border:2px solid #5aa6ff66;border-radius:12px;padding:10px;margin:8px 0}
+.lg-ph{display:flex;align-items:center;gap:10px}
+.lg-ph .pav{width:46px;height:46px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;border:3px solid #fff8}
+.lg-pm{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.lg-name{background:transparent;border:0;border-bottom:2px dashed #5aa6ff55;color:#fff;font-weight:800;font-size:17px;padding:2px 0;width:100%;user-select:text}
+.lg-slot{text-align:left;background:#ffffff14;border:1px dashed #ffffff55;border-radius:8px;padding:4px 8px;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lg-slot.ok{background:#12945e55;border-style:solid;border-color:#2fcf8a}
+.lg-slot[disabled]{opacity:.55}
+.lg-x{background:#ff4d5e;border-radius:50%;width:26px;height:26px;font-weight:900;flex:none}
+.lg-team{display:flex;gap:2px;flex-wrap:wrap;margin:8px 0 4px;min-height:44px}
+.lg-none{font-size:12px;opacity:.7;margin:8px 0}
+.lg-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.lg-add{display:flex;flex-direction:column;gap:8px;margin-top:10px;border-top:1px solid #ffffff22;padding-top:10px}
+.lg-add .emo{display:flex;gap:6px;flex-wrap:wrap}
+.lg-add .emo span{cursor:pointer;font-size:22px;padding:2px 6px;border-radius:8px;border:2px solid transparent}
+.lg-add .emo.col span{width:26px;height:26px;padding:0;border-radius:50%}
+.lg-add .emo span.on{border-color:var(--gold)}
+.lg-ok{color:#8dffc6;font-size:13px;margin:6px 0}
+.lg-err{color:#ff9aa4;font-size:13px;margin:6px 0}
+.lg-warn{font-size:12px;margin-top:8px;background:#5a3b0033;border:1px solid #ffb84a88;border-radius:8px;padding:6px 8px}
+.lg-warn ul{margin:6px 0 2px 18px}
+.lg-steps{margin-top:10px;font-size:13px}
+.lg-steps p{margin:6px 0}
+.lg-steps code{background:#04122f;padding:1px 5px;border-radius:5px}
+#scr-liga textarea{width:100%;height:90px;margin-top:8px;font-size:11px}
+.lg-ov{position:fixed;inset:0;z-index:200;background:#000a;display:flex;align-items:flex-end;justify-content:center}
+.lg-sheet{background:#0b1d44;border:2px solid #5aa6ff;border-radius:16px 16px 0 0;width:min(560px,100%);max-height:85vh;display:flex;flex-direction:column;padding:12px;gap:8px}
+.lg-sh{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.lg-in{width:100%}
+.lg-ul{list-style:none;overflow:auto;display:flex;flex-direction:column;gap:4px}
+.lg-opt{width:100%;text-align:left;background:#ffffff12;border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:2px}
+.lg-opt small{opacity:.7;font-size:11px}
+.lg-opt:disabled{opacity:.4}
+.lg-empty{opacity:.7;padding:10px}

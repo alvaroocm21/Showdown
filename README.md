@@ -83,6 +83,25 @@ La interfaz traduce los eventos del combate al español (los textos poco comunes
 - Sprites 3D animados de Pokémon Showdown. Si no cargan, se muestra un marcador por tipo.
 - Equipo y medallas se guardan en `localStorage`.
 
+## 🏟 Liga ROM (combates en la ROM de 3DS)
+Apartado para jugar una liga entre varios entrenadores **en la ROM** (Rubí Omega / Zafiro Alfa o Ultra Sol / Ultra Luna,
+descifrada, con o sin mod en .zip). Aquí no hay combates: se preparan los equipos y se llevan a la ROM.
+1. **Jornada**: crea tantas como quieras; una jornada nueva copia los equipos de la anterior.
+2. **Entrenadores**: añade a cada participante y elige sus Pokémon de esa jornada con el mismo editor de equipos de la app
+   (nivel, naturaleza, EVs/IVs, habilidad, objeto, 4 movimientos, importar en formato Showdown) o tráelos del equipo de un jugador.
+3. **ROM**: elige el `.3ds` (se lee en el dispositivo, no se sube) y asigna a cada participante un entrenador del juego
+   (hay un botón para sugerirlos). Los nombres se casan en inglés (o español) con los textos de la ROM, así que funciona también con mods
+   que añaden Pokémon de 8.ª/9.ª gen. Lo que no existe en la ROM se omite y se avisa.
+4. **Exportar**: descarga un `.zip` con `<TitleID>/romfs/...` (solo los dos archivos de entrenadores) para `load/mods/` de Azahar
+   o `luma/titles/` de una 3DS; en Chrome de escritorio también puede guardar directamente en una carpeta.
+   Las megaevoluciones se escriben como el Pokémon base con su megapiedra.
+
+Notas: en ORAS la ROM no guarda naturaleza ni EVs de los entrenadores (USUM sí). La Liga ROM necesita elegir archivos y descargar,
+algo que el WebView de la APK actual no permite: úsala en la web/PWA. Código: `lib/romcore.js` (lectura/escritura de ROM,
+GARC, entrenadores), `lib/ligamap.js` (Showdown → ROM), `lib/liga.js` + `lib/liga.css` (pantalla).
+Pruebas: `python3 test/make_rom.py test/out/fake.3ds oras && python3 test/make_rom.py test/out/um.3ds usum && node test/liga.test.js test/out && node test/ui.js test/out`
+(la última necesita `playwright`).
+
 ## Reconstruir el paquete (opcional)
 `lib/pkmn.bundle.js` contiene el simulador y los datos. Para regenerarlo:
 

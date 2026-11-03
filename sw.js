@@ -1,6 +1,6 @@
 // Service worker: la app funciona sin conexión una vez cargada y guarda los sprites ya vistos.
-const VER='duelos-v1';
-const SHELL=['./','index.html','manifest.webmanifest','lib/pkmn.bundle.js','icons/icon-192.png','icons/icon-512.png','icons/apple-touch-icon.png'];
+const VER='duelos-v2';
+const SHELL=['./','index.html','manifest.webmanifest','lib/pkmn.bundle.js','lib/romcore.js','lib/ligamap.js','lib/liga.js','lib/liga.css','icons/icon-192.png','icons/icon-512.png','icons/apple-touch-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(VER).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==VER&&k.startsWith('duelos-')).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{
