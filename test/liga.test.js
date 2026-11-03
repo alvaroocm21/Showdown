@@ -110,6 +110,14 @@ Level: 20
     assert.deepEqual(after.moves, before.moves); assert.deepEqual(after.classes, before.classes);
     console.log("NOMBRES OK");
   }
+  // ---- Lista de archivos del RomFS ----
+  {
+    const rom = await Core.openRom(R_(S + "/um.3ds"));
+    const l = rom.list(), paths = l.map(f => f.path).sort();
+    assert.deepEqual(paths, ["a/0/1/3", "a/0/1/7", "a/0/3/2", "a/0/3/6", "a/1/0/6", "a/1/0/7"]);
+    assert.equal(l.find(f => f.path === "a/1/0/6").size, (await rom.readFile("a/1/0/6")).length);
+    console.log("LISTA OK");
+  }
   // ---- Formas ----
   {
     const g = await open(S + "/um.3ds");
