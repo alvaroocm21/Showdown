@@ -97,8 +97,9 @@ descifrada, con o sin mod en .zip). Aquí no hay combates: se preparan los equip
    Las megaevoluciones se escriben como el Pokémon base con su megapiedra.
 
 5. **Resultados y monedas:** anota quién gana cada combate (clasificación e historial cara a cara) y cada resultado da monedas
-   (victoria 100, empate 50, derrota 25; configurable). Con ellas se compran retoques a los Pokémon de la jornada: habilidad al azar
-   (de su especie o cualquiera), naturaleza (elegir o al azar), ataque (elegir o al azar entre los que aprende), objeto al azar o IVs a 31.
+   (victoria 100, empate 50, derrota 25; configurable). Con ellas se compran retoques a los Pokémon de la jornada: habilidad al azar,
+   naturaleza (elegir o al azar), ataque (elegir o al azar), objeto al azar o IVs a 31. Las habilidades, ataques y objetos al azar salen
+   de entre todos los del juego, aprenda o no el Pokémon.
    Si la ROM está abierta, el azar solo elige lo que existe en ella. Lógica en `lib/ligashop.js`.
 
 Notas: en ORAS la ROM no guarda naturaleza ni EVs de los entrenadores (USUM sí). La Liga ROM necesita elegir archivos y descargar,

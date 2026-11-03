@@ -12,15 +12,15 @@ let seed = 1; const rand = () => (seed = (seed * 16807) % 2147483647) / 21474836
 const mk = () => ({ species: "Gengar", ability: "Cursed Body", item: "Leftovers", nature: "Timid", moves: ["Shadow Ball", "Sludge Bomb", "Thunderbolt", "Hypnosis"], ivs: { hp: 31, atk: 0, def: 31, spa: 31, spd: 31, spe: 31 } });
 
 let s = mk();
-assert.equal(Shop.why("ab", s, env), "No tiene otra habilidad", "Gengar solo tiene una");
-s = { ...mk(), species: "Charizard", ability: "Blaze" };
-let t = Shop.apply("ab", s, env, null, rand); assert.ok(/Habilidad/.test(t), t);
-assert.ok(Object.values(Dex.species.get("Charizard").abilities).includes(s.ability) && s.ability !== "Blaze", "habilidad propia de la especie");
-s = mk(); Shop.apply("abAny", s, env, null, rand); assert.notEqual(s.ability, "Cursed Body");
+// habilidad al azar: entre TODAS las del juego, aunque no sea de su especie
+assert.equal(Shop.why("ab", s, env), "");
+const seen = new Set(); for (let i = 0; i < 60; i++) { const q = mk(); Shop.apply("ab", q, env, null, rand); assert.notEqual(q.ability, "Cursed Body"); seen.add(q.ability); }
+assert.ok([...seen].some(n => !Object.values(Dex.species.get("Gengar").abilities).includes(n)), "salen habilidades ajenas a la especie");
 s = mk(); Shop.apply("natR", s, env, null, rand); assert.notEqual(s.nature, "Timid");
 s = mk(); Shop.apply("nat", s, env, { nature: "Modest" }); assert.equal(s.nature, "Modest");
 s = mk(); t = Shop.apply("mvR", s, env, null, rand); assert.equal(s.moves.length, 4); assert.equal(new Set(s.moves).size, 4, "sin repetidos");
-assert.ok(learnable(Dex.species.get("Gengar")).has(Dex.moves.get(s.moves.find(m => !mk().moves.includes(m))).id), "ataque que aprende");
+const seenM = new Set(); for (let i = 0; i < 60; i++) { const q = mk(); Shop.apply("mvR", q, env, null, rand); seenM.add(q.moves.find(m => !mk().moves.includes(m))); }
+assert.ok([...seenM].some(m => !learnable(Dex.species.get("Gengar")).has(Dex.moves.get(m).id)), "salen ataques que no aprende");
 s = mk(); Shop.apply("mv", s, env, { move: "Hex", slot: 2 }); assert.deepEqual(s.moves, ["Shadow Ball", "Sludge Bomb", "Hex", "Hypnosis"]);
 s = mk(); Shop.apply("mv", s, env, { move: "Shadow Ball", slot: 3 }); assert.deepEqual(s.moves, ["Sludge Bomb", "Thunderbolt", "Shadow Ball"].length === 3 ? s.moves : [], "el repetido se mueve, no se duplica"); assert.equal(s.moves.filter(m => m === "Shadow Ball").length, 1);
 s = mk(); Shop.apply("itR", s, env, null, rand); assert.notEqual(s.item, "Leftovers");
