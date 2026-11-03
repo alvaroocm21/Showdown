@@ -428,6 +428,7 @@ body.sv #result{background:#07050dd9}
 <script src="lib/pkmn.bundle.js"></script>
 <script src="lib/romcore.js"></script>
 <script src="lib/ligamap.js"></script>
+<script src="lib/ligashop.js"></script>
 <script src="lib/liga.js"></script>
 <script>
 'use strict';
@@ -2009,7 +2010,7 @@ function renderRunSide(el){
     saveRun();renderRun()});
   $('#rAb').onclick=()=>{if(confirm('¿Abandonar la aventura? Se perderá el progreso.')){run=null;store.set(pk('run'),null);renderRun()}}}
 $('#goRun').onclick=()=>show('run');
-Liga.init({Dex,Teams,NAMES,store,esc,nmSp,iconEl,show,editTeam:editExternalTeam,
+Liga.init({Dex,Teams,NAMES,store,esc,nmSp,nmMove,nmAb,nmItem,iconEl,show,editTeam:editExternalTeam,learnable,MOVES,ABILS,NATURES,RITEMS,
   profileTeams:()=>profiles().map(p=>({id:p.id,name:p.name,emoji:p.emoji,team:store.get(`zaf3.${p.id}.team`,[])}))});
 $('#goLiga').onclick=()=>show('liga');
 

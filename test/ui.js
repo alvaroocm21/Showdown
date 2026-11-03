@@ -71,6 +71,21 @@ Level: 30
   assert.match(await pg.innerText("#ligaRoot"), /Ana 1 – 0 Beto|Beto 0 – 1 Ana|Ana\s+1\s+–\s+0\s+Beto/);
   await pg.reload(); await pg.waitForSelector("#pname", { timeout: 60000 }); await pg.click(".pcard"); await pg.click("#goLiga");
   assert.match(await pg.innerText(".lg-t tbody tr:first-child"), /Ana\s+2/, "los resultados se guardan");
+  // monedas: Ana ganó (100) y empató (50) → 150
+  await pg.selectOption("#lgSP", { index: 0 });
+  assert.match(await pg.innerText("#lgSP"), /Ana · 🪙150/);
+  const mon = pg.locator(".lg-sm").first();
+  await mon.locator("[data-shop=natR]").click();
+  assert.match(await pg.innerText("#lgSP"), /Ana · 🪙100/);
+  await pg.click("#lgCoinGive");                       // +50 manual → 150
+  await pg.locator(".lg-sm").first().locator("[data-shop=mv]").click();
+  await pg.fill(".lg-in", "Surf"); await pg.click(".lg-opt"); await pg.click(".lg-opt");
+  assert.match(await pg.innerText("#lgSP"), /Ana · 🪙30/);
+  assert.match(await pg.innerText(".lg-sm >> nth=0"), /Surf|Hidrobomba|Surfear/i, "el ataque elegido está en el equipo");
+  assert.ok(await pg.locator(".lg-sm").first().locator("[data-shop=ab]").isDisabled(), "sin monedas no se compra");
+  // borrar un combate devuelve el premio
+  await pg.reload(); await pg.waitForSelector("#pname", { timeout: 60000 }); await pg.click(".pcard"); await pg.click("#goLiga");
+  assert.match(await pg.innerText("#lgSP"), /Ana · 🪙/, "monedas guardadas");
   const sw = await pg.evaluate(() => document.documentElement.scrollWidth); assert.ok(sw <= 390, "scroll horizontal " + sw);
   await pg.screenshot({ path: S + "/liga-j2.png", fullPage: true });
   await br.close(); srv.close();

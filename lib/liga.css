@@ -51,3 +51,13 @@
 .lg-t{width:100%;border-collapse:collapse;font-size:13px}
 .lg-t th,.lg-t td{padding:5px 6px;text-align:center;border-bottom:1px solid #ffffff22;font-variant-numeric:tabular-nums}
 .lg-t td:nth-child(2),.lg-t th:nth-child(2){text-align:left}
+
+.lg-coin{font-size:12px;opacity:.85}
+.lg-sm{background:#07183a;border:1px solid #5aa6ff44;border-radius:10px;padding:8px;margin:8px 0}
+.lg-smh{display:flex;flex-direction:column;gap:2px;margin-bottom:4px}
+.lg-smh small{font-size:11px;opacity:.8}
+.lg-log{margin:6px 0 0 18px;font-size:12px}
+.lg-cfg{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:6px}
+.lg-cfg label{display:flex;flex-direction:column;gap:2px;font-size:11px}
+.lg-cfg input,#lgCoinN{background:#04122f;color:#fff;border:2px solid #5aa6ff88;border-radius:8px;padding:6px 8px;min-width:0;width:100%}
+#lgCoinN{width:110px}
