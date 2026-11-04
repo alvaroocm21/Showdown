@@ -254,3 +254,25 @@
 .lh-champ span{font-size:48px;filter:drop-shadow(0 0 12px #ffd24a)}
 .lh-champ small{letter-spacing:.2em;color:#ffd24a;font-weight:800;font-size:11px;display:block}
 .lh-champ b{font-size:26px;font-weight:900}
+
+/* escudos */
+.lh-img{width:100%;height:100%;object-fit:contain;display:block;border-radius:50%}
+.lh-img.sq{border-radius:8px}
+.lh-av{overflow:hidden}
+.lh-av .lh-img{padding:2px}
+.lh-av.sq{border-radius:14px}
+.lh-trophy{display:flex;align-items:center;justify-content:center;width:64px;height:64px;flex:none}
+.lh-trophy .lh-img{filter:drop-shadow(0 0 10px var(--cc,#ffd24a))}
+.lh-hero{border-color:var(--cc,#ffd24a)}
+.lh-chip.comp .lh-img{width:20px;height:20px;display:inline-block;vertical-align:-5px}
+.lh-m .lh-img,.lh-ht2 .lh-img,.lh-chip .lh-img,.lh-m .lh-ms .lh-img{width:18px;height:18px;display:inline-block;vertical-align:-4px}
+.lh-pos .lh-img{width:100%}
+.pav{overflow:hidden}
+.pav .lh-img{padding:3px}
+.lh-shield{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+.lh-sbtn{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.lh-sbtn label.btn{cursor:pointer}
+.lh-cpick{display:inline-flex;width:26px;height:26px;border-radius:50%;overflow:hidden;border:2px solid #fff8;position:relative;background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red)}
+.lh-cpick input{position:absolute;inset:-6px;width:40px;height:40px;opacity:0;cursor:pointer}
+.lh-emo.col span{width:26px;height:26px;padding:0;border-radius:50%;display:inline-block;cursor:pointer;border:2px solid transparent}
+.lh-emo.col span.on{border-color:#ffd24a}

@@ -61,6 +61,14 @@ Level: 30
   await pg.click("#teamOk"); await pg.waitForSelector(".lh-mon");
   assert.equal(await pg.locator(".lh-mon").count(), 2);
   assert.match(await pg.innerText(".lh-mon >> nth=0"), /habilidad/i);
+  // escudo del entrenador: imagen y color
+  const b64 = await pg.evaluate(() => { const c = document.createElement("canvas"); c.width = c.height = 40; const g = c.getContext("2d"); g.fillStyle = "#d24a4a"; g.fillRect(0, 0, 40, 40); g.fillStyle = "#fff"; g.fillRect(10, 10, 20, 20); return c.toDataURL("image/png").split(",")[1]; });
+  fs.writeFileSync(S + "/escudo.png", Buffer.from(b64, "base64"));
+  await pg.setInputFiles("#lhImgP", S + "/escudo.png"); await pg.waitForSelector(".lh-dh .lh-av img");
+  assert.ok(await pg.evaluate(() => JSON.parse(localStorage.getItem("liga.v1")).parts[0].img.startsWith("data:image/png")), "la imagen se guarda");
+  await pg.click('.lh-shield ~ .lh-emo [data-pc] >> nth=1');
+  assert.match(await pg.locator(".lh-dh .lh-av").getAttribute("style"), /rgb\(232, 89, 12\)|#e8590c/i, "cambia el color");
+  await pg.screenshot({ path: S + "/liga-escudo.png", fullPage: true });
   await pg.screenshot({ path: S + "/liga-detalle.png", fullPage: true });
   assert.equal(await pg.evaluate(() => JSON.parse(localStorage.getItem(Object.keys(localStorage).find(k => /\.team$/.test(k))) || "[]").length), 0, "no toca el equipo del jugador");
 
@@ -124,6 +132,10 @@ Level: 30
   await pg.click('[data-tab="ajustes"]'); await pg.click("#lhNone");
   assert.equal(await pg.locator('[data-pm].on').count(), 0); await pg.click("#lhAll");
   assert.equal(await pg.locator('[data-pm].on').count(), 6);
+  await pg.setInputFiles("#lhImgC", S + "/escudo.png"); await pg.waitForSelector(".lh-hero .lh-trophy img");
+  assert.ok(await pg.locator(".lh-chip.comp.on img").count() >= 1, "el escudo sale en la pestaña de la competición");
+  await pg.click('.lh-emo.col [data-cc] >> nth=3'); await pg.click("#lhRmImgC");
+  assert.equal(await pg.locator(".lh-hero .lh-trophy img").count(), 0, "se puede quitar la imagen y dejar solo el color");
 
   // ---- 7. Cerrar temporada de la liga → historial ----
   await pg.click('[data-tab="comp"]'); await pg.click(".lh-det summary >> nth=-1"); await pg.click("#lhClose");

@@ -106,6 +106,7 @@ los equipos de la jornada elegida. Los combates se juegan en el juego.
   quedan fuera; después, eliminatorias hasta la final. Con 36 entrenadores es exactamente el formato real (8 directos, 16 de playoff, 12 fuera); con otros números se adapta.
 - **📅 Calendario:** elige quién eres («⭐ Este soy yo») y verás tus próximos partidos de **todas** las competiciones, con su fecha, y tu racha (victorias/empates/derrotas seguidas,
   últimos 5, mejor racha). «Gané / Empate / Perdí» lo anota y da las monedas.
+- **Escudos:** cada entrenador y cada competición puede llevar una imagen (de la galería, se guarda reducida a 96 px) o solo un color (paleta o color libre); sin imagen se ve el emoji sobre el color.
 - **👥 Entrenadores:** tarjetas con récord, forma y competiciones; la ficha enseña cada Pokémon al detalle (tipos, habilidad, objeto, naturaleza, ataques, estadísticas, EVs/IVs).
 - **🪙 Tienda:** cada combate da monedas (victoria 100, empate 50, derrota 25; configurable), que valen para todas las competiciones: habilidad al azar, naturaleza (elegir o al azar),
   ataque (elegir o al azar), objeto al azar o IVs a 31 (al azar entre todo lo que hay en el juego; con la ROM abierta, solo lo que existe en ella).
