@@ -94,23 +94,27 @@ los equipos de la jornada elegida. Los combates se juegan en el juego.
    de Azahar/Citra o `luma/titles/` de una 3DS. En Chrome de escritorio también puede guardar directamente en una carpeta.
    También hay un explorador de archivos de la ROM (lista y descarga de archivos concretos).
 
-**🏟 Liga** (consulta y gestión), con pestañas:
-- **🏆 Temporada:** jornadas, podio y clasificación con colores por zonas (verde ascenso, azul playoff, rojo descenso; las plazas se configuran en Ajustes y se aplican desde 4 entrenadores), con la forma de los últimos 5 partidos (de toda la temporada o de una jornada), combates anotados (quién ganó), cara a cara y cierre de temporada.
-- **📅 Calendario:** elige quién eres («⭐ Este soy yo» en tu ficha) y verás tus próximos partidos con su fecha (Hoy, Mañana…) y tu racha
-  (victorias/empates/derrotas seguidas, últimos 5 resultados, mejor racha). «Generar partidos» crea la ronda de la jornada (todos contra todos,
-  sin repetir rival hasta completar la vuelta) y cada partido se resuelve con «Gané / Empate / Perdí», que lo anota y da las monedas. También hay
-  rachas de todos los entrenadores y la fecha de cada jornada. Lógica en `lib/ligacal.js`.
-- **👥 Entrenadores:** tarjetas con récord y equipo; al abrir uno se ve cada Pokémon al detalle (tipos, habilidad, objeto, naturaleza, ataques, estadísticas
-  calculadas, EVs/IVs), sus combates, y se puede editar el equipo con el editor de equipos de la app, copiar el de la jornada anterior o traer el de un jugador.
-- **🪙 Tienda:** cada combate da monedas (victoria 100, empate 50, derrota 25; configurable) para retocar Pokémon: habilidad al azar, naturaleza (elegir o al azar),
-  ataque (elegir o al azar), objeto al azar o IVs a 31. Las habilidades, ataques y objetos al azar salen de entre todos los del juego, aprenda o no el Pokémon,
-  y, con la ROM abierta, solo de los que existen en ella.
-- **📜 Historial:** temporadas cerradas con su clasificación, combates y equipos de cada jornada.
-- **⚙ Ajustes:** premios y precios, copia de seguridad.
+**🏟 Liga** (consulta y gestión): varias competiciones a la vez, con los mismos entrenadores en todas.
+- **Competiciones:** arriba eliges o creas una (**🏟 Liga**, **🏆 Copa** o **⭐ Champions**). Todas pueden jugarse a la vez. Cada entrenador entra en las que tú elijas
+  (en su ficha o en Ajustes → Participantes). Por defecto, un entrenador nuevo entra en la competición abierta. Su equipo es el mismo en todas hasta que lo cambias en una jornada;
+  cada jornada hereda el equipo de la anterior (no se duplica), así que puedes tener 38 jornadas sin llenar el almacenamiento.
+- **Liga:** calendario completo a **1 vuelta** o **2 vueltas** (ida y vuelta) con un botón; podio y clasificación con colores (verde ascenso, azul playoff, rojo descenso,
+  configurables), forma de los últimos 5 partidos y cara a cara.
+- **Copa:** sorteo aleatorio (o por orden de la lista) del cuadro, partido único o ida y vuelta (la final es única). Si no son potencia de 2, descansan los primeros del sorteo.
+  Los partidos se crean solos según se decide cada eliminatoria; si una eliminatoria a ida y vuelta queda empatada, eliges quién pasa.
+- **Champions (formato nuevo):** fase de liga en la que cada uno juega N rivales distintos; los mejores pasan directos, los siguientes juegan un playoff a ida y vuelta y los demás
+  quedan fuera; después, eliminatorias hasta la final. Con 36 entrenadores es exactamente el formato real (8 directos, 16 de playoff, 12 fuera); con otros números se adapta.
+- **📅 Calendario:** elige quién eres («⭐ Este soy yo») y verás tus próximos partidos de **todas** las competiciones, con su fecha, y tu racha (victorias/empates/derrotas seguidas,
+  últimos 5, mejor racha). «Gané / Empate / Perdí» lo anota y da las monedas.
+- **👥 Entrenadores:** tarjetas con récord, forma y competiciones; la ficha enseña cada Pokémon al detalle (tipos, habilidad, objeto, naturaleza, ataques, estadísticas, EVs/IVs).
+- **🪙 Tienda:** cada combate da monedas (victoria 100, empate 50, derrota 25; configurable), que valen para todas las competiciones: habilidad al azar, naturaleza (elegir o al azar),
+  ataque (elegir o al azar), objeto al azar o IVs a 31 (al azar entre todo lo que hay en el juego; con la ROM abierta, solo lo que existe en ella).
+- **📜 Historial:** cada temporada o edición cerrada con su clasificación, cuadro, combates y equipos de cada jornada.
+- **⚙ Ajustes:** nombre, participantes, formato de la competición, premios y precios, copia de seguridad de todo.
 
 Notas: en ORAS la ROM no guarda naturaleza ni EVs de los entrenadores (USUM sí). La APK (v1.1) permite elegir la ROM y guarda los .zip en Descargas
 (sin probar en dispositivo real). Código: `lib/romcore.js` (lectura/escritura de ROM, GARC, entrenadores), `lib/ligamap.js` (Showdown → ROM), `lib/liga.js`
-(datos comunes y Editor ROM), `lib/ligahub.js` (pantalla Liga), `lib/ligacal.js` (calendario y rachas), `lib/ligashop.js` (tienda), `lib/liga.css`.
+(datos comunes y Editor ROM), `lib/ligahub.js` (pantalla Liga), `lib/ligacal.js` (calendarios, rachas y eliminatorias), `lib/ligashop.js` (tienda), `lib/liga.css`.
 Pruebas: `python3 test/make_rom.py test/out/fake.3ds oras && python3 test/make_rom.py test/out/um.3ds usum && node test/liga.test.js test/out && node test/shop.test.js && node test/cal.test.js && node test/ui.js test/out`
 (la última necesita `playwright`).
 

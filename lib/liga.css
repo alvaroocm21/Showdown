@@ -228,3 +228,29 @@
 .lh-leg i{width:14px;height:14px;border-radius:4px;display:inline-block}
 .lh-leg i.z-asc{background:#1f9d57}.lh-leg i.z-po{background:#38b6ff}.lh-leg i.z-desc{background:#d24a4a}
 .lh-leg small{opacity:.7}
+
+/* varias competiciones y cuadros de eliminatorias */
+.lh-chips.comps{margin-bottom:10px}
+.lh-chip.comp{background:#12285a;border-color:#5aa6ff66;font-size:14px}
+.lh-chip.comp.on{background:linear-gradient(#ffd95e,#e8a417);color:#3a2600;border-color:#fff3b8}
+.lh-chips.wrap{flex-wrap:wrap;overflow:visible}
+.lh-hero.t-copa{border-color:#e8a417;background:radial-gradient(500px 160px at 0% 0%,#e8a41766,transparent 70%),linear-gradient(135deg,#3a2a08,#0b1d44)}
+.lh-hero.t-champions{border-color:#7a5cff;background:radial-gradient(500px 160px at 0% 0%,#7a5cff66,transparent 70%),linear-gradient(135deg,#1c1450,#071235)}
+.lh-tc.off{opacity:.6;border-style:dashed}
+.lh-ties{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.lh-tie{background:#07183a;border:2px solid #5aa6ff55;border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.lh-tie.done{border-color:#1f9d5799}
+.lh-ts{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:8px;background:#ffffff0d}
+.lh-ts b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.lh-ts em{font-style:normal;font-weight:900;font-size:16px;min-width:20px;text-align:right}
+.lh-ts .lh-av{width:28px;height:28px;font-size:15px;border-width:2px}
+.lh-ts.win{background:linear-gradient(90deg,#1f9d5744,#ffffff0d);box-shadow:inset 4px 0 0 #1f9d57}
+.lh-ts.win b{color:#8dffc6}
+.lh-ts.lose{opacity:.55}
+.lh-tbd{opacity:.55;font-style:italic;font-size:13px;flex:1}
+.lh-tb{display:flex;flex-direction:column;gap:4px;margin-top:4px}
+.lh-fx.in{background:#0a2050;margin:4px 0 0;padding:8px}
+.lh-champ{display:flex;align-items:center;gap:14px;padding:16px;border-radius:16px;border:2px solid #ffd24a;background:radial-gradient(400px 120px at 0% 0%,#ffd24a66,transparent 70%),linear-gradient(135deg,#3a2a08,#0b1d44);box-shadow:0 0 28px #ffd24a55}
+.lh-champ span{font-size:48px;filter:drop-shadow(0 0 12px #ffd24a)}
+.lh-champ small{letter-spacing:.2em;color:#ffd24a;font-weight:800;font-size:11px;display:block}
+.lh-champ b{font-size:26px;font-weight:900}
