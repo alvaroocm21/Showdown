@@ -102,11 +102,40 @@ Level: 30
   await pg.selectOption("#lhMe", { label: "Ana" });
   assert.match(await pg.innerText(".lh-body"), /Tú/, "salen mis próximos partidos");
   await pg.locator('.lh-fx [data-w]').first().click();                                // “Gané”
+  assert.match(await pg.innerText(".lg-sheet"), /Marcador/);
+  assert.equal(await pg.locator('.lg-sheet input[data-side="b"]:checked').count(), 3, "al ganar, por defecto caen los 3 Pokémon del rival");
+  await pg.click('.lg-sheet input[data-side="a"] >> nth=0'); await pg.click(".lg-sheet [data-ok]");   // gana 3–1: cae el Pikachu de Ana
   assert.match(await pg.innerText(".lh-streak"), /1 victoria seguida/);
   assert.match(await pg.innerText(".lh-hero"), /Ana · .*victoria/);
   await pg.screenshot({ path: S + "/liga-calendario.png", fullPage: true });
   await pg.click('[data-tab="comp"]');
   assert.equal(await pg.locator(".lh-pod").count(), 0, "sin podio");
+  assert.match(await pg.innerText(".lh-cl thead"), /GF[\s\S]*GC/, "la tabla tiene GF y GC");
+  assert.match(await pg.innerText(".lh-cl tbody tr:first-child"), /Ana[\s\S]*\t1\t1\t0\t0\t3\t1\t3/, "Ana: 1 PJ, 1 V, GF 3, GC 1, 3 pts");
+  await pg.click('[data-tab="calendario"]'); assert.match(await pg.innerText(".lh-body"), /3–1/, "el combate muestra su marcador");
+  await pg.click(".lh-edit >> nth=0"); await pg.click('.lg-sheet input[data-side="b"] >> nth=0'); await pg.click(".lg-sheet [data-ok]");   // ahora 2–1
+  await pg.click('[data-tab="comp"]'); assert.match(await pg.innerText(".lh-cl tbody tr:first-child"), /Ana[\s\S]*\t2\t1\t3/, "se puede corregir el marcador");
+  // estadísticas: Pikachu de Ana jugó 1 partido y tiene 1 amarilla
+  await pg.click('[data-tab="stats"]');
+  assert.match(await pg.innerText(".lh-stt tbody"), /Pikachu\s*Ana\s*1\t1\t0\t/, "PJ 1 y 🟨 1");
+  // 2.º partido: vuelve a caer Pikachu → 2 amarillas → sancionado
+  await pg.click('[data-tab="calendario"]'); await pg.locator('.lh-fx [data-w]').first().click();
+  await pg.click('.lg-sheet input[data-side="a"] >> nth=0'); await pg.click(".lg-sheet [data-ok]");
+  await pg.click('[data-tab="stats"]');
+  assert.match(await pg.innerText(".lh-body"), /Sancionados ahora/); assert.match(await pg.innerText(".lh-stt tbody"), /Pikachu\s*Ana\s*2\t2\t1\t.*Sancionado/, "2 amarillas = 🟥");
+  // la ROM no recibe al sancionado
+  await pg.click("#lhBack"); await pg.click("#goRom"); await pg.waitForSelector("#lgExp");
+  const [dl2] = await Promise.all([pg.waitForEvent("download"), pg.click("#lgExp")]);
+  assert.match(await pg.innerText(".lg-warn[open]"), /Pikachu sancionado/, "al exportar se avisa de que el sancionado no se incluye");
+  await pg.click("#lgGoLiga"); await pg.click('[data-tab="calendario"]');
+  // 3.er partido: Pikachu aparece sancionado y no puede jugar; al cumplirlo vuelve
+  await pg.locator('.lh-fx [data-w]').first().click();
+  await pg.waitForSelector(".lg-sheet");
+  assert.equal(await pg.locator('.lg-sheet input[disabled][data-sp="Pikachu"]').count(), 1, "Pikachu no puede jugar este partido");
+  await pg.click(".lg-sheet [data-skip]");
+  await pg.click('[data-tab="stats"]'); assert.match(await pg.innerText(".lh-stt tbody"), /Pikachu\s*Ana\s*2\t2\t1\t—/, "cumple la sanción: sigue con 2 PJ y deja de estar sancionado");
+  await pg.screenshot({ path: S + "/liga-stats.png", fullPage: true });
+  await pg.click('[data-tab="comp"]');
   assert.equal(await pg.locator(".lh-body > .lh-card").count(), 1, "la pestaña solo lleva la clasificación");
   assert.equal(await pg.locator(".lh-cl tr.z-asc").count(), 2); assert.equal(await pg.locator(".lh-cl tr.z-po").count(), 2); assert.equal(await pg.locator(".lh-cl tr.z-desc").count(), 2);
   await pg.screenshot({ path: S + "/liga-clasificacion.png", fullPage: true });
@@ -118,7 +147,7 @@ Level: 30
   assert.deepEqual(await pg.locator(".lh-card .lh-ch b").allInnerTexts().then(a => a.filter(x => /^(Cuartos de final|Semifinales|Final)$/.test(x))), ["Cuartos de final", "Semifinales", "Final"]);
   assert.equal(await pg.locator(".lh-tie .lh-note", { hasText: "Pasa directo" }).count(), 2, "con 6, dos descansan");
   await pg.screenshot({ path: S + "/liga-copa.png", fullPage: true });
-  for (let i = 0; i < 12 && !(await pg.locator(".lh-champ").count()); i++) await pg.locator('.lh-tie [data-fx][data-w="a"]').first().click();
+  for (let i = 0; i < 12 && !(await pg.locator(".lh-champ").count()); i++) { await pg.locator('.lh-tie [data-fx][data-w="a"]').first().click(); await pg.click(".lg-sheet [data-skip]"); }
   assert.equal(await pg.locator(".lh-champ").count(), 1, "se juega la copa hasta tener campeón");
   await pg.screenshot({ path: S + "/liga-copa-final.png", fullPage: true });
 
@@ -128,6 +157,7 @@ Level: 30
   await pg.selectOption("#lhRounds", "3"); await pg.click("#lhGenCL");
   assert.equal(await pg.locator(".lh-cl tbody tr").count(), 6);
   await pg.click('[data-tab="calendario"]'); await pg.locator('.lh-hj .lh-fx [data-w]').first().click();
+  await pg.click(".lg-sheet [data-skip]");
   await pg.click('[data-tab="comp"]'); await pg.click("#lhGenCK");
   const rounds = await pg.locator(".lh-card .lh-ch b").allInnerTexts();
   assert.ok(rounds.includes("Playoff") && rounds.includes("Final"), "salen playoff y final: " + rounds.join("|"));

@@ -99,11 +99,15 @@ los equipos de la jornada elegida. Los combates se juegan en el juego.
   (en su ficha o en Ajustes → Participantes). Por defecto, un entrenador nuevo entra en la competición abierta. Su equipo es el mismo en todas hasta que lo cambias en una jornada;
   cada jornada hereda el equipo de la anterior (no se duplica), así que puedes tener 38 jornadas sin llenar el almacenamiento.
 - **Liga:** calendario completo a **1 vuelta** o **2 vueltas** (ida y vuelta) con un botón; clasificación con colores (verde ascenso, azul playoff, rojo descenso,
-  configurables), sin nada más debajo; los combates y el cara a cara están en Calendario, y el cierre de temporada en Ajustes, forma de los últimos 5 partidos y cara a cara.
+  configurables) con **GF y GC** (Pokémon derrotados a favor y en contra; al anotar un combate se pide el marcador, de 0 a 6, y se puede corregir con ✎; sin marcador cuenta 1–0; el desempate es por diferencia y luego GF), sin nada más debajo; los combates y el cara a cara están en Calendario, y el cierre de temporada en Ajustes, forma de los últimos 5 partidos y cara a cara.
 - **Copa:** sorteo aleatorio (o por orden de la lista) del cuadro, partido único o ida y vuelta (la final es única). Si no son potencia de 2, descansan los primeros del sorteo.
   Los partidos se crean solos según se decide cada eliminatoria; si una eliminatoria a ida y vuelta queda empatada, eliges quién pasa.
 - **Champions (formato nuevo):** fase de liga en la que cada uno juega N rivales distintos; los mejores pasan directos, los siguientes juegan un playoff a ida y vuelta y los demás
   quedan fuera; después, eliminatorias hasta la final. Con 36 entrenadores es exactamente el formato real (8 directos, 16 de playoff, 12 fuera); con otros números se adapta.
+- **🟨 Tarjetas y 📊 estadísticas de Pokémon:** al anotar un combate se marcan los Pokémon que se debilitaron en cada equipo; cada uno recibe una **amarilla** y, a la 2.ª, **se pierde el siguiente
+  partido** (🟥). El sancionado aparece desactivado en el combate siguiente y **no se incluye en el equipo que se exporta a la ROM** (se avisa al exportar). De los debilitados salen también GF y GC.
+  La pestaña **Estadísticas** muestra, por Pokémon, partidos jugados, amarillas y sanciones (de la competición o de todas), los más jugados, los más amonestados y los sancionados ahora; cada
+  Pokémon enseña también sus cifras en la ficha del entrenador. Todo se calcula repasando los combates, así que borrar o corregir uno lo recalcula bien.
 - **📅 Calendario:** elige quién eres («⭐ Este soy yo») y verás tus próximos partidos de **todas** las competiciones, con su fecha, y tu racha (victorias/empates/derrotas seguidas,
   últimos 5, mejor racha). «Gané / Empate / Perdí» lo anota y da las monedas.
 - **🎲 Sorteo de equipos:** reparte Pokémon al azar entre los participantes (solo a los que no tienen equipo, o a todos) para la jornada actual, y al crear una competición hay una casilla para sortear

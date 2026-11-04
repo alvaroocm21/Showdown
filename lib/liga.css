@@ -278,3 +278,44 @@
 .lh-emo.col span.on{border-color:#ffd24a}
 .lh-chk{display:flex;gap:8px;align-items:center;font-size:13px;margin:8px 0}
 .lh-cfg select{background:#04122f;color:#fff;border:2px solid #5aa6ff88;border-radius:8px;padding:7px 9px;width:100%}
+
+.lg-score{display:flex;align-items:flex-end;gap:10px;justify-content:center;margin:10px 0}
+.lg-score label{display:flex;flex-direction:column;gap:4px;font-size:12px;flex:1;min-width:0;text-align:center}
+.lg-score input{background:#04122f;color:#fff;border:2px solid #5aa6ff88;border-radius:10px;padding:10px;font-size:22px;font-weight:900;text-align:center;width:100%}
+.lg-score span{font-size:24px;font-weight:900;padding-bottom:10px}
+.lh-cl td,.lh-cl th{padding:8px 3px;font-size:12px}
+.lh-cl td:nth-child(2) b{max-width:96px}
+.lh-sc{font-weight:900;font-style:normal;font-size:14px;opacity:1!important}
+.lh-edit{background:#ffffff1c;border-radius:50%;width:24px;height:24px;font-size:12px;flex:none}
+
+.lg-sides{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0;overflow:auto;max-height:50vh}
+.lg-sd{display:flex;flex-direction:column;gap:4px;min-width:0}
+.lg-sd b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lg-sd small{opacity:.7;font-size:11px}
+.lg-ck{display:flex;align-items:center;gap:6px;font-size:13px;background:#ffffff10;border-radius:8px;padding:6px 8px;min-width:0}
+.lg-ck input[type=checkbox]{width:20px;height:20px;flex:none;accent-color:#e8b800}
+.lg-ck input[type=number]{width:60px;background:#04122f;color:#fff;border:2px solid #5aa6ff88;border-radius:8px;padding:4px}
+.lg-ck.off{opacity:.55}
+@media (max-width:420px){.lg-sides{grid-template-columns:1fr}}
+
+/* tarjetas y estadísticas de Pokémon */
+.lh-cards{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.lh-cards span{background:#ffffff18;border-radius:999px;padding:2px 9px;font-size:11px}
+.lh-cards .sus{background:#d24a4a;font-weight:700}
+.lh-cards .warn{background:#e8b80044}
+.lh-sus{display:block;color:#ff9aa4;font-size:12px;margin:2px 0 4px;text-align:center}
+.lh-st-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #ffffff14}
+.lh-st-row:last-child{border:0}
+.lh-st-n{width:20px;font-weight:900;opacity:.6;text-align:center}
+.lh-st-ic{flex:none;width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center}
+.lh-st-nm{flex:1;min-width:0;display:flex;flex-direction:column}
+.lh-st-nm small,.lh-stt small{display:block;opacity:.7;font-size:11px;font-weight:400}
+.lh-st-nm b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lh-stt .lh-nm{display:flex;align-items:center;gap:6px;min-width:130px}
+.lh-stt td,.lh-stt th{font-size:12px}
+
+/* los escudos en línea (junto a un nombre) son pequeños; dentro del avatar o del trofeo ocupan todo */
+.lh-img{width:18px;height:18px;object-fit:contain;display:inline-block;vertical-align:-4px;border-radius:50%}
+.lh-img.sq{border-radius:6px}
+.lh-av .lh-img,.pav .lh-img,.lh-trophy .lh-img{width:100%;height:100%;display:block;vertical-align:baseline}
+.lh-av .lh-img.sq,.lh-trophy .lh-img.sq{border-radius:10px}
