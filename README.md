@@ -95,7 +95,7 @@ los equipos de la jornada elegida. Los combates se juegan en el juego.
    También hay un explorador de archivos de la ROM (lista y descarga de archivos concretos).
 
 **🏟 Liga** (consulta y gestión), con pestañas:
-- **🏆 Temporada:** jornadas, podio y clasificación (de toda la temporada o de una jornada), combates anotados (quién ganó), cara a cara y cierre de temporada.
+- **🏆 Temporada:** jornadas, podio y clasificación con colores por zonas (verde ascenso, azul playoff, rojo descenso; las plazas se configuran en Ajustes y se aplican desde 4 entrenadores), con la forma de los últimos 5 partidos (de toda la temporada o de una jornada), combates anotados (quién ganó), cara a cara y cierre de temporada.
 - **📅 Calendario:** elige quién eres («⭐ Este soy yo» en tu ficha) y verás tus próximos partidos con su fecha (Hoy, Mañana…) y tu racha
   (victorias/empates/derrotas seguidas, últimos 5 resultados, mejor racha). «Generar partidos» crea la ronda de la jornada (todos contra todos,
   sin repetir rival hasta completar la vuelta) y cada partido se resuelve con «Gané / Empate / Perdí», que lo anota y da las monedas. También hay

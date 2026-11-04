@@ -28,4 +28,12 @@ assert.match(Cal.dayLabel("2026-11-20", now), /20/);
 const js = [{ id: "j1" }, { id: "j2", date: "2026-11-10" }];
 const up = Cal.upcoming([{ id: 1, j: "j1" }, { id: 2, j: "j2" }, { id: 3, j: "j1", date: "2026-11-12" }, { id: 4, j: "j1", date: "2026-11-06" }], js);
 assert.deepEqual(up.map(f => f.id), [4, 2, 3, 1]);
+// zonas de la tabla
+const z = (n, c) => Cal.zones(n, c).join(",");
+assert.equal(z(3, { asc: 1, po: 1, desc: 1 }), ",,", "menos de 4: sin zonas");
+assert.equal(z(8, { asc: 2, po: 2, desc: 2 }), "asc,asc,po,po,,,desc,desc");
+assert.equal(z(20, { asc: 2, po: 4, desc: 3 }).split(",").filter(x => x === "po").length, 4);
+assert.equal(z(5, { asc: 2, po: 2, desc: 2 }), "asc,asc,po,desc,desc", "si no caben, se recorta primero el playoff");
+assert.equal(z(4, { asc: 3, po: 3, desc: 3 }), "asc,asc,asc,po", "ascenso primero, luego descenso, y el playoff con lo que sobra");
+assert.equal(z(6, { asc: 0, po: 0, desc: 1 }), ",,,,,desc");
 console.log("CALENDARIO OK");

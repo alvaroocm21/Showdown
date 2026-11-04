@@ -67,10 +67,10 @@ Level: 30
   await pg.click("#lhJnew");
   assert.equal(await pg.locator(".lh-chip[data-j]").count(), 2);
   await pg.click(".lh-det summary >> nth=0"); await pg.selectOption("#lhMR", "a"); await pg.click("#lhMAdd");
-  assert.match(await pg.innerText(".lh-t tbody tr:first-child"), /Ana\s+1\s+1\s+0\s+0\s+3/);
+  assert.match(await pg.innerText(".lh-t tbody tr:first-child"), /Ana[\s\S]*\t1\t1\t0\t0\t3/);
   assert.match(await pg.innerText(".lh-pod"), /Ana/);
   await pg.click('.lh-chip[data-j] >> nth=0'); await pg.click(".lh-det summary >> nth=0"); await pg.selectOption("#lhMR", "d"); await pg.click("#lhMAdd");
-  assert.match(await pg.innerText(".lh-t tbody tr:first-child"), /Ana\s+2\s+1\s+1\s+0\s+4/);
+  assert.match(await pg.innerText(".lh-t tbody tr:first-child"), /Ana[\s\S]*\t2\t1\t1\t0\t4/);
   await pg.screenshot({ path: S + "/liga-temporada.png", fullPage: true });
   // monedas: 100 + 50 = 150
   await pg.click('[data-tab="tienda"]');
@@ -97,6 +97,16 @@ Level: 30
   await pg.locator('.lh-fx [data-w]').first().click();                                // “Gané”
   assert.match(await pg.innerText(".lh-streak"), /1 victoria seguida/);
   assert.match(await pg.innerText("#lhSP, .lh-hero"), /victoria seguida/);
+  // clasificación con zonas: con 3 entrenadores no hay; al añadir más aparecen ascenso/playoff/descenso
+  await pg.click('[data-tab="entrenadores"]'); for (const n of ["Dani", "Eva", "Fran"]) { await pg.fill("#lhNew", n); await pg.click("#lhAdd"); }
+  await pg.click('[data-tab="temporada"]');
+  assert.equal(await pg.locator(".lh-cl tr.z-asc").count(), 2); assert.equal(await pg.locator(".lh-cl tr.z-po").count(), 2); assert.equal(await pg.locator(".lh-cl tr.z-desc").count(), 2);
+  assert.match(await pg.innerText(".lh-leg"), /Ascenso[\s\S]*Playoff[\s\S]*Descenso/);
+  await pg.screenshot({ path: S + "/liga-clasificacion.png", fullPage: true });
+  await pg.click('[data-tab="ajustes"]'); await pg.fill('[data-zone="desc"]', "0"); await pg.press('[data-zone="desc"]', "Enter");
+  await pg.click('[data-tab="temporada"]'); assert.equal(await pg.locator(".lh-cl tr.z-desc").count(), 0, "se pueden quitar zonas");
+  await pg.click('[data-tab="ajustes"]'); await pg.fill('[data-zone="desc"]', "2"); await pg.press('[data-zone="desc"]', "Enter");
+  await pg.click('[data-tab="temporada"]');
   // cerrar temporada → historial
   pg.on("dialog", d => d.accept());
   await pg.click('[data-tab="temporada"]'); await pg.click(".lh-det summary >> nth=-1"); await pg.click("#lhClose");
