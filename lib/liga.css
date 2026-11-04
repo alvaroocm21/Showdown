@@ -186,3 +186,26 @@
 .lh-ht2>div{display:flex;flex-wrap:wrap}
 .lh-ht2 img,.lh-ht2 canvas{width:32px!important;height:32px!important;object-fit:contain}
 @media (max-width:560px){.lh-mv{grid-template-columns:1fr}.lh-hero{padding:12px}.lh-trophy{font-size:42px}}
+
+/* calendario y rachas */
+.lh-mechip{margin-top:4px;font-size:13px;color:#ffd24a;font-weight:700}
+.lh-form{display:flex;gap:3px;margin:3px 0}
+.lh-form i{font-style:normal;font-size:10px;font-weight:800;width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff}
+.lh-form.big i{width:26px;height:26px;font-size:13px}
+.lh-form .fV{background:#1f9d57}.lh-form .fE{background:#8a94a6}.lh-form .fD{background:#d24a4a}
+.lh-streak{display:flex;gap:14px;align-items:center}
+.lh-sbig{flex:none;width:84px;height:84px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#ffffff14;border:4px solid #8a94a6}
+.lh-sbig b{font-size:34px;line-height:1}.lh-sbig small{font-size:11px;opacity:.85}
+.lh-sbig.V{border-color:#1f9d57;box-shadow:0 0 20px #1f9d5788}.lh-sbig.D{border-color:#d24a4a}
+.lh-sinfo{display:flex;flex-direction:column;gap:4px;min-width:0}.lh-sinfo b{font-size:16px}.lh-sinfo small{opacity:.75;font-size:12px}
+.lh-fx{background:#07183a;border:1px solid #5aa6ff55;border-radius:12px;padding:10px;margin:8px 0}
+.lh-fxh{display:flex;align-items:center;gap:8px}
+.lh-fxh small{opacity:.7;flex:1;font-size:12px}
+.lh-day{background:#2f7bff;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:800}
+.lh-day.hoy{background:#e8a417;color:#3a2600}
+.lh-vs{display:flex;align-items:center;justify-content:center;gap:12px;margin:8px 0}
+.lh-vs span{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;max-width:40%}
+.lh-vs b{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.lh-vs i{font-style:normal;opacity:.6;font-weight:800}
+.lh-lab{display:flex;flex-direction:column;gap:3px;font-size:12px;flex:1}
+.lh-lab input{background:#04122f;color:#fff;border:2px solid #5aa6ff88;border-radius:8px;padding:7px 9px}

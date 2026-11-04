@@ -96,6 +96,10 @@ los equipos de la jornada elegida. Los combates se juegan en el juego.
 
 **🏟 Liga** (consulta y gestión), con pestañas:
 - **🏆 Temporada:** jornadas, podio y clasificación (de toda la temporada o de una jornada), combates anotados (quién ganó), cara a cara y cierre de temporada.
+- **📅 Calendario:** elige quién eres («⭐ Este soy yo» en tu ficha) y verás tus próximos partidos con su fecha (Hoy, Mañana…) y tu racha
+  (victorias/empates/derrotas seguidas, últimos 5 resultados, mejor racha). «Generar partidos» crea la ronda de la jornada (todos contra todos,
+  sin repetir rival hasta completar la vuelta) y cada partido se resuelve con «Gané / Empate / Perdí», que lo anota y da las monedas. También hay
+  rachas de todos los entrenadores y la fecha de cada jornada. Lógica en `lib/ligacal.js`.
 - **👥 Entrenadores:** tarjetas con récord y equipo; al abrir uno se ve cada Pokémon al detalle (tipos, habilidad, objeto, naturaleza, ataques, estadísticas
   calculadas, EVs/IVs), sus combates, y se puede editar el equipo con el editor de equipos de la app, copiar el de la jornada anterior o traer el de un jugador.
 - **🪙 Tienda:** cada combate da monedas (victoria 100, empate 50, derrota 25; configurable) para retocar Pokémon: habilidad al azar, naturaleza (elegir o al azar),
@@ -106,8 +110,8 @@ los equipos de la jornada elegida. Los combates se juegan en el juego.
 
 Notas: en ORAS la ROM no guarda naturaleza ni EVs de los entrenadores (USUM sí). La APK (v1.1) permite elegir la ROM y guarda los .zip en Descargas
 (sin probar en dispositivo real). Código: `lib/romcore.js` (lectura/escritura de ROM, GARC, entrenadores), `lib/ligamap.js` (Showdown → ROM), `lib/liga.js`
-(datos comunes y Editor ROM), `lib/ligahub.js` (pantalla Liga), `lib/ligashop.js` (tienda), `lib/liga.css`.
-Pruebas: `python3 test/make_rom.py test/out/fake.3ds oras && python3 test/make_rom.py test/out/um.3ds usum && node test/liga.test.js test/out && node test/shop.test.js && node test/ui.js test/out`
+(datos comunes y Editor ROM), `lib/ligahub.js` (pantalla Liga), `lib/ligacal.js` (calendario y rachas), `lib/ligashop.js` (tienda), `lib/liga.css`.
+Pruebas: `python3 test/make_rom.py test/out/fake.3ds oras && python3 test/make_rom.py test/out/um.3ds usum && node test/liga.test.js test/out && node test/shop.test.js && node test/cal.test.js && node test/ui.js test/out`
 (la última necesita `playwright`).
 
 ## Reconstruir el paquete (opcional)

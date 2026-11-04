@@ -82,6 +82,21 @@ Level: 30
   await pg.fill(".lg-in", "Surf"); await pg.click(".lg-opt"); await pg.click(".lg-opt");
   assert.match(await pg.innerText("#lhSP"), /Ana · 🪙30/);
   assert.ok(await pg.locator(".lh-sm").first().locator("[data-shop=ab]").isDisabled(), "sin monedas no se compra");
+  // ---- Calendario y racha ----
+  await pg.click('[data-tab="entrenadores"]'); await pg.click(".lh-tc >> nth=0");   // detalle de Ana
+  await pg.click('[data-act="me"]'); assert.match(await pg.innerText(".lh-hero"), /Ana · .*seguida/, "la racha sale en la cabecera");
+  await pg.click("#lhBackList"); await pg.fill("#lhNew", "Carla"); await pg.click("#lhAdd");
+  await pg.click('[data-tab="calendario"]');
+  assert.match(await pg.innerText(".lh-streak"), /1 empate seguida/);
+  await pg.click("#lhJnew");                                                         // jornada 3
+  await pg.fill("#lhJdate", "2099-01-02");
+  await pg.click("#lhGen");
+  assert.ok(await pg.locator(".lh-fx").count() >= 1, "se generan partidos");
+  assert.match(await pg.innerText(".lh-body"), /Tú/, "salen mis próximos partidos");
+  await pg.screenshot({ path: S + "/liga-calendario.png", fullPage: true });
+  await pg.locator('.lh-fx [data-w]').first().click();                                // “Gané”
+  assert.match(await pg.innerText(".lh-streak"), /1 victoria seguida/);
+  assert.match(await pg.innerText("#lhSP, .lh-hero"), /victoria seguida/);
   // cerrar temporada → historial
   pg.on("dialog", d => d.accept());
   await pg.click('[data-tab="temporada"]'); await pg.click(".lh-det summary >> nth=-1"); await pg.click("#lhClose");
@@ -94,7 +109,7 @@ Level: 30
   assert.equal(await pg.inputValue("#lhSeason"), "Temporada 2");
   await pg.click('[data-tab="historial"]'); assert.match(await pg.innerText(".lh-hs"), /Temporada 1/, "el historial se guarda");
   await pg.setViewportSize({ width: 390, height: 844 });
-  for (const tab of ["temporada", "entrenadores", "tienda", "historial", "ajustes"]) {
+  for (const tab of ["temporada", "calendario", "entrenadores", "tienda", "historial", "ajustes"]) {
     await pg.click(`[data-tab="${tab}"]`);
     const sw = await pg.evaluate(() => document.querySelector("#scr-liga").scrollWidth); assert.ok(sw <= 390, `scroll horizontal en ${tab}: ${sw}`);
   }
