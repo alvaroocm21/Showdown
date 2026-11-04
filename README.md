@@ -102,8 +102,7 @@ descifrada, con o sin mod en .zip). Aquí no hay combates: se preparan los equip
    de entre todos los del juego, aprenda o no el Pokémon.
    Si la ROM está abierta, el azar solo elige lo que existe en ella. Lógica en `lib/ligashop.js`.
 
-Notas: en ORAS la ROM no guarda naturaleza ni EVs de los entrenadores (USUM sí). La Liga ROM necesita elegir archivos y descargar,
-algo que el WebView de la APK actual no permite: úsala en la web/PWA. Código: `lib/romcore.js` (lectura/escritura de ROM,
+Notas: en ORAS la ROM no guarda naturaleza ni EVs de los entrenadores (USUM sí). La APK (v1.1) ya permite elegir la ROM y guarda los .zip en Descargas (sin probar en dispositivo real). Código: `lib/romcore.js` (lectura/escritura de ROM,
 GARC, entrenadores), `lib/ligamap.js` (Showdown → ROM), `lib/liga.js` + `lib/liga.css` (pantalla).
 Pruebas: `python3 test/make_rom.py test/out/fake.3ds oras && python3 test/make_rom.py test/out/um.3ds usum && node test/liga.test.js test/out && node test/ui.js test/out`
 (la última necesita `playwright`).

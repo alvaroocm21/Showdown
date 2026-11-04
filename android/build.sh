@@ -12,7 +12,7 @@ B=build; rm -rf $B; mkdir -p $B/classes $B/dex $B/apk/assets/www ../dist
 # 1) recursos + manifiesto
 aapt2 compile --dir res -o $B/res.zip
 aapt2 link -o $B/base.apk -I "$ANDROID_JAR" --manifest AndroidManifest.xml \
-  --min-sdk-version 21 --target-sdk-version 30 --version-code 1 --version-name 1.0 $B/res.zip
+  --min-sdk-version 21 --target-sdk-version 30 --version-code 2 --version-name 1.1 $B/res.zip
 
 # 2) código Java -> dex
 javac --release 8 -nowarn -cp "$ANDROID_JAR" -d $B/classes $(find src -name '*.java')
