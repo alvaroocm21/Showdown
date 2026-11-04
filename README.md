@@ -98,8 +98,8 @@ los equipos de la jornada elegida. Los combates se juegan en el juego.
 - **Competiciones:** arriba eliges o creas una (**🏟 Liga**, **🏆 Copa** o **⭐ Champions**). Todas pueden jugarse a la vez. Cada entrenador entra en las que tú elijas
   (en su ficha o en Ajustes → Participantes). Por defecto, un entrenador nuevo entra en la competición abierta. Su equipo es el mismo en todas hasta que lo cambias en una jornada;
   cada jornada hereda el equipo de la anterior (no se duplica), así que puedes tener 38 jornadas sin llenar el almacenamiento.
-- **Liga:** calendario completo a **1 vuelta** o **2 vueltas** (ida y vuelta) con un botón; podio y clasificación con colores (verde ascenso, azul playoff, rojo descenso,
-  configurables), forma de los últimos 5 partidos y cara a cara.
+- **Liga:** calendario completo a **1 vuelta** o **2 vueltas** (ida y vuelta) con un botón; clasificación con colores (verde ascenso, azul playoff, rojo descenso,
+  configurables), sin nada más debajo; los combates y el cara a cara están en Calendario, y el cierre de temporada en Ajustes, forma de los últimos 5 partidos y cara a cara.
 - **Copa:** sorteo aleatorio (o por orden de la lista) del cuadro, partido único o ida y vuelta (la final es única). Si no son potencia de 2, descansan los primeros del sorteo.
   Los partidos se crean solos según se decide cada eliminatoria; si una eliminatoria a ida y vuelta queda empatada, eliges quién pasa.
 - **Champions (formato nuevo):** fase de liga en la que cada uno juega N rivales distintos; los mejores pasan directos, los siguientes juegan un playoff a ida y vuelta y los demás

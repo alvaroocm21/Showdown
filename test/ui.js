@@ -106,6 +106,8 @@ Level: 30
   assert.match(await pg.innerText(".lh-hero"), /Ana · .*victoria/);
   await pg.screenshot({ path: S + "/liga-calendario.png", fullPage: true });
   await pg.click('[data-tab="comp"]');
+  assert.equal(await pg.locator(".lh-pod").count(), 0, "sin podio");
+  assert.equal(await pg.locator(".lh-body > .lh-card").count(), 1, "la pestaña solo lleva la clasificación");
   assert.equal(await pg.locator(".lh-cl tr.z-asc").count(), 2); assert.equal(await pg.locator(".lh-cl tr.z-po").count(), 2); assert.equal(await pg.locator(".lh-cl tr.z-desc").count(), 2);
   await pg.screenshot({ path: S + "/liga-clasificacion.png", fullPage: true });
 
@@ -148,7 +150,7 @@ Level: 30
   assert.equal(await pg.locator(".lh-hero .lh-trophy img").count(), 0, "se puede quitar la imagen y dejar solo el color");
 
   // ---- 7. Cerrar temporada de la liga → historial ----
-  await pg.click('[data-tab="comp"]'); await pg.click(".lh-det summary >> nth=-1"); await pg.click("#lhClose");
+  await pg.click('[data-tab="ajustes"]'); await pg.click("details.lh-det:has(#lhClose) > summary"); await pg.click("#lhClose");
   await pg.waitForSelector(".lh-hs"); assert.match(await pg.innerText(".lh-hs"), /Liga · Temporada 1/);
   await pg.screenshot({ path: S + "/liga-historial.png", fullPage: true });
   // ---- 8. Persistencia y ancho móvil ----
