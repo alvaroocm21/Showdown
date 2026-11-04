@@ -53,8 +53,9 @@ Level: 30
   assert.equal(await pg.inputValue("#lhCompName"), "Liga");
   await pg.click('[data-tab="entrenadores"]');
   for (const n of ["Ana", "Beto", "Carla", "Dani", "Eva", "Fran"]) { await pg.fill("#lhNew", n); await pg.click("#lhAdd"); }
-  assert.equal(await pg.locator(".lh-tc").count(), 6);
-  await pg.click(".lh-tc >> nth=0"); await pg.waitForSelector(".lh-dh");
+  assert.equal(await pg.locator(".lh-tc").count(), 7, "los 6 entrenadores y el jugador con el que entré");
+  assert.match(await pg.innerText(".lh-hero"), /Álvaro/, "«tú» es el jugador con el que entré");
+  await pg.click('.lh-tc:has-text("Ana")'); await pg.waitForSelector(".lh-dh");
   await pg.click('[data-act="team"]'); await pg.waitForSelector("#scr-team.on");
   assert.match(await pg.innerText("#teamTitle"), /Ana · Liga · Jornada 1/);
   await pg.click("#ieBtn"); await pg.fill("#ieText", TEAM); await pg.click("#ieImport");
@@ -65,7 +66,7 @@ Level: 30
   const b64 = await pg.evaluate(() => { const c = document.createElement("canvas"); c.width = c.height = 40; const g = c.getContext("2d"); g.fillStyle = "#d24a4a"; g.fillRect(0, 0, 40, 40); g.fillStyle = "#fff"; g.fillRect(10, 10, 20, 20); return c.toDataURL("image/png").split(",")[1]; });
   fs.writeFileSync(S + "/escudo.png", Buffer.from(b64, "base64"));
   await pg.setInputFiles("#lhImgP", S + "/escudo.png"); await pg.waitForSelector(".lh-dh .lh-av img");
-  assert.ok(await pg.evaluate(() => JSON.parse(localStorage.getItem("liga.v1")).parts[0].img.startsWith("data:image/png")), "la imagen se guarda");
+  assert.ok(await pg.evaluate(() => JSON.parse(localStorage.getItem("liga.v1")).parts.find(p => p.name === "Ana").img.startsWith("data:image/png")), "la imagen se guarda");
   await pg.click('.lh-shield ~ .lh-emo [data-pc] >> nth=1');
   assert.match(await pg.locator(".lh-dh .lh-av").getAttribute("style"), /rgb\(232, 89, 12\)|#e8590c/i, "cambia el color");
   await pg.screenshot({ path: S + "/liga-escudo.png", fullPage: true });
@@ -74,20 +75,20 @@ Level: 30
   await pg.selectOption('[data-so="size"]', "3"); await pg.fill('[data-so="level"]', "40"); await pg.press('[data-so="level"]', "Enter");
   await pg.screenshot({ path: S + "/liga-sorteo.png", fullPage: true });
   await pg.click("#lhSortear");
-  await pg.click(".lh-tc >> nth=1"); await pg.waitForSelector(".lh-dh");
+  await pg.click('.lh-tc:has-text("Beto")'); await pg.waitForSelector(".lh-dh");
   assert.equal(await pg.locator(".lh-mon").count(), 3, "el sorteo da 3 Pokémon");
   assert.match(await pg.innerText(".lh-mon >> nth=0"), /Nv\. 40/);
-  await pg.click("#lhBackList"); await pg.click(".lh-tc >> nth=0"); await pg.waitForSelector(".lh-dh");
+  await pg.click("#lhBackList"); await pg.click('.lh-tc:has-text("Ana")'); await pg.waitForSelector(".lh-dh");
   assert.equal(await pg.locator(".lh-mon").count(), 2, "Ana conserva su equipo");
   await pg.screenshot({ path: S + "/liga-detalle.png", fullPage: true });
   assert.equal(await pg.evaluate(() => JSON.parse(localStorage.getItem(Object.keys(localStorage).find(k => /\.team$/.test(k))) || "[]").length), 0, "no toca el equipo del jugador");
 
   // ---- 2. Editor ROM ----
   await pg.click("#lhBack"); await pg.click("#goRom"); await pg.waitForSelector("#lgRom");
-  assert.equal(await pg.locator("#romRoot .lg-p").count(), 6);
+  assert.equal(await pg.locator("#romRoot .lg-p").count(), 7);
   await pg.setInputFiles("#lgRom", S + "/um.3ds"); await pg.setInputFiles("#lgMod", S + "/um.3ds.mod.zip");
   await pg.click("#lgOpen"); await pg.waitForSelector(".lg-ok", { timeout: 15000 });
-  await pg.click(".lg-p:nth-child(1) [data-act=slot]"); await pg.fill(".lg-in", "Liam"); await pg.click(".lg-opt");
+  await pg.click('.lg-p:has-text("Ana") [data-act=slot]'); await pg.fill(".lg-in", "Liam"); await pg.click(".lg-opt");
   await pg.click("#lgBlock"); await pg.fill(".lg-in", "Kaudan");
   assert.match(await pg.innerText(".lg-opt"), /N\./, "se ve el equipo del entrenador"); await pg.click(".lg-opt");
   assert.equal(await pg.locator(".lg-slot.ok").count(), 2);
@@ -98,7 +99,7 @@ Level: 30
   await pg.click("#lgGoLiga"); await pg.waitForSelector("#lhCompName");
   await pg.click('[data-tab="calendario"]');
   await pg.selectOption("#lhVueltas", "2"); await pg.click("#lhGenLiga");
-  assert.equal(await pg.locator(".lh-chip[data-j]").count(), 10, "6 entrenadores a 2 vueltas = 10 jornadas");
+  assert.equal(await pg.locator(".lh-chip[data-j]").count(), 14, "7 entrenadores a 2 vueltas = 14 jornadas");
   await pg.selectOption("#lhMe", { label: "Ana" });
   assert.match(await pg.innerText(".lh-body"), /Tú/, "salen mis próximos partidos");
   await pg.locator('.lh-fx [data-w]').first().click();                                // “Gané”
@@ -145,7 +146,7 @@ Level: 30
   assert.equal(await pg.inputValue("#lhCompName"), "Copa de invierno");
   await pg.click("#lhGenCup");
   assert.deepEqual(await pg.locator(".lh-card .lh-ch b").allInnerTexts().then(a => a.filter(x => /^(Cuartos de final|Semifinales|Final)$/.test(x))), ["Cuartos de final", "Semifinales", "Final"]);
-  assert.equal(await pg.locator(".lh-tie .lh-note", { hasText: "Pasa directo" }).count(), 2, "con 6, dos descansan");
+  assert.equal(await pg.locator(".lh-tie .lh-note", { hasText: "Pasa directo" }).count(), 1, "con 7, uno descansa");
   await pg.screenshot({ path: S + "/liga-copa.png", fullPage: true });
   for (let i = 0; i < 12 && !(await pg.locator(".lh-champ").count()); i++) { await pg.locator('.lh-tie [data-fx][data-w="a"]').first().click(); await pg.click(".lg-sheet [data-skip]"); }
   assert.equal(await pg.locator(".lh-champ").count(), 1, "se juega la copa hasta tener campeón");
@@ -155,7 +156,7 @@ Level: 30
   await pg.click("#lhCompNew"); await pg.fill("#lhCName", "Champions"); await pg.selectOption("#lhCType", "champions"); await pg.click("#lhCCreate");
   assert.match(await pg.innerText(".lh-body"), /fase de liga/i);
   await pg.selectOption("#lhRounds", "3"); await pg.click("#lhGenCL");
-  assert.equal(await pg.locator(".lh-cl tbody tr").count(), 6);
+  assert.equal(await pg.locator(".lh-cl tbody tr").count(), 7);
   await pg.click('[data-tab="calendario"]'); await pg.locator('.lh-hj .lh-fx [data-w]').first().click();
   await pg.click(".lg-sheet [data-skip]");
   await pg.click('[data-tab="comp"]'); await pg.click("#lhGenCK");
@@ -165,7 +166,7 @@ Level: 30
   await pg.screenshot({ path: S + "/liga-champions.png", fullPage: true });
 
   // ---- 6. Entrenadores en varias competiciones ----
-  await pg.click('[data-tab="entrenadores"]'); await pg.click(".lh-tc >> nth=5");           // Fran
+  await pg.click('[data-tab="entrenadores"]'); await pg.click('.lh-tc:has-text("Fran")');           // Fran
   assert.equal(await pg.locator('[data-member].on').count(), 3, "Fran está en las tres competiciones");
   await pg.click('[data-member]:not(.on), [data-member].on >> nth=2');                       // sale de la Champions
   assert.equal(await pg.locator('[data-member].on').count(), 2);
@@ -173,7 +174,7 @@ Level: 30
   await pg.click(".lh-chip.comp >> nth=0"); assert.equal(await pg.inputValue("#lhCompName"), "Liga");
   await pg.click('[data-tab="ajustes"]'); await pg.click("#lhNone");
   assert.equal(await pg.locator('[data-pm].on').count(), 0); await pg.click("#lhAll");
-  assert.equal(await pg.locator('[data-pm].on').count(), 6);
+  assert.equal(await pg.locator('[data-pm].on').count(), 7);
   await pg.setInputFiles("#lhImgC", S + "/escudo.png"); await pg.waitForSelector(".lh-hero .lh-trophy img");
   assert.ok(await pg.locator(".lh-chip.comp.on img").count() >= 1, "el escudo sale en la pestaña de la competición");
   await pg.click('.lh-emo.col [data-cc] >> nth=3'); await pg.click("#lhRmImgC");
@@ -184,7 +185,14 @@ Level: 30
   await pg.waitForSelector(".lh-hs"); assert.match(await pg.innerText(".lh-hs"), /Liga · Temporada 1/);
   await pg.screenshot({ path: S + "/liga-historial.png", fullPage: true });
   // ---- 8. Persistencia y ancho móvil ----
-  await pg.reload(); await pg.waitForSelector("#pname", { timeout: 60000 }); await pg.click(".pcard"); await pg.click("#goLiga"); await pg.waitForSelector("#lhCompName");
+  await pg.reload(); await pg.waitForSelector("#pname", { timeout: 60000 });
+  assert.equal(await pg.locator(".pcard").count(), 7, "la pantalla de entrada lista a los jugadores de la liga");
+  assert.match(await pg.innerText("#plist"), /Ana[\s\S]*Fran/);
+  assert.ok(await pg.locator("#pcol span").count() >= 24, "hay muchos colores"); assert.equal(await pg.locator("#pcc").count(), 1, "y un selector de color libre");
+  assert.equal(await pg.locator("#plist .pcard .pav img").count(), 1, "el escudo de Ana sale en su tarjeta");
+  await pg.screenshot({ path: S + "/entrada.png", fullPage: true });
+  await pg.click('.pcard:has-text("Ana")'); assert.match(await pg.innerText("#whoami"), /Ana/);
+  await pg.click("#goLiga"); await pg.waitForSelector("#lhCompName"); assert.match(await pg.innerText(".lh-hero"), /Ana/, "al entrar como Ana, «tú» es Ana");
   assert.equal(await pg.locator(".lh-chip.comp").count(), 3, "las tres competiciones se guardan");
   await pg.click('[data-tab="historial"]'); assert.match(await pg.innerText(".lh-hs"), /Temporada 1/);
   for (const tab of ["comp", "calendario", "entrenadores", "tienda", "historial", "ajustes"]) {

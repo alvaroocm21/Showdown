@@ -1766,28 +1766,30 @@ let PID=null,run=null;
 const pk=k=>`zaf3.${PID}.${k}`;
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const EMOJIS=['🧢','🔥','💧','🌿','⚡','🌙','⭐','🐉','👾','🎮','🦊','🐱'];
-const PCOLORS=['#2f7bff','#e8590c','#2fa84f','#a040a0','#d4a600','#e84a8a','#2ab7c9','#6b7a90'];
+const PCOLORS=['#2f7bff','#e8590c','#2fa84f','#a040a0','#d4a600','#e84a8a','#2ab7c9','#6b7a90','#e03131','#f08c00','#94d82d','#12b886','#1c7ed6','#7048e8','#d6336c','#862e9c','#495057','#0b7285','#5c940d','#c92a2a','#ffd43b','#74c0fc','#b197fc','#ff8787'];
+const pavIn=p=>p.img?`<img class="lh-img" src="${p.img}" alt="">`:p.emoji;
 const profiles=()=>store.get('zaf3.profiles',[]);
 const curProfile=()=>profiles().find(p=>p.id===PID);
 let newEmo=EMOJIS[0],newCol=PCOLORS[0];
 function showProfiles(){
   PID=null;if(M){M.dead=true;M=null}
+  try{Liga.syncPlayers()}catch(e){console.error(e)}   // los jugadores son los entrenadores de la liga
   const list=profiles(),el=$('#plist');el.innerHTML='';
   list.forEach(p=>{
     const r=store.get(`zaf3.${p.id}.run`,null);
     const d=document.createElement('div');d.className='pcard';
-    d.innerHTML=`<div class="pav" style="background:${p.color}">${p.emoji}</div><b>${esc(p.name)}</b><small>${r&&!r.over?'🎲 '+esc(stageLabelOf(r)):'Sin aventura en curso'}</small><button class="x" title="Borrar jugador">×</button>`;
+    d.innerHTML=`<div class="pav" style="background:${p.color}">${pavIn(p)}</div><b>${esc(p.name)}</b><small>${r&&!r.over?'🎲 '+esc(stageLabelOf(r)):'Sin aventura en curso'}</small><button class="x" title="Borrar jugador">×</button>`;
     d.onclick=e=>{
       if(e.target.classList.contains('x')){
-        if(confirm(`¿Borrar al jugador "${p.name}" y todos sus datos?`)){
-          ['team','beat','run'].forEach(k=>{try{localStorage.removeItem(`zaf3.${p.id}.${k}`)}catch{}});
-          store.set('zaf3.profiles',list.filter(x=>x.id!==p.id));showProfiles()}}
+        if(confirm(`¿Borrar al jugador "${p.name}" y todos sus datos? También saldrá de las ligas y se borrarán sus combates.`)){
+          Liga.removePlayer(p.id);showProfiles()}}
       else pickProfile(p.id)};
     el.append(d)});
   $('#pemo').innerHTML=EMOJIS.map(e=>`<span data-e="${e}" class="${e===newEmo?'on':''}">${e}</span>`).join('');
-  $('#pcol').innerHTML=PCOLORS.map(c=>`<span data-c="${c}" style="background:${c}" class="${c===newCol?'on':''}"></span>`).join('');
+  $('#pcol').innerHTML=PCOLORS.map(c=>`<span data-c="${c}" style="background:${c}" class="${c===newCol?'on':''}"></span>`).join('')+`<label class="lh-cpick" title="Otro color"><input type="color" id="pcc" value="${/^#[0-9a-f]{6}$/i.test(newCol)?newCol:'#2f7bff'}"></label>`;
   $$('#pemo span').forEach(x=>x.onclick=()=>{newEmo=x.dataset.e;showProfiles()});
   $$('#pcol span').forEach(x=>x.onclick=()=>{newCol=x.dataset.c;showProfiles()});
+  $('#pcc').onchange=e=>{newCol=e.target.value;const n=$('#pname').value;showProfiles();$('#pname').value=n};
   show('profile')}
 $('#pcreate').onclick=()=>{
   const name=$('#pname').value.trim();if(!name){$('#pname').focus();return}
@@ -1796,10 +1798,10 @@ $('#pcreate').onclick=()=>{
   if(list.length===1){ // migrar datos de versiones anteriores
     const t=store.get('zaf2.team',null),b=store.get('zaf2.beat',null);
     if(t)store.set(`zaf3.${id}.team`,t);if(b)store.set(`zaf3.${id}.beat`,b)}
-  $('#pname').value='';pickProfile(id)};
+  $('#pname').value='';try{Liga.syncPlayers()}catch(e){console.error(e)}pickProfile(id)};
 $('#pname').onkeydown=e=>{if(e.key==='Enter')$('#pcreate').click()};
 function pickProfile(id){
-  PID=id;
+  PID=id;try{Liga.setMe(id)}catch(e){console.error(e)}
   MY=store.get(pk('team'),[]).filter(s=>s&&Dex.species.get(s.species).exists).map(s=>({...s,item:s.item===undefined?'':s.item}));
   sel=0;run=store.get(pk('run'),null);
   show('title')}
@@ -1807,7 +1809,7 @@ let VIEW=store.get('zaf3.view','back');
 function setTheme(sv){document.body.classList.toggle('sv',sv);store.set('zaf3.theme',sv?'sv':'oras')}
 function renderWho(){
   const p=curProfile();if(!p){$('#whoami').innerHTML='';return}
-  $('#whoami').innerHTML=`<div class="pav" style="background:${p.color}">${p.emoji}</div><b>${esc(p.name)}</b><button class="btn sm ghost" id="chgUser">Cambiar jugador</button><button class="btn sm ghost" id="themeBtn">🎨 Estilo: ${isSV()?'Escarlata/Púrpura (9.ª gen)':'Zafiro Alfa (6.ª gen)'}</button>${isSV()?`<button class="btn sm ghost" id="viewBtn">👀 Mis Pokémon: ${VIEW==='back'?'de espaldas (animados)':'de frente (HD)'}</button>`:''}`;
+  $('#whoami').innerHTML=`<div class="pav" style="background:${p.color}">${pavIn(p)}</div><b>${esc(p.name)}</b><button class="btn sm ghost" id="chgUser">Cambiar jugador</button><button class="btn sm ghost" id="themeBtn">🎨 Estilo: ${isSV()?'Escarlata/Púrpura (9.ª gen)':'Zafiro Alfa (6.ª gen)'}</button>${isSV()?`<button class="btn sm ghost" id="viewBtn">👀 Mis Pokémon: ${VIEW==='back'?'de espaldas (animados)':'de frente (HD)'}</button>`:''}`;
   $('#chgUser').onclick=showProfiles;
   $('#themeBtn').onclick=()=>{setTheme(!isSV());renderWho()};
   const vb=$('#viewBtn');if(vb)vb.onclick=()=>{VIEW=VIEW==='back'?'front':'back';store.set('zaf3.view',VIEW);renderWho()}}
@@ -2019,7 +2021,7 @@ function renderRunSide(el){
     saveRun();renderRun()});
   $('#rAb').onclick=()=>{if(confirm('¿Abandonar la aventura? Se perderá el progreso.')){run=null;store.set(pk('run'),null);renderRun()}}}
 $('#goRun').onclick=()=>show('run');
-Liga.init({Dex,Teams,NAMES,store,esc,nmSp,nmMove,nmAb,nmItem,tchip,tCol,tES,iconEl,POOL,defaultSet,TYPE_NAMES:Object.keys(TYPES).filter(t=>t!=='Stellar'),show,editTeam:editExternalTeam,learnable,MOVES,ABILS,NATURES,RITEMS,
+Liga.init({PCOLORS,getProfiles:profiles,setProfiles:l=>store.set('zaf3.profiles',l),removeProfile:id=>{['team','beat','run'].forEach(k=>{try{localStorage.removeItem(`zaf3.${id}.${k}`)}catch{}});store.set('zaf3.profiles',profiles().filter(x=>x.id!==id))},Dex,Teams,NAMES,store,esc,nmSp,nmMove,nmAb,nmItem,tchip,tCol,tES,iconEl,POOL,defaultSet,TYPE_NAMES:Object.keys(TYPES).filter(t=>t!=='Stellar'),show,editTeam:editExternalTeam,learnable,MOVES,ABILS,NATURES,RITEMS,
   profileTeams:()=>profiles().map(p=>({id:p.id,name:p.name,emoji:p.emoji,team:store.get(`zaf3.${p.id}.team`,[])}))});
 $('#goLiga').onclick=()=>show('liga');
 $('#goRom').onclick=()=>show('rom');

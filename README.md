@@ -114,6 +114,8 @@ los equipos de la jornada elegida. Los combates se juegan en el juego.
   en el momento. Se elige cuántos Pokémon por equipo, el nivel, hasta qué generación, si solo totalmente evolucionados, si entran legendarios y míticos, y si se repiten entre entrenadores.
   «Azar total» da habilidad, objeto, naturaleza y ataques al azar (entre todo lo que hay en el juego; con al menos 2 de daño); «Coherente» usa una habilidad de su especie y ataques sugeridos.
   Con la ROM abierta solo salen Pokémon, ataques, habilidades y objetos que existen en ella. Lógica en `lib/ligasorteo.js`.
+- **Jugadores = entrenadores de la liga:** la pantalla de entrada («¿Quién juega?») lista a los entrenadores de las ligas, con su color y su escudo, y al entrar como uno de ellos «tú» pasa a ser ese
+  jugador en el calendario y la racha. Un jugador nuevo creado en la entrada entra en la competición abierta; borrarlo lo quita también de las ligas (y sus combates). Hay 24 colores y un selector libre.
 - **Escudos:** cada entrenador y cada competición puede llevar una imagen (de la galería, se guarda reducida a 96 px) o solo un color (paleta o color libre); sin imagen se ve el emoji sobre el color.
 - **👥 Entrenadores:** tarjetas con récord, forma y competiciones; la ficha enseña cada Pokémon al detalle (tipos, habilidad, objeto, naturaleza, ataques, estadísticas, EVs/IVs).
 - **🪙 Tienda:** cada combate da monedas (victoria 100, empate 50, derrota 25; configurable), que valen para todas las competiciones: habilidad al azar, naturaleza (elegir o al azar),
