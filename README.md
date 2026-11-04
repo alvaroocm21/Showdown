@@ -83,28 +83,31 @@ La interfaz traduce los eventos del combate al español (los textos poco comunes
 - Sprites 3D animados de Pokémon Showdown. Si no cargan, se muestra un marcador por tipo.
 - Equipo y medallas se guardan en `localStorage`.
 
-## 🏟 Liga ROM (combates en la ROM de 3DS)
-Apartado para jugar una liga entre varios entrenadores **en la ROM** (Rubí Omega / Zafiro Alfa o Ultra Sol / Ultra Luna,
-descifrada, con o sin mod en .zip). Aquí no hay combates: se preparan los equipos y se llevan a la ROM.
-1. **Jornada**: crea tantas como quieras; una jornada nueva copia los equipos de la anterior.
-2. **Entrenadores**: añade a cada participante y elige sus Pokémon de esa jornada con el mismo editor de equipos de la app
-   (nivel, naturaleza, EVs/IVs, habilidad, objeto, 4 movimientos, importar en formato Showdown) o tráelos del equipo de un jugador.
-3. **ROM**: elige el `.3ds` (se lee en el dispositivo, no se sube) y asigna a cada participante un entrenador del juego
-   (hay un botón para sugerirlos). Los nombres se casan en inglés (o español) con los textos de la ROM, así que funciona también con mods
-   que añaden Pokémon de 8.ª/9.ª gen. Lo que no existe en la ROM se omite y se avisa.
-4. **Exportar**: descarga un `.zip` con `<TitleID>/romfs/...` (solo los dos archivos de entrenadores) para `load/mods/` de Azahar
-   o `luma/titles/` de una 3DS; en Chrome de escritorio también puede guardar directamente en una carpeta.
-   Los nombres de los entrenadores se escriben solo en los textos en español (el .zip pesa mucho menos). Las megaevoluciones se escriben como el Pokémon base con su megapiedra.
+## 🎮 Editor ROM y 🏟 Liga (dos apartados en la portada)
+**🎮 Editor ROM** (lo principal): lleva a la ROM de 3DS (Rubí Omega / Zafiro Alfa o Ultra Sol / Ultra Luna, descifrada, con o sin mod en .zip)
+los equipos de la jornada elegida. Los combates se juegan en el juego.
+1. Elige el `.3ds` (se lee en el dispositivo, no se sube) y, si lo usas, el mod `.zip`.
+2. Elige la jornada y asigna a cada entrenador de la liga uno del juego (a mano, en bloque desde un entrenador, o sugeridos).
+   Los nombres se casan en inglés (o español) con los textos de la ROM, así que funciona con mods que añaden Pokémon de 8.ª/9.ª gen.
+   Lo que no existe en la ROM se omite y se avisa. Las megaevoluciones se escriben como el Pokémon base con su megapiedra.
+3. Descarga un `.zip` con `<TitleID>/romfs/...` (solo los archivos de entrenadores y los textos en español con los nombres) para `load/mods/`
+   de Azahar/Citra o `luma/titles/` de una 3DS. En Chrome de escritorio también puede guardar directamente en una carpeta.
+   También hay un explorador de archivos de la ROM (lista y descarga de archivos concretos).
 
-5. **Resultados y monedas:** anota quién gana cada combate (clasificación e historial cara a cara) y cada resultado da monedas
-   (victoria 100, empate 50, derrota 25; configurable). Con ellas se compran retoques a los Pokémon de la jornada: habilidad al azar,
-   naturaleza (elegir o al azar), ataque (elegir o al azar), objeto al azar o IVs a 31. Las habilidades, ataques y objetos al azar salen
-   de entre todos los del juego, aprenda o no el Pokémon.
-   Si la ROM está abierta, el azar solo elige lo que existe en ella. Lógica en `lib/ligashop.js`.
+**🏟 Liga** (consulta y gestión), con pestañas:
+- **🏆 Temporada:** jornadas, podio y clasificación (de toda la temporada o de una jornada), combates anotados (quién ganó), cara a cara y cierre de temporada.
+- **👥 Entrenadores:** tarjetas con récord y equipo; al abrir uno se ve cada Pokémon al detalle (tipos, habilidad, objeto, naturaleza, ataques, estadísticas
+  calculadas, EVs/IVs), sus combates, y se puede editar el equipo con el editor de equipos de la app, copiar el de la jornada anterior o traer el de un jugador.
+- **🪙 Tienda:** cada combate da monedas (victoria 100, empate 50, derrota 25; configurable) para retocar Pokémon: habilidad al azar, naturaleza (elegir o al azar),
+  ataque (elegir o al azar), objeto al azar o IVs a 31. Las habilidades, ataques y objetos al azar salen de entre todos los del juego, aprenda o no el Pokémon,
+  y, con la ROM abierta, solo de los que existen en ella.
+- **📜 Historial:** temporadas cerradas con su clasificación, combates y equipos de cada jornada.
+- **⚙ Ajustes:** premios y precios, copia de seguridad.
 
-Notas: en ORAS la ROM no guarda naturaleza ni EVs de los entrenadores (USUM sí). La APK (v1.1) ya permite elegir la ROM y guarda los .zip en Descargas (sin probar en dispositivo real). Código: `lib/romcore.js` (lectura/escritura de ROM,
-GARC, entrenadores), `lib/ligamap.js` (Showdown → ROM), `lib/liga.js` + `lib/liga.css` (pantalla).
-Pruebas: `python3 test/make_rom.py test/out/fake.3ds oras && python3 test/make_rom.py test/out/um.3ds usum && node test/liga.test.js test/out && node test/ui.js test/out`
+Notas: en ORAS la ROM no guarda naturaleza ni EVs de los entrenadores (USUM sí). La APK (v1.1) permite elegir la ROM y guarda los .zip en Descargas
+(sin probar en dispositivo real). Código: `lib/romcore.js` (lectura/escritura de ROM, GARC, entrenadores), `lib/ligamap.js` (Showdown → ROM), `lib/liga.js`
+(datos comunes y Editor ROM), `lib/ligahub.js` (pantalla Liga), `lib/ligashop.js` (tienda), `lib/liga.css`.
+Pruebas: `python3 test/make_rom.py test/out/fake.3ds oras && python3 test/make_rom.py test/out/um.3ds usum && node test/liga.test.js test/out && node test/shop.test.js && node test/ui.js test/out`
 (la última necesita `playwright`).
 
 ## Reconstruir el paquete (opcional)

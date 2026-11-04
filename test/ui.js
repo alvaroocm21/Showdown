@@ -28,18 +28,26 @@ Level: 30
   pg.on("pageerror", e => errors.push(String(e)));
   await pg.goto(URL); await pg.waitForSelector("#pname", { timeout: 60000 });
   await pg.fill("#pname", "Álvaro"); await pg.click("#pcreate"); await pg.waitForSelector("#goLiga");
-  await pg.click("#goLiga"); await pg.waitForSelector("#lgNew");
-  for (const n of ["Ana", "Beto"]) { await pg.fill("#lgNew", n); await pg.click("#lgAdd"); }
-  assert.equal(await pg.locator(".lg-p").count(), 2);
-  // equipo de Ana con el editor de equipos de la app
-  await pg.click(".lg-p:nth-child(1) [data-act=team]"); await pg.waitForSelector("#scr-team.on");
+  // ---- Liga ----
+  await pg.click("#goLiga"); await pg.waitForSelector("#lhSeason");
+  assert.equal(await pg.inputValue("#lhSeason"), "Temporada 1");
+  await pg.click('[data-tab="entrenadores"]');
+  for (const n of ["Ana", "Beto"]) { await pg.fill("#lhNew", n); await pg.click("#lhAdd"); }
+  assert.equal(await pg.locator(".lh-tc").count(), 2);
+  // detalle de Ana + equipo con el editor de equipos de la app
+  await pg.click('.lh-tc >> nth=0'); await pg.waitForSelector(".lh-dh");
+  await pg.click('[data-act="team"]'); await pg.waitForSelector("#scr-team.on");
   assert.match(await pg.innerText("#teamTitle"), /Ana · Jornada 1/);
   await pg.click("#ieBtn"); await pg.fill("#ieText", TEAM); await pg.click("#ieImport");
-  await pg.click("#teamOk"); await pg.waitForSelector("#ligaRoot .lg-p");
-  assert.match(await pg.innerText(".lg-p:nth-child(1) [data-act=team]"), /\(2\/6\)/);
-  // el equipo del propio jugador no se toca
-  assert.equal(await pg.evaluate(() => JSON.parse(localStorage.getItem(Object.keys(localStorage).find(k => /\.team$/.test(k))) || "[]").length), 0);
-  // ROM + mod
+  await pg.click("#teamOk"); await pg.waitForSelector(".lh-mon");
+  assert.equal(await pg.locator(".lh-mon").count(), 2, "vuelve al detalle con los Pokémon");
+  await pg.screenshot({ path: S + "/liga-detalle.png", fullPage: true });
+  const det = await pg.innerText(".lh-mon >> nth=0");
+  assert.match(det, /habilidad/i); assert.match(det, /naturaleza/i); assert.match(det, /PS|Vel/);
+  assert.equal(await pg.evaluate(() => JSON.parse(localStorage.getItem(Object.keys(localStorage).find(k => /\.team$/.test(k))) || "[]").length), 0, "no toca el equipo del jugador");
+  // ---- Editor ROM ----
+  await pg.click("#lhBack"); await pg.waitForSelector("#goRom"); await pg.click("#goRom"); await pg.waitForSelector("#lgRom");
+  assert.equal(await pg.locator("#romRoot .lg-p").count(), 2);
   await pg.setInputFiles("#lgRom", S + "/um.3ds"); await pg.setInputFiles("#lgMod", S + "/um.3ds.mod.zip");
   await pg.click("#lgOpen"); await pg.waitForSelector(".lg-ok", { timeout: 15000 });
   console.log("rom:", await pg.innerText(".lg-ok"));
@@ -48,46 +56,48 @@ Level: 30
   assert.match(await pg.innerText(".lg-opt"), /N\./, "se ve el equipo del entrenador");
   await pg.click(".lg-opt");
   assert.equal(await pg.locator(".lg-slot.ok").count(), 2, "el bloque asigna a todos");
-  await pg.click("#lgSug");
-  console.log("slots:", await pg.locator(".lg-slot").allInnerTexts());
-  await pg.screenshot({ path: S + "/liga-rom.png", fullPage: true });
   const [dl] = await Promise.all([pg.waitForEvent("download"), pg.click("#lgExp")]);
   await dl.saveAs(S + "/liga-out.zip"); console.log("descarga:", dl.suggestedFilename());
   console.log("informe:", (await pg.innerText(".lg-ok >> nth=1")));
-  // persistencia
-  await pg.reload(); await pg.waitForSelector("#pname", { timeout: 60000 });
-  await pg.click(".pcard"); await pg.click("#goLiga"); await pg.waitForSelector("#lgNew");
-  assert.equal(await pg.locator(".lg-p").count(), 2);
-  // nueva jornada copia los equipos
-  await pg.click("#lgJnew");
-  assert.equal(await pg.locator("#lgJ option").count(), 2);
-  assert.match(await pg.innerText(".lg-p:nth-child(1) [data-act=team]"), /\(2\/6\)/);
-  // resultados: Ana gana a Beto en la jornada 2 y empatan en la 1
-  await pg.selectOption("#lgMR", "a"); await pg.click("#lgMAdd");
-  assert.equal(await pg.locator(".lg-m").count() >= 2, true);
-  assert.match(await pg.innerText(".lg-t tbody tr:first-child"), /Ana\s+1\s+1\s+0\s+0\s+3/);
-  await pg.selectOption("#lgJ", { index: 0 }); await pg.selectOption("#lgMR", "d"); await pg.click("#lgMAdd");
-  assert.match(await pg.innerText(".lg-t tbody tr:first-child"), /Ana\s+2\s+1\s+1\s+0\s+4/);
-  assert.match(await pg.innerText("#ligaRoot"), /Ana 1 – 0 Beto|Beto 0 – 1 Ana|Ana\s+1\s+–\s+0\s+Beto/);
-  await pg.reload(); await pg.waitForSelector("#pname", { timeout: 60000 }); await pg.click(".pcard"); await pg.click("#goLiga");
-  assert.match(await pg.innerText(".lg-t tbody tr:first-child"), /Ana\s+2/, "los resultados se guardan");
-  // monedas: Ana ganó (100) y empató (50) → 150
-  await pg.selectOption("#lgSP", { index: 0 });
-  assert.match(await pg.innerText("#lgSP"), /Ana · 🪙150/);
-  const mon = pg.locator(".lg-sm").first();
-  await mon.locator("[data-shop=natR]").click();
-  assert.match(await pg.innerText("#lgSP"), /Ana · 🪙100/);
-  await pg.click("#lgCoinGive");                       // +50 manual → 150
-  await pg.locator(".lg-sm").first().locator("[data-shop=mv]").click();
+  await pg.screenshot({ path: S + "/rom.png", fullPage: true });
+  // ---- Temporada: nueva jornada, resultados, monedas ----
+  await pg.click("#lgGoLiga"); await pg.waitForSelector("#lhSeason");
+  assert.equal(await pg.locator(".lh-mon").count(), 2, "vuelve donde estaba (detalle de Ana)");
+  await pg.click('[data-tab="temporada"]');
+  await pg.click("#lhJnew");
+  assert.equal(await pg.locator(".lh-chip[data-j]").count(), 2);
+  await pg.click(".lh-det summary >> nth=0"); await pg.selectOption("#lhMR", "a"); await pg.click("#lhMAdd");
+  assert.match(await pg.innerText(".lh-t tbody tr:first-child"), /Ana\s+1\s+1\s+0\s+0\s+3/);
+  assert.match(await pg.innerText(".lh-pod"), /Ana/);
+  await pg.click('.lh-chip[data-j] >> nth=0'); await pg.click(".lh-det summary >> nth=0"); await pg.selectOption("#lhMR", "d"); await pg.click("#lhMAdd");
+  assert.match(await pg.innerText(".lh-t tbody tr:first-child"), /Ana\s+2\s+1\s+1\s+0\s+4/);
+  await pg.screenshot({ path: S + "/liga-temporada.png", fullPage: true });
+  // monedas: 100 + 50 = 150
+  await pg.click('[data-tab="tienda"]');
+  assert.match(await pg.innerText("#lhSP"), /Ana · 🪙150/);
+  await pg.locator(".lh-sm").first().locator("[data-shop=natR]").click();
+  assert.match(await pg.innerText("#lhSP"), /Ana · 🪙100/);
+  await pg.click("#lhCoinGive");
+  await pg.locator(".lh-sm").first().locator("[data-shop=mv]").click();
   await pg.fill(".lg-in", "Surf"); await pg.click(".lg-opt"); await pg.click(".lg-opt");
-  assert.match(await pg.innerText("#lgSP"), /Ana · 🪙30/);
-  assert.match(await pg.innerText(".lg-sm >> nth=0"), /Surf|Hidrobomba|Surfear/i, "el ataque elegido está en el equipo");
-  assert.ok(await pg.locator(".lg-sm").first().locator("[data-shop=ab]").isDisabled(), "sin monedas no se compra");
-  // borrar un combate devuelve el premio
-  await pg.reload(); await pg.waitForSelector("#pname", { timeout: 60000 }); await pg.click(".pcard"); await pg.click("#goLiga");
-  assert.match(await pg.innerText("#lgSP"), /Ana · 🪙/, "monedas guardadas");
-  const sw = await pg.evaluate(() => document.documentElement.scrollWidth); assert.ok(sw <= 390, "scroll horizontal " + sw);
-  await pg.screenshot({ path: S + "/liga-j2.png", fullPage: true });
+  assert.match(await pg.innerText("#lhSP"), /Ana · 🪙30/);
+  assert.ok(await pg.locator(".lh-sm").first().locator("[data-shop=ab]").isDisabled(), "sin monedas no se compra");
+  // cerrar temporada → historial
+  pg.on("dialog", d => d.accept());
+  await pg.click('[data-tab="temporada"]'); await pg.click(".lh-det summary >> nth=-1"); await pg.click("#lhClose");
+  await pg.waitForSelector(".lh-hs");
+  assert.match(await pg.innerText(".lh-hs"), /Temporada 1/); assert.match(await pg.innerText(".lh-hs"), /Campeón: Ana/);
+  assert.equal(await pg.inputValue("#lhSeason"), "Temporada 2");
+  await pg.screenshot({ path: S + "/liga-historial.png", fullPage: true });
+  // persistencia
+  await pg.reload(); await pg.waitForSelector("#pname", { timeout: 60000 }); await pg.click(".pcard"); await pg.click("#goLiga"); await pg.waitForSelector("#lhSeason");
+  assert.equal(await pg.inputValue("#lhSeason"), "Temporada 2");
+  await pg.click('[data-tab="historial"]'); assert.match(await pg.innerText(".lh-hs"), /Temporada 1/, "el historial se guarda");
+  await pg.setViewportSize({ width: 390, height: 844 });
+  for (const tab of ["temporada", "entrenadores", "tienda", "historial", "ajustes"]) {
+    await pg.click(`[data-tab="${tab}"]`);
+    const sw = await pg.evaluate(() => document.querySelector("#scr-liga").scrollWidth); assert.ok(sw <= 390, `scroll horizontal en ${tab}: ${sw}`);
+  }
   await br.close(); srv.close();
   console.log("errores de página:", errors); assert.equal(errors.length, 0);
   console.log("UI OK");

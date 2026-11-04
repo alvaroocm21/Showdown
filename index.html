@@ -335,7 +335,8 @@ body.sv #result{background:#07050dd9}
     <button class="btn" id="goTrainers">Ir a combatir</button>
     <button class="btn gold" data-league>🏆 Desafío de la Liga</button>
     <button class="btn" id="goRun" style="background:linear-gradient(#b86bff,#6a2fd1);box-shadow:0 4px 0 #3a1580">🎲 Randomlocke</button>
-    <button class="btn" id="goLiga" style="background:linear-gradient(#2fcf8a,#12945e);box-shadow:0 4px 0 #0a5a3a">🏟 Liga ROM</button>
+    <button class="btn" id="goRom" style="background:linear-gradient(#2fcf8a,#12945e);box-shadow:0 4px 0 #0a5a3a">🎮 Editor ROM</button>
+    <button class="btn" id="goLiga" style="background:linear-gradient(#ff9a3d,#d9610a);box-shadow:0 4px 0 #7a3600">🏟 Liga</button>
   </div>
   <button class="btn" id="installBtn">📲 Instalar app en este dispositivo</button>
   <div class="stats-line" id="installHint" style="display:none;max-width:420px;padding:0 14px"></div>
@@ -398,8 +399,13 @@ body.sv #result{background:#07050dd9}
   <div class="waves"></div>
 </section>
 
+<section id="scr-rom" class="screen">
+  <div class="wrap lg-wrap" id="romRoot"></div>
+  <div class="waves"></div>
+</section>
+
 <section id="scr-liga" class="screen">
-  <div class="wrap lg-wrap" id="ligaRoot"></div>
+  <div class="wrap lg-wrap lh-wrap" id="ligaRoot"></div>
   <div class="waves"></div>
 </section>
 
@@ -430,6 +436,7 @@ body.sv #result{background:#07050dd9}
 <script src="lib/ligamap.js"></script>
 <script src="lib/ligashop.js"></script>
 <script src="lib/liga.js"></script>
+<script src="lib/ligahub.js"></script>
 <script>
 'use strict';
 if(typeof PKMN==='undefined'){document.getElementById('loading').innerHTML='No se pudo cargar <b>lib/pkmn.bundle.js</b>.<br>Abre la carpeta completa del proyecto (no solo index.html).'}
@@ -630,7 +637,7 @@ $('#ieExport').onclick=()=>{$('#ieText').value=Teams.export(MY)};
 $('#ieImport').onclick=()=>{try{const t=Teams.import($('#ieText').value);if(!t||!t.length)throw 0;MY=t.slice(0,6).map(s=>{const d=defaultSet(s.species);return{...d,...s,name:'',evs:{hp:0,atk:0,def:0,spa:0,spd:0,spe:0,...s.evs},ivs:{hp:31,atk:31,def:31,spa:31,spd:31,spe:31,...s.ivs},level:s.level||100,teraType:s.teraType||d.teraType,moves:s.moves.slice(0,4)}});sel=0;saveTeam();renderTeam()}catch(e){alert('No se pudo importar el equipo.')}};
 
 /* ================= PANTALLAS ================= */
-function show(n){if(window.AndroidApp)try{AndroidApp.landscape(n==='battle')}catch(e){}$$('.screen').forEach(s=>s.classList.toggle('on',s.id==='scr-'+n));if(n==='battle')fit();if(n==='team')renderTeam();if(n==='trainers')renderTrainers();if(n==='run')renderRun();if(n==='title')renderWho();if(n==='liga')Liga.render()}
+function show(n){if(window.AndroidApp)try{AndroidApp.landscape(n==='battle')}catch(e){}$$('.screen').forEach(s=>s.classList.toggle('on',s.id==='scr-'+n));if(n==='battle')fit();if(n==='team')renderTeam();if(n==='trainers')renderTrainers();if(n==='run')renderRun();if(n==='title')renderWho();if(n==='liga')Liga.renderHub();if(n==='rom')Liga.renderRom()}
 $$('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
 $('#goTeam').onclick=()=>show('team');
 const ensureTeam=()=>{if(!MY.length)randomTeam()};
@@ -2010,11 +2017,12 @@ function renderRunSide(el){
     saveRun();renderRun()});
   $('#rAb').onclick=()=>{if(confirm('¿Abandonar la aventura? Se perderá el progreso.')){run=null;store.set(pk('run'),null);renderRun()}}}
 $('#goRun').onclick=()=>show('run');
-Liga.init({Dex,Teams,NAMES,store,esc,nmSp,nmMove,nmAb,nmItem,iconEl,show,editTeam:editExternalTeam,learnable,MOVES,ABILS,NATURES,RITEMS,
+Liga.init({Dex,Teams,NAMES,store,esc,nmSp,nmMove,nmAb,nmItem,tchip,tCol,tES,iconEl,show,editTeam:editExternalTeam,learnable,MOVES,ABILS,NATURES,RITEMS,
   profileTeams:()=>profiles().map(p=>({id:p.id,name:p.name,emoji:p.emoji,team:store.get(`zaf3.${p.id}.team`,[])}))});
 $('#goLiga').onclick=()=>show('liga');
+$('#goRom').onclick=()=>show('rom');
 
-window.__back=()=>{const on=(document.querySelector('.screen.on')||{}).id,map={'scr-team':'title','scr-trainers':'title','scr-run':'title','scr-liga':'title','scr-title':'profile'};
+window.__back=()=>{const on=(document.querySelector('.screen.on')||{}).id,map={'scr-team':'title','scr-trainers':'title','scr-run':'title','scr-liga':'title','scr-rom':'title','scr-title':'profile'};
   if(on==='scr-team'&&TEAMCTX){TEAMCTX.back();return true}
   if(on==='scr-battle'){if(M&&M.opts&&M.opts.noQuit)return true;$('#quit').click();return true}
   if(!map[on])return false;if(map[on]==='profile')showProfiles();else show(map[on]);return true};
