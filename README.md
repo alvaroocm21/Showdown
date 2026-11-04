@@ -106,6 +106,10 @@ los equipos de la jornada elegida. Los combates se juegan en el juego.
   quedan fuera; después, eliminatorias hasta la final. Con 36 entrenadores es exactamente el formato real (8 directos, 16 de playoff, 12 fuera); con otros números se adapta.
 - **📅 Calendario:** elige quién eres («⭐ Este soy yo») y verás tus próximos partidos de **todas** las competiciones, con su fecha, y tu racha (victorias/empates/derrotas seguidas,
   últimos 5, mejor racha). «Gané / Empate / Perdí» lo anota y da las monedas.
+- **🎲 Sorteo de equipos:** reparte Pokémon al azar entre los participantes (solo a los que no tienen equipo, o a todos) para la jornada actual, y al crear una competición hay una casilla para sortear
+  en el momento. Se elige cuántos Pokémon por equipo, el nivel, hasta qué generación, si solo totalmente evolucionados, si entran legendarios y míticos, y si se repiten entre entrenadores.
+  «Azar total» da habilidad, objeto, naturaleza y ataques al azar (entre todo lo que hay en el juego; con al menos 2 de daño); «Coherente» usa una habilidad de su especie y ataques sugeridos.
+  Con la ROM abierta solo salen Pokémon, ataques, habilidades y objetos que existen en ella. Lógica en `lib/ligasorteo.js`.
 - **Escudos:** cada entrenador y cada competición puede llevar una imagen (de la galería, se guarda reducida a 96 px) o solo un color (paleta o color libre); sin imagen se ve el emoji sobre el color.
 - **👥 Entrenadores:** tarjetas con récord, forma y competiciones; la ficha enseña cada Pokémon al detalle (tipos, habilidad, objeto, naturaleza, ataques, estadísticas, EVs/IVs).
 - **🪙 Tienda:** cada combate da monedas (victoria 100, empate 50, derrota 25; configurable), que valen para todas las competiciones: habilidad al azar, naturaleza (elegir o al azar),
@@ -116,7 +120,7 @@ los equipos de la jornada elegida. Los combates se juegan en el juego.
 Notas: en ORAS la ROM no guarda naturaleza ni EVs de los entrenadores (USUM sí). La APK (v1.1) permite elegir la ROM y guarda los .zip en Descargas
 (sin probar en dispositivo real). Código: `lib/romcore.js` (lectura/escritura de ROM, GARC, entrenadores), `lib/ligamap.js` (Showdown → ROM), `lib/liga.js`
 (datos comunes y Editor ROM), `lib/ligahub.js` (pantalla Liga), `lib/ligacal.js` (calendarios, rachas y eliminatorias), `lib/ligashop.js` (tienda), `lib/liga.css`.
-Pruebas: `python3 test/make_rom.py test/out/fake.3ds oras && python3 test/make_rom.py test/out/um.3ds usum && node test/liga.test.js test/out && node test/shop.test.js && node test/cal.test.js && node test/ui.js test/out`
+Pruebas: `python3 test/make_rom.py test/out/fake.3ds oras && python3 test/make_rom.py test/out/um.3ds usum && node test/liga.test.js test/out && node test/shop.test.js && node test/cal.test.js && node test/sorteo.test.js && node test/ui.js test/out`
 (la última necesita `playwright`).
 
 ## Reconstruir el paquete (opcional)

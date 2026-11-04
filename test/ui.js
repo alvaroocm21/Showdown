@@ -69,6 +69,16 @@ Level: 30
   await pg.click('.lh-shield ~ .lh-emo [data-pc] >> nth=1');
   assert.match(await pg.locator(".lh-dh .lh-av").getAttribute("style"), /rgb\(232, 89, 12\)|#e8590c/i, "cambia el color");
   await pg.screenshot({ path: S + "/liga-escudo.png", fullPage: true });
+  // sorteo de equipos: los 5 sin equipo reciben 3 Pokémon de nivel 40; Ana conserva el suyo
+  await pg.click("#lhBackList"); await pg.click("#lhSorteo > summary");
+  await pg.selectOption('[data-so="size"]', "3"); await pg.fill('[data-so="level"]', "40"); await pg.press('[data-so="level"]', "Enter");
+  await pg.screenshot({ path: S + "/liga-sorteo.png", fullPage: true });
+  await pg.click("#lhSortear");
+  await pg.click(".lh-tc >> nth=1"); await pg.waitForSelector(".lh-dh");
+  assert.equal(await pg.locator(".lh-mon").count(), 3, "el sorteo da 3 Pokémon");
+  assert.match(await pg.innerText(".lh-mon >> nth=0"), /Nv\. 40/);
+  await pg.click("#lhBackList"); await pg.click(".lh-tc >> nth=0"); await pg.waitForSelector(".lh-dh");
+  assert.equal(await pg.locator(".lh-mon").count(), 2, "Ana conserva su equipo");
   await pg.screenshot({ path: S + "/liga-detalle.png", fullPage: true });
   assert.equal(await pg.evaluate(() => JSON.parse(localStorage.getItem(Object.keys(localStorage).find(k => /\.team$/.test(k))) || "[]").length), 0, "no toca el equipo del jugador");
 
