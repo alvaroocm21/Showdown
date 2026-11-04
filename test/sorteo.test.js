@@ -32,4 +32,18 @@ const few = Sorteo.draw({ ...env, pool: pool.filter(s => s.gen === 1 && !(s.evos
 assert.ok(few.every(t => t.length >= 1), "no se queda sin equipo");
 // la ROM limita las especies
 const rom = Sorteo.draw({ ...env, ok: (k, o) => k !== "species" || o.num <= 151 }, { size: 6 }, 4, rand); assert.ok(rom.flat().every(s => Dex.species.get(s.species).num <= 151));
+// porcentajes: con 95 salen Pokémon mucho más fuertes que con 5, y 50 queda en medio
+const avg = ts => { const l = ts.flat().map(x => Sorteo.bst(Dex.species.get(x.species))); return l.reduce((a, b) => a + b, 0) / l.length; };
+const R = (r, n) => Sorteo.draw(env, { size: 6, unique: false }, n, rand, Array(n).fill(r));
+const a95 = avg(R(95, 20)), a50 = avg(R(50, 20)), a5 = avg(R(5, 20));
+assert.ok(a95 > a50 + 60 && a50 > a5 + 60, `media por porcentaje: 95→${a95.toFixed(0)} 50→${a50.toFixed(0)} 5→${a5.toFixed(0)}`);
+assert.ok(a95 >= 560, "un 95 da equipos de élite: " + a95.toFixed(0)); assert.ok(a5 <= 400, "un 5 da equipos humildes: " + a5.toFixed(0));
+// cada entrenador con su porcentaje, sin repetir familias entre ellos y con equipos completos
+const mix = Sorteo.draw(env, { size: 6 }, 3, rand, [90, 50, 10]);
+assert.ok(mix.every(t => t.length === 6) && avg([mix[0]]) > avg([mix[1]]) && avg([mix[1]]) > avg([mix[2]]), "orden por porcentaje 90 > 50 > 10");
+assert.equal(new Set(mix.flat().map(s => fam(s.species))).size, 18, "sin familias repetidas");
+assert.equal(Sorteo.etiqueta(92), "Élite"); assert.equal(Sorteo.etiqueta(5), "Humilde");
+// con pocos Pokémon disponibles y porcentaje, no se queda sin equipo
+const poor = Sorteo.draw({ ...env, pool: pool.filter(s => s.gen === 1 && !(s.evos && s.evos.length)).slice(0, 8) }, { size: 6, final: false, legend: true }, 3, rand, [90, 90, 90]);
+assert.ok(poor.every(t => t.length >= 1));
 console.log("SORTEO OK");

@@ -74,11 +74,17 @@ const TEAM8 = ["Pikachu", "Bulbasaur", "Charmander", "Squirtle", "Gengar", "Snor
   // sorteo de equipos: los 5 sin equipo reciben 3 Pokémon de nivel 40; Ana conserva el suyo
   await pg.click("#lhBackList"); await pg.click("#lhSorteo > summary");
   await pg.selectOption('[data-so="size"]', "3"); await pg.fill('[data-so="level"]', "40"); await pg.press('[data-so="level"]', "Enter");
+  await pg.fill('.lh-rt:has-text("Beto") input', "95"); await pg.press('.lh-rt:has-text("Beto") input', "Enter");
+  await pg.fill('.lh-rt:has-text("Carla") input', "5"); await pg.press('.lh-rt:has-text("Carla") input', "Enter");
+  assert.match(await pg.innerText('.lh-rt:has-text("Beto")'), /Élite/); assert.match(await pg.innerText('.lh-rt:has-text("Carla")'), /Humilde/);
   await pg.screenshot({ path: S + "/liga-sorteo.png", fullPage: true });
   await pg.click("#lhSortear");
+  const bst = await pg.evaluate(() => { const d = JSON.parse(localStorage.getItem("liga.v1")); const avg = n => { const p = d.parts.find(x => x.name === n), tm = Object.values(p.teams)[0]; const l = tm.map(s => { const b = PKMN.Dex.species.get(s.species).baseStats; return b.hp + b.atk + b.def + b.spa + b.spd + b.spe; }); return l.reduce((x, y) => x + y, 0) / l.length; }; return [avg("Beto"), avg("Carla")]; });
+  assert.ok(bst[0] > bst[1] + 100, `con 95% salen Pokémon más fuertes que con 5%: ${bst.map(Math.round)}`);
   await pg.click('.lh-tc:has-text("Beto")'); await pg.waitForSelector(".lh-dh");
   assert.equal(await pg.locator(".lh-mon").count(), 3, "el sorteo da 3 Pokémon");
   assert.match(await pg.innerText(".lh-mon >> nth=0"), /Nv\. 40/);
+  assert.match(await pg.innerText(".lh-body"), /95% · Élite/, "la ficha muestra su porcentaje");
   await pg.click("#lhBackList"); await pg.click('.lh-tc:has-text("Ana")'); await pg.waitForSelector(".lh-dh");
   assert.equal(await pg.locator(".lh-mon").count(), 2, "Ana conserva su equipo");
   await pg.screenshot({ path: S + "/liga-detalle.png", fullPage: true });

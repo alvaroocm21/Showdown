@@ -116,6 +116,9 @@ los equipos de la jornada elegida. Los combates se juegan en el juego.
   Con la ROM abierta solo salen Pokémon, ataques, habilidades y objetos que existen en ella. Lógica en `lib/ligasorteo.js`.
 - **Jugadores = entrenadores de la liga:** la pantalla de entrada («¿Quién juega?») lista a los entrenadores de las ligas, con su color y su escudo, y al entrar como uno de ellos «tú» pasa a ser ese
   jugador en el calendario y la racha. Un jugador nuevo creado en la entrada entra en la competición abierta; borrarlo lo quita también de las ligas (y sus combates). Hay 24 colores y un selector libre.
+- **⚡ Porcentaje de calidad:** cada entrenador puede tener un porcentaje (0–100) en su ficha o en el sorteo; el sorteo le da Pokémon acordes: con **90** salen los más fuertes (por suma de estadísticas base, como un equipo
+  de élite), con 50 unos medios y con 20 los más flojos (el azar se reparte alrededor de ese puesto). Etiquetas: Élite (90+), Alto (70+), Medio (40+), Bajo (20+), Humilde. Sin porcentaje usa el de por defecto
+  del sorteo, y se puede apagar para repartir todo al azar. Hay botones para poner porcentajes al azar o quitarlos.
 - **Escudos:** cada entrenador y cada competición puede llevar una imagen (de la galería, se guarda reducida a 96 px) o solo un color (paleta o color libre); sin imagen se ve el emoji sobre el color.
 - **🛡 Equipo:** tu plantilla (hasta 12 Pokémon por competición y jornada, que se edita con el editor de equipos de la app) con cada Pokémon al detalle (habilidad, objeto, naturaleza, ataques, estadísticas,
   partidos jugados y tarjetas) y la **elección de tus 6 titulares**: los 6 primeros son los que juegan y el resto el banquillo; con «Hacer titular» / «Cambiar por un suplente» los intercambias.
