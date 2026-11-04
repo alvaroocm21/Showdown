@@ -17,6 +17,7 @@ Level: 42
 Bulbasaur @ Sitrus Berry
 Level: 30
 - Vine Whip`;
+const TEAM8 = ["Pikachu", "Bulbasaur", "Charmander", "Squirtle", "Gengar", "Snorlax", "Eevee", "Mewtwo"].map(n => `${n}\n- Surf`).join("\n\n");
 (async () => {
   await new Promise(r => srv.listen(0, "127.0.0.1", r));
   const URL = `http://127.0.0.1:${srv.address().port}/index.html`;
@@ -82,6 +83,25 @@ Level: 30
   assert.equal(await pg.locator(".lh-mon").count(), 2, "Ana conserva su equipo");
   await pg.screenshot({ path: S + "/liga-detalle.png", fullPage: true });
   assert.equal(await pg.evaluate(() => JSON.parse(localStorage.getItem(Object.keys(localStorage).find(k => /\.team$/.test(k))) || "[]").length), 0, "no toca el equipo del jugador");
+
+  // ---- Equipo: plantilla de 8, 6 titulares y 2 suplentes ----
+  await pg.click("#lhBackList"); await pg.click('.lh-tc:has-text("Eva")'); await pg.waitForSelector(".lh-dh");
+  await pg.click('[data-act="team"]'); await pg.waitForSelector("#scr-team.on");
+  if (!(await pg.locator("#ieText").isVisible())) await pg.click("#ieBtn"); await pg.fill("#ieText", TEAM8); await pg.click("#ieImport");
+  assert.equal(await pg.locator("#slots .slot").count(), 12, "la plantilla de la liga admite hasta 12");
+  await pg.click("#teamOk"); await pg.waitForSelector(".lh-mon");
+  assert.equal(await pg.locator(".lh-mon").count(), 8);
+  assert.match(await pg.innerText('.lh-card:has(.lh-ch b:has-text("Equipo en")) .lh-ch'), /6 titulares \+ 2 suplentes/);
+  await pg.click('[data-tab="equipo"]'); await pg.selectOption("#lhEqP", { label: "Eva" });
+  const tit = pg.locator('.lh-card:has(.lh-ch b:text-is("Titulares"))'), ban = pg.locator('.lh-card:has(.lh-ch b:text-is("Banquillo"))');
+  assert.equal(await tit.locator(".lh-mon").count(), 6); assert.equal(await ban.locator(".lh-mon").count(), 2);
+  assert.match(await tit.locator(".lh-mon >> nth=0").innerText(), /Titular 1/); assert.match(await tit.locator(".lh-mon >> nth=0").innerText(), /habilidad[\s\S]*naturaleza[\s\S]*objeto|objeto[\s\S]*naturaleza/i);
+  const firstBench = (await ban.locator(".lh-mon >> nth=0").locator(".lh-mi b").innerText()).trim();
+  await ban.locator('[data-eq="up"]').first().click(); await pg.click(".lg-opt >> nth=0");              // el primer suplente sustituye al titular 1
+  assert.equal((await tit.locator(".lh-mon >> nth=0").locator(".lh-mi b").innerText()).trim(), firstBench, "el suplente pasa a titular");
+  assert.equal(await tit.locator(".lh-mon").count(), 6); assert.equal(await ban.locator(".lh-mon").count(), 2);
+  await pg.screenshot({ path: S + "/liga-equipo.png", fullPage: true });
+  await pg.click('[data-tab="entrenadores"]');
 
   // ---- 2. Editor ROM ----
   await pg.click("#lhBack"); await pg.click("#goRom"); await pg.waitForSelector("#lgRom");
@@ -195,7 +215,7 @@ Level: 30
   await pg.click("#goLiga"); await pg.waitForSelector("#lhCompName"); assert.match(await pg.innerText(".lh-hero"), /Ana/, "al entrar como Ana, «tú» es Ana");
   assert.equal(await pg.locator(".lh-chip.comp").count(), 3, "las tres competiciones se guardan");
   await pg.click('[data-tab="historial"]'); assert.match(await pg.innerText(".lh-hs"), /Temporada 1/);
-  for (const tab of ["comp", "calendario", "entrenadores", "tienda", "historial", "ajustes"]) {
+  for (const tab of ["comp", "calendario", "equipo", "entrenadores", "tienda", "historial", "ajustes"]) {
     await pg.click(`[data-tab="${tab}"]`);
     const sw = await pg.evaluate(() => document.querySelector("#scr-liga").scrollWidth); assert.ok(sw <= 390, `scroll horizontal en ${tab}: ${sw}`);
   }

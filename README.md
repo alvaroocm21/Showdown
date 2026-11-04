@@ -117,6 +117,9 @@ los equipos de la jornada elegida. Los combates se juegan en el juego.
 - **Jugadores = entrenadores de la liga:** la pantalla de entrada («¿Quién juega?») lista a los entrenadores de las ligas, con su color y su escudo, y al entrar como uno de ellos «tú» pasa a ser ese
   jugador en el calendario y la racha. Un jugador nuevo creado en la entrada entra en la competición abierta; borrarlo lo quita también de las ligas (y sus combates). Hay 24 colores y un selector libre.
 - **Escudos:** cada entrenador y cada competición puede llevar una imagen (de la galería, se guarda reducida a 96 px) o solo un color (paleta o color libre); sin imagen se ve el emoji sobre el color.
+- **🛡 Equipo:** tu plantilla (hasta 12 Pokémon por competición y jornada, que se edita con el editor de equipos de la app) con cada Pokémon al detalle (habilidad, objeto, naturaleza, ataques, estadísticas,
+  partidos jugados y tarjetas) y la **elección de tus 6 titulares**: los 6 primeros son los que juegan y el resto el banquillo; con «Hacer titular» / «Cambiar por un suplente» los intercambias.
+  Si un titular está sancionado (2 🟨), no juega y entra un suplente, tanto en el marcador como al exportar a la ROM (que siempre escribe solo los 6 que juegan). Se puede ver el equipo de cualquier entrenador.
 - **👥 Entrenadores:** tarjetas con récord, forma y competiciones; la ficha enseña cada Pokémon al detalle (tipos, habilidad, objeto, naturaleza, ataques, estadísticas, EVs/IVs).
 - **🪙 Tienda:** cada combate da monedas (victoria 100, empate 50, derrota 25; configurable), que valen para todas las competiciones: habilidad al azar, naturaleza (elegir o al azar),
   ataque (elegir o al azar), objeto al azar o IVs a 31 (al azar entre todo lo que hay en el juego; con la ROM abierta, solo lo que existe en ella).
