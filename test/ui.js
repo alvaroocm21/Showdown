@@ -104,6 +104,13 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   await pg.click('.lh-tc:has-text("Beto")'); assert.equal(await pg.locator(".lh-mon").count(), 0, "al cancelar no se reparte"); await pg.click("#lhBackList");
   await pg.click("#lhSortear"); await pg.waitForSelector(".lg-sheet .lh-rt");
   await setRange(pg, '.lg-sheet .lh-rt:has-text("Beto")', 95); await setRange(pg, '.lg-sheet .lh-rt:has-text("Carla")', 5);
+  // cualquier número del 1 al 100, de 1 en 1: deslizador y casilla van juntos
+  await setRange(pg, '.lg-sheet .lh-rt:has-text("Beto")', 93);
+  assert.equal(await pg.inputValue('.lg-sheet .lh-rt:has-text("Beto") [data-n]'), "93", "el deslizador mueve la casilla de 1 en 1");
+  await pg.fill('.lg-sheet .lh-rt:has-text("Dani") [data-n]', "37");
+  assert.equal(await pg.inputValue('.lg-sheet .lh-rt:has-text("Dani") [data-r]'), "37", "la casilla mueve el deslizador");
+  assert.match(await pg.innerText('.lg-sheet .lh-rt:has-text("Dani")'), /Bajo/);
+  await pg.fill('.lg-sheet .lh-rt:has-text("Beto") [data-n]', "95");
   assert.match(await pg.innerText('.lg-sheet .lh-rt:has-text("Beto")'), /Élite/); assert.match(await pg.innerText('.lg-sheet .lh-rt:has-text("Carla")'), /Humilde/);
   await pg.screenshot({ path: S + "/liga-sorteo.png", fullPage: true });
   await pg.click(".lg-sheet [data-ok]");
@@ -113,6 +120,10 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   assert.equal(await pg.locator(".lh-mon").count(), 3, "el sorteo da 3 Pokémon");
   assert.match(await pg.innerText(".lh-mon >> nth=0"), /Nv\. 40/);
   assert.match(await pg.innerText(".lh-body"), /95% · Élite/, "la ficha muestra su porcentaje");
+  assert.equal(await pg.getAttribute(".lh-range", "step"), "1", "el deslizador de la ficha va de 1 en 1");
+  await pg.fill(".lh-rtnum", "62"); await pg.press(".lh-rtnum", "Enter");
+  assert.match(await pg.innerText(".lh-body"), /62% · Medio/, "se puede escribir cualquier número");
+  assert.equal(await pg.evaluate(() => { const d = JSON.parse(localStorage.getItem("liga.v1")); return d.parts.flatMap(p => Object.values(p.teams || {}).flat()).filter(s => (PKMN.Dex.items.get(s.item) || {}).megaStone).length; }), 0, "el sorteo no da megapiedras");
   await pg.click("#lhBackList"); await pg.click('.lh-tc:has-text("Ana")'); await pg.waitForSelector(".lh-dh");
   assert.equal(await pg.locator(".lh-mon").count(), 2, "Ana conserva su equipo");
   await pg.screenshot({ path: S + "/liga-detalle.png", fullPage: true });
@@ -132,6 +143,14 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   await ban.locator('[data-eq="up"]').first().click(); await pg.click(".lg-opt >> nth=0");              // el primer suplente sustituye al titular 1
   assert.equal((await tit.locator(".lh-mon >> nth=0").locator(".lh-mi b").innerText()).trim(), firstBench, "el suplente pasa a titular");
   assert.equal(await tit.locator(".lh-mon").count(), 6); assert.equal(await ban.locator(".lh-mon").count(), 2);
+  // megas: no se sortean; se equipa la megapiedra a un Pokémon cuando se quiera
+  assert.equal(await pg.locator('.lh-mon:has-text("Pikachu") [data-mega], .lh-mon:has-text("Bulbasaur") [data-mega]').count(), 0, "solo los Pokémon que megaevolucionan ofrecen megapiedra");
+  const gen = tit.locator('.lh-mon:has-text("Gengar")'); await gen.locator("[data-mega]").click();
+  assert.match(await pg.innerText(".lg-sheet"), /Gengarit/i); await pg.click(".lg-opt >> nth=0");
+  assert.match(await gen.innerText(), /Gengarit/i, "queda equipada la megapiedra");
+  await gen.locator("[data-mega]").click(); await pg.click('.lg-opt:has-text("Quitar")');
+  assert.doesNotMatch(await gen.innerText(), /Gengarit/i, "y se puede quitar");
+  await gen.locator("[data-mega]").click(); await pg.click(".lg-opt >> nth=0");                         // la deja puesta
   await pg.screenshot({ path: S + "/liga-equipo.png", fullPage: true });
   await pg.click('[data-tab="entrenadores"]');
 

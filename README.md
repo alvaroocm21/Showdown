@@ -110,6 +110,8 @@ los equipos de la jornada elegida. Los combates se juegan en el juego.
   Pokémon enseña también sus cifras en la ficha del entrenador. Todo se calcula repasando los combates, así que borrar o corregir uno lo recalcula bien.
 - **📅 Calendario:** elige quién eres («⭐ Este soy yo») y verás tus próximos partidos de **todas** las competiciones, con su fecha, y tu racha (victorias/empates/derrotas seguidas,
   últimos 5, mejor racha). «Gané / Empate / Perdí» lo anota y da las monedas.
+- **Porcentajes de 1 a 100 y megas:** el porcentaje de calidad se escribe o se mueve de 1 en 1 (cualquier número del 1 al 100). El sorteo **no reparte megas** (ni la especie mega ni la megapiedra): en la pestaña Equipo, los Pokémon que megaevolucionan
+  tienen un botón **💎 Equipar megapiedra** para ponérsela cuando quieras (y quitarla); a la ROM va el Pokémon base con su megapiedra y megaevoluciona en combate.
 - **Flujo de Pokémon:** 1) «🎲 Sortear» (en Equipo, en la ficha, en el sorteo general o al crear una competición) **pide primero el porcentaje de calidad** de cada entrenador al que se va a repartir; 2) reparte 12 Pokémon (6 titulares + 6 suplentes); 3) en la pestaña Equipo eliges qué 6 juegan en cada jornada.
 - **🎲 Sorteo de equipos:** reparte Pokémon al azar entre los participantes (solo a los que no tienen equipo, o a todos) para la jornada actual, y al crear una competición hay una casilla para sortear
   en el momento. Se elige cuántos Pokémon por equipo (hasta 12 = 6 titulares + 6 suplentes; 12 por defecto), el nivel, hasta qué generación, si solo totalmente evolucionados, si entran legendarios y míticos, y si se repiten entre entrenadores.

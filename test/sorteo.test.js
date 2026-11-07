@@ -7,7 +7,7 @@ const pool = Dex.species.all().filter(s => s.exists && s.num > 0 && !s.battleOnl
 const env = { Dex, pool, abils: Dex.abilities.all().filter(a => a.exists && a.id !== "noability"), natures: Dex.natures.all(),
   moves: Dex.moves.all().filter(m => m.exists && !m.isZ && !m.isMax && m.id !== "struggle"), items: Dex.items.all().filter(i => i.exists && !i.isNonstandard && !i.isPokeball && !i.megaStone && !i.zMove),
   types: Dex.types.all().map(t => t.name).filter(t => t !== "Stellar"),
-  defaultSet: (name, o) => { const sp = Dex.species.get(name), b = sp.baseStats, off = b.atk >= b.spa ? "atk" : "spa"; return { species: sp.name, level: (o && o.level) || 50, ability: Object.values(sp.abilities)[0], item: "Leftovers", nature: off === "atk" ? "Jolly" : "Timid", moves: ["Tackle"], evs: { hp: 4, atk: 0, def: 0, spa: 0, spd: 0, spe: 252, [off]: 252 }, ivs: { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 }, teraType: sp.types[0], name: "", gender: "" }; } };
+  defaultSet: (name, o) => { const sp = Dex.species.get(name), b = sp.baseStats, off = b.atk >= b.spa ? "atk" : "spa"; return { species: sp.name, level: (o && o.level) || 50, ability: Object.values(sp.abilities)[0], item: (Dex.items.all().find(i => i.exists && i.megaStone && i.megaStone[sp.name]) || { name: "Leftovers" }).name, nature: off === "atk" ? "Jolly" : "Timid", moves: ["Tackle"], evs: { hp: 4, atk: 0, def: 0, spa: 0, spd: 0, spe: 252, [off]: 252 }, ivs: { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 }, teraType: sp.types[0], name: "", gender: "" }; } };
 let seed = 7; const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 const fam = sp => { let s = Dex.species.get(sp), g = 0; while (s.prevo && g++ < 4) s = Dex.species.get(s.prevo); return s.id; };
 
@@ -52,4 +52,11 @@ assert.ok(big12.every(t => t.length === 12), "cada entrenador recibe 12");
 assert.equal(new Set(big12.flat().map(s => fam(s.species))).size, 240, "240 familias distintas en la liga");
 assert.equal(Sorteo.DEFAULTS().size, 12, "por defecto, 12");
 assert.equal(Sorteo.opts({ size: 6 }).size, 12, "un 6 guardado de antes no manda si nunca se eligió"); assert.equal(Sorteo.opts({ size: 6, sizeSet: true }).size, 6, "pero sí si se eligió a mano");
+// las megas no se sortean: ni la especie ni la megapiedra, en ninguno de los dos modos
+for (const mode of ["coherent", "random"]) {
+  const all = Sorteo.draw(env, { size: 12, mode, final: false, legend: true, unique: false }, 40, rand).flat();
+  assert.ok(all.every(s => !Dex.species.get(s.species).isMega), "ninguna especie mega (" + mode + ")");
+  assert.ok(all.every(s => !(Dex.items.get(s.item) || {}).megaStone), "ninguna megapiedra (" + mode + "): " + all.filter(s => (Dex.items.get(s.item) || {}).megaStone).map(s => s.species + "/" + s.item).slice(0, 3));
+}
+assert.ok(!Sorteo.pool({ ...env, pool: Dex.species.all().filter(s => s.exists) }, { final: false, legend: true, gen: 9 }).some(s => s.isMega), "ni siquiera si el pool trae megas");
 console.log("SORTEO OK");

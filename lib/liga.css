@@ -345,3 +345,8 @@
 .lg-sheet .lh-rt output{font-weight:900;min-width:30px;text-align:right}
 .lg-sheet .lh-rt .lh-rtl{width:64px;text-align:right}
 .lg-sheet .lh-rt [data-r]{flex:1 1 100%;accent-color:#ffd24a;width:100%}
+
+.lg-sheet .lh-rt [data-n]{width:64px;background:#04122f;color:#fff;border:2px solid #5aa6ff88;border-radius:8px;padding:5px;text-align:center;font-weight:900}
+.lh-rtrow{display:flex;align-items:center;gap:10px}
+.lh-rtrow .lh-range{flex:1}
+.lh-rtnum{width:70px;background:#04122f;color:#fff;border:2px solid #5aa6ff88;border-radius:8px;padding:6px;text-align:center}
