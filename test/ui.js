@@ -144,6 +144,8 @@ const TEAM8 = ["Pikachu", "Bulbasaur", "Charmander", "Squirtle", "Gengar", "Snor
   await pg.screenshot({ path: S + "/liga-calendario.png", fullPage: true });
   await pg.click('[data-tab="comp"]');
   assert.equal(await pg.locator(".lh-pod").count(), 0, "sin podio");
+  assert.equal(await pg.locator(".lh-cl tr.z-po").first().evaluate(e => getComputedStyle(e).borderLeftColor), "rgb(240, 140, 0)", "el playoff es naranja");
+  assert.equal(await pg.locator(".lh-leg i.z-po").evaluate(e => getComputedStyle(e).backgroundColor), "rgb(240, 140, 0)", "y también en la leyenda");
   assert.ok(await pg.locator(".lh-cl tbody tr .lh-av").count() >= 7, "cada fila de la clasificación lleva el escudo del entrenador");
   assert.equal(await pg.locator(".lh-cl tbody tr:has-text(\"Ana\") .lh-av img").count(), 1, "y se ve la imagen de Ana");
   assert.match(await pg.innerText(".lh-cl thead"), /GF[\s\S]*GC/, "la tabla tiene GF y GC");

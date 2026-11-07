@@ -98,7 +98,7 @@ los equipos de la jornada elegida. Los combates se juegan en el juego.
 - **Competiciones:** arriba eliges o creas una (**🏟 Liga**, **🏆 Copa** o **⭐ Champions**). Todas pueden jugarse a la vez. Cada entrenador entra en las que tú elijas
   (en su ficha o en Ajustes → Participantes). Por defecto, un entrenador nuevo entra en la competición abierta. Su equipo es el mismo en todas hasta que lo cambias en una jornada;
   cada jornada hereda el equipo de la anterior (no se duplica), así que puedes tener 38 jornadas sin llenar el almacenamiento.
-- **Liga:** calendario completo a **1 vuelta** o **2 vueltas** (ida y vuelta) con un botón; clasificación con colores (verde ascenso, azul playoff, rojo descenso,
+- **Liga:** calendario completo a **1 vuelta** o **2 vueltas** (ida y vuelta) con un botón; clasificación con colores (verde ascenso, naranja playoff, rojo descenso,
   configurables), con el **escudo** de cada entrenador junto a su nombre, con **GF y GC** (Pokémon derrotados a favor y en contra; al anotar un combate se pide el marcador, de 0 a 6, y se puede corregir con ✎; sin marcador cuenta 1–0; el desempate es por diferencia y luego GF), sin nada más debajo; los combates y el cara a cara están en Calendario, y el cierre de temporada en Ajustes, forma de los últimos 5 partidos y cara a cara.
 - **Copa:** sorteo aleatorio (o por orden de la lista) del cuadro, partido único o ida y vuelta (la final es única). Si no son potencia de 2, descansan los primeros del sorteo.
   Los partidos se crean solos según se decide cada eliminatoria; si una eliminatoria a ida y vuelta queda empatada, eliges quién pasa.
