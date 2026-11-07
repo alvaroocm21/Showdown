@@ -80,6 +80,7 @@ const TEAM8 = ["Pikachu", "Bulbasaur", "Charmander", "Squirtle", "Gengar", "Snor
   await pg.screenshot({ path: S + "/liga-escudo.png", fullPage: true });
   // sorteo de equipos: los 5 sin equipo reciben 3 Pokémon de nivel 40; Ana conserva el suyo
   await pg.click("#lhBackList"); await pg.click("#lhSorteo > summary");
+  assert.equal(await pg.inputValue('[data-so="size"]'), "12", "el sorteo reparte 12 por defecto");
   await pg.selectOption('[data-so="size"]', "3"); await pg.fill('[data-so="level"]', "40"); await pg.press('[data-so="level"]', "Enter");
   await pg.fill('.lh-rt:has-text("Beto") input', "95"); await pg.press('.lh-rt:has-text("Beto") input', "Enter");
   await pg.fill('.lh-rt:has-text("Carla") input', "5"); await pg.press('.lh-rt:has-text("Carla") input', "Enter");

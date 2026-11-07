@@ -46,4 +46,10 @@ assert.equal(Sorteo.etiqueta(92), "Élite"); assert.equal(Sorteo.etiqueta(5), "H
 // con pocos Pokémon disponibles y porcentaje, no se queda sin equipo
 const poor = Sorteo.draw({ ...env, pool: pool.filter(s => s.gen === 1 && !(s.evos && s.evos.length)).slice(0, 8) }, { size: 6, final: false, legend: true }, 3, rand, [90, 90, 90]);
 assert.ok(poor.every(t => t.length >= 1));
+// plantilla de 12 (6 titulares + 6 suplentes): todos distintos, también entre entrenadores
+const big12 = Sorteo.draw(env, { size: 12 }, 20, rand);
+assert.ok(big12.every(t => t.length === 12), "cada entrenador recibe 12");
+assert.equal(new Set(big12.flat().map(s => fam(s.species))).size, 240, "240 familias distintas en la liga");
+assert.equal(Sorteo.DEFAULTS().size, 12, "por defecto, 12");
+assert.equal(Sorteo.opts({ size: 6 }).size, 12, "un 6 guardado de antes no manda si nunca se eligió"); assert.equal(Sorteo.opts({ size: 6, sizeSet: true }).size, 6, "pero sí si se eligió a mano");
 console.log("SORTEO OK");

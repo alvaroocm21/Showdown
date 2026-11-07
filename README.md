@@ -111,7 +111,7 @@ los equipos de la jornada elegida. Los combates se juegan en el juego.
 - **📅 Calendario:** elige quién eres («⭐ Este soy yo») y verás tus próximos partidos de **todas** las competiciones, con su fecha, y tu racha (victorias/empates/derrotas seguidas,
   últimos 5, mejor racha). «Gané / Empate / Perdí» lo anota y da las monedas.
 - **🎲 Sorteo de equipos:** reparte Pokémon al azar entre los participantes (solo a los que no tienen equipo, o a todos) para la jornada actual, y al crear una competición hay una casilla para sortear
-  en el momento. Se elige cuántos Pokémon por equipo, el nivel, hasta qué generación, si solo totalmente evolucionados, si entran legendarios y míticos, y si se repiten entre entrenadores.
+  en el momento. Se elige cuántos Pokémon por equipo (hasta 12 = 6 titulares + 6 suplentes; 12 por defecto), el nivel, hasta qué generación, si solo totalmente evolucionados, si entran legendarios y míticos, y si se repiten entre entrenadores.
   «Azar total» da habilidad, objeto, naturaleza y ataques al azar (entre todo lo que hay en el juego; con al menos 2 de daño); «Coherente» usa una habilidad de su especie y ataques sugeridos.
   Con la ROM abierta solo salen Pokémon, ataques, habilidades y objetos que existen en ella. Lógica en `lib/ligasorteo.js`.
 - **Jugadores = entrenadores de la liga:** la pantalla de entrada («¿Quién juega?») lista a los entrenadores de las ligas, con su color y su escudo, y al entrar como uno de ellos «tú» pasa a ser ese
