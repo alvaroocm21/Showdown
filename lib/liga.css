@@ -331,3 +331,9 @@
 .lh-rt input{width:70px;background:#04122f;color:#fff;border:2px solid #5aa6ff88;border-radius:8px;padding:6px;text-align:center}
 .lh-rtl{width:64px;font-size:11px;opacity:.85;text-align:right}
 .lh-range{width:100%;accent-color:#ffd24a;margin:8px 0}
+
+/* escudo en la clasificación */
+.lh-nmc{display:flex;align-items:center;gap:8px;min-width:0}
+.lh-nmt{min-width:0;display:flex;flex-direction:column}
+.lh-cl .lh-nmc .lh-av{width:30px;height:30px;font-size:16px;border-width:2px;flex:none}
+.lh-cl .lh-nm b{max-width:86px}

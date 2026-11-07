@@ -144,6 +144,8 @@ const TEAM8 = ["Pikachu", "Bulbasaur", "Charmander", "Squirtle", "Gengar", "Snor
   await pg.screenshot({ path: S + "/liga-calendario.png", fullPage: true });
   await pg.click('[data-tab="comp"]');
   assert.equal(await pg.locator(".lh-pod").count(), 0, "sin podio");
+  assert.ok(await pg.locator(".lh-cl tbody tr .lh-av").count() >= 7, "cada fila de la clasificación lleva el escudo del entrenador");
+  assert.equal(await pg.locator(".lh-cl tbody tr:has-text(\"Ana\") .lh-av img").count(), 1, "y se ve la imagen de Ana");
   assert.match(await pg.innerText(".lh-cl thead"), /GF[\s\S]*GC/, "la tabla tiene GF y GC");
   assert.match(await pg.innerText(".lh-cl tbody tr:first-child"), /Ana[\s\S]*\t1\t1\t0\t0\t3\t1\t3/, "Ana: 1 PJ, 1 V, GF 3, GC 1, 3 pts");
   await pg.click('[data-tab="calendario"]'); assert.match(await pg.innerText(".lh-body"), /3–1/, "el combate muestra su marcador");
