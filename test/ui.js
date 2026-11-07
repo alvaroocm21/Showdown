@@ -50,8 +50,15 @@ const TEAM8 = ["Pikachu", "Bulbasaur", "Charmander", "Squirtle", "Gengar", "Snor
 
   const pg = await mk();
   // ---- 1. Entrenadores y equipo ----
+  // el equipo que el jugador ya tenía en «Elegir equipo» debe verse en la Liga
+  await pg.evaluate(() => { const id = JSON.parse(localStorage.getItem("zaf3.profiles")).find(p => p.name === "Álvaro").id; const iv = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
+    localStorage.setItem(`zaf3.${id}.team`, JSON.stringify([{ species: "Gengar", level: 50, ability: "Cursed Body", item: "Leftovers", nature: "Timid", moves: ["Shadow Ball", "Sludge Bomb"], evs: { hp: 4, spa: 252, spe: 252 }, ivs: iv, teraType: "Ghost", name: "", gender: "" },
+      { species: "Snorlax", level: 50, ability: "Immunity", item: "", nature: "Adamant", moves: ["Body Slam"], evs: { hp: 252, atk: 252 }, ivs: iv, teraType: "Normal", name: "", gender: "" }])); });
   await pg.click("#goLiga"); await pg.waitForSelector("#lhCompName");
   assert.equal(await pg.inputValue("#lhCompName"), "Liga");
+  await pg.click('[data-tab="equipo"]');
+  assert.equal(await pg.locator(".lh-mon").count(), 2, "mi equipo de «Elegir equipo» sale en la pestaña Equipo");
+  assert.match(await pg.innerText(".lh-mon >> nth=0"), /Gengar/); assert.match(await pg.innerText(".lh-mon >> nth=0"), /Cursed Body|Cuerpo Maldito/i);
   await pg.click('[data-tab="entrenadores"]');
   for (const n of ["Ana", "Beto", "Carla", "Dani", "Eva", "Fran"]) { await pg.fill("#lhNew", n); await pg.click("#lhAdd"); }
   assert.equal(await pg.locator(".lh-tc").count(), 7, "los 6 entrenadores y el jugador con el que entré");
@@ -88,7 +95,7 @@ const TEAM8 = ["Pikachu", "Bulbasaur", "Charmander", "Squirtle", "Gengar", "Snor
   await pg.click("#lhBackList"); await pg.click('.lh-tc:has-text("Ana")'); await pg.waitForSelector(".lh-dh");
   assert.equal(await pg.locator(".lh-mon").count(), 2, "Ana conserva su equipo");
   await pg.screenshot({ path: S + "/liga-detalle.png", fullPage: true });
-  assert.equal(await pg.evaluate(() => JSON.parse(localStorage.getItem(Object.keys(localStorage).find(k => /\.team$/.test(k))) || "[]").length), 0, "no toca el equipo del jugador");
+  assert.equal(await pg.evaluate(() => JSON.parse(localStorage.getItem(Object.keys(localStorage).find(k => /\.team$/.test(k))) || "[]").length), 2, "editar equipos de la liga no cambia el equipo del jugador");
 
   // ---- Equipo: plantilla de 8, 6 titulares y 2 suplentes ----
   await pg.click("#lhBackList"); await pg.click('.lh-tc:has-text("Eva")'); await pg.waitForSelector(".lh-dh");

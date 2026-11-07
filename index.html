@@ -2022,7 +2022,7 @@ function renderRunSide(el){
     saveRun();renderRun()});
   $('#rAb').onclick=()=>{if(confirm('¿Abandonar la aventura? Se perderá el progreso.')){run=null;store.set(pk('run'),null);renderRun()}}}
 $('#goRun').onclick=()=>show('run');
-Liga.init({PCOLORS,getProfiles:profiles,setProfiles:l=>store.set('zaf3.profiles',l),removeProfile:id=>{['team','beat','run'].forEach(k=>{try{localStorage.removeItem(`zaf3.${id}.${k}`)}catch{}});store.set('zaf3.profiles',profiles().filter(x=>x.id!==id))},Dex,Teams,NAMES,store,esc,nmSp,nmMove,nmAb,nmItem,tchip,tCol,tES,iconEl,POOL,defaultSet,TYPE_NAMES:Object.keys(TYPES).filter(t=>t!=='Stellar'),show,editTeam:editExternalTeam,learnable,MOVES,ABILS,NATURES,RITEMS,
+Liga.init({PCOLORS,profileTeam:id=>store.get(`zaf3.${id}.team`,[]).filter(s=>s&&Dex.species.get(s.species).exists),getProfiles:profiles,setProfiles:l=>store.set('zaf3.profiles',l),removeProfile:id=>{['team','beat','run'].forEach(k=>{try{localStorage.removeItem(`zaf3.${id}.${k}`)}catch{}});store.set('zaf3.profiles',profiles().filter(x=>x.id!==id))},Dex,Teams,NAMES,store,esc,nmSp,nmMove,nmAb,nmItem,tchip,tCol,tES,iconEl,POOL,defaultSet,TYPE_NAMES:Object.keys(TYPES).filter(t=>t!=='Stellar'),show,editTeam:editExternalTeam,learnable,MOVES,ABILS,NATURES,RITEMS,
   profileTeams:()=>profiles().map(p=>({id:p.id,name:p.name,emoji:p.emoji,team:store.get(`zaf3.${p.id}.team`,[])}))});
 $('#goLiga').onclick=()=>show('liga');
 $('#goRom').onclick=()=>show('rom');
