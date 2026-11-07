@@ -18,6 +18,15 @@ Bulbasaur @ Sitrus Berry
 Level: 30
 - Vine Whip`;
 const TEAM8 = ["Pikachu", "Bulbasaur", "Charmander", "Squirtle", "Gengar", "Snorlax", "Eevee", "Mewtwo"].map(n => `${n}\n- Surf`).join("\n\n");
+const MON = (species, ability, level, moves, item = "") => ({ species, level, ability, item, nature: "Timid", moves, evs: { hp: 4, spa: 252, spe: 252 }, ivs: { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 }, teraType: "Normal", name: "", gender: "" });
+const ANA = [MON("Pikachu", "Static", 42, ["Surf", "Thunder Shock"], "Leftovers"), MON("Bulbasaur", "Overgrow", 30, ["Vine Whip"], "Sitrus Berry")];
+const EVA = ["Pikachu", "Bulbasaur", "Charmander", "Squirtle", "Gengar", "Snorlax", "Eevee", "Mewtwo"].map(n => MON(n, "Static", 50, ["Surf"]));
+// La Liga ya no tiene editor: los equipos salen del sorteo. En la prueba se fijan en el almacenamiento para poder comprobar cosas concretas.
+const setTeam = async (pg, name, sets) => {
+  await pg.evaluate(([name, sets]) => { const d = JSON.parse(localStorage.getItem("liga.v1")), c = d.comps.find(x => x.id === d.cc), p = d.parts.find(x => x.name === name); p.teams = p.teams || {}; p.teams[c.cur] = sets; p.last = sets; localStorage.setItem("liga.v1", JSON.stringify(d)); }, [name, sets]);
+  await pg.click("#lhBack"); await pg.click("#goLiga"); await pg.waitForSelector("#lhCompName");
+};
+const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) => { e.value = v; e.dispatchEvent(new Event("input", { bubbles: true })); }, v);
 (async () => {
   await new Promise(r => srv.listen(0, "127.0.0.1", r));
   const URL = `http://127.0.0.1:${srv.address().port}/index.html`;
@@ -59,17 +68,22 @@ const TEAM8 = ["Pikachu", "Bulbasaur", "Charmander", "Squirtle", "Gengar", "Snor
   await pg.click('[data-tab="equipo"]');
   assert.equal(await pg.locator(".lh-mon").count(), 2, "mi equipo de «Elegir equipo» sale en la pestaña Equipo");
   assert.match(await pg.innerText(".lh-mon >> nth=0"), /Gengar/); assert.match(await pg.innerText(".lh-mon >> nth=0"), /Cursed Body|Cuerpo Maldito/i);
+  // «Sortear mis Pokémon»: pide mi porcentaje y me da 12 (6 titulares + 6 suplentes)
+  await pg.click("[data-eqdraw]"); await pg.waitForSelector(".lg-sheet .lh-rt");
+  assert.equal(await pg.locator(".lg-sheet .lh-rt").count(), 1, "solo me pide mi porcentaje");
+  await setRange(pg, ".lg-sheet .lh-rt", 90); assert.match(await pg.innerText(".lg-sheet .lh-rt"), /Élite/);
+  await pg.click(".lg-sheet [data-ok]");
+  assert.equal(await pg.locator('.lh-card:has(.lh-ch b:text-is("Titulares")) .lh-mon').count(), 6, "6 titulares");
+  assert.equal(await pg.locator('.lh-card:has(.lh-ch b:text-is("Banquillo")) .lh-mon').count(), 6, "y 6 suplentes: salen los 12 en el equipo");
   await pg.click('[data-tab="entrenadores"]');
   for (const n of ["Ana", "Beto", "Carla", "Dani", "Eva", "Fran"]) { await pg.fill("#lhNew", n); await pg.click("#lhAdd"); }
   assert.equal(await pg.locator(".lh-tc").count(), 7, "los 6 entrenadores y el jugador con el que entré");
   assert.match(await pg.innerText(".lh-hero"), /Álvaro/, "«tú» es el jugador con el que entré");
+  await setTeam(pg, "Ana", ANA);
   await pg.click('.lh-tc:has-text("Ana")'); await pg.waitForSelector(".lh-dh");
-  await pg.click('[data-act="team"]'); await pg.waitForSelector("#scr-team.on");
-  assert.match(await pg.innerText("#teamTitle"), /Ana · Liga · Jornada 1/);
-  await pg.click("#ieBtn"); await pg.fill("#ieText", TEAM); await pg.click("#ieImport");
-  await pg.click("#teamOk"); await pg.waitForSelector(".lh-mon");
+  assert.equal(await pg.locator('[data-act="team"]').count(), 0, "ya no hay botón de editar el equipo");
   assert.equal(await pg.locator(".lh-mon").count(), 2);
-  assert.match(await pg.innerText(".lh-mon >> nth=0"), /habilidad/i);
+
   // escudo del entrenador: imagen y color
   const b64 = await pg.evaluate(() => { const c = document.createElement("canvas"); c.width = c.height = 40; const g = c.getContext("2d"); g.fillStyle = "#d24a4a"; g.fillRect(0, 0, 40, 40); g.fillStyle = "#fff"; g.fillRect(10, 10, 20, 20); return c.toDataURL("image/png").split(",")[1]; });
   fs.writeFileSync(S + "/escudo.png", Buffer.from(b64, "base64"));
@@ -78,15 +92,21 @@ const TEAM8 = ["Pikachu", "Bulbasaur", "Charmander", "Squirtle", "Gengar", "Snor
   await pg.click('.lh-shield ~ .lh-emo [data-pc] >> nth=1');
   assert.match(await pg.locator(".lh-dh .lh-av").getAttribute("style"), /rgb\(232, 89, 12\)|#e8590c/i, "cambia el color");
   await pg.screenshot({ path: S + "/liga-escudo.png", fullPage: true });
-  // sorteo de equipos: los 5 sin equipo reciben 3 Pokémon de nivel 40; Ana conserva el suyo
+  // sorteo: primero pide los porcentajes y luego reparte (3 Pokémon de nivel 40 a los 5 sin equipo); Ana conserva el suyo
   await pg.click("#lhBackList"); await pg.click("#lhSorteo > summary");
   assert.equal(await pg.inputValue('[data-so="size"]'), "12", "el sorteo reparte 12 por defecto");
+  assert.equal(await pg.locator('[data-so="rating"], [data-rt], #lhRtRand').count(), 0, "los porcentajes ya no se ponen en la tarjeta: se piden al repartir");
   await pg.selectOption('[data-so="size"]', "3"); await pg.fill('[data-so="level"]', "40"); await pg.press('[data-so="level"]', "Enter");
-  await pg.fill('.lh-rt:has-text("Beto") input', "95"); await pg.press('.lh-rt:has-text("Beto") input', "Enter");
-  await pg.fill('.lh-rt:has-text("Carla") input', "5"); await pg.press('.lh-rt:has-text("Carla") input', "Enter");
-  assert.match(await pg.innerText('.lh-rt:has-text("Beto")'), /Élite/); assert.match(await pg.innerText('.lh-rt:has-text("Carla")'), /Humilde/);
+  await pg.click("#lhSortear"); await pg.waitForSelector(".lg-sheet .lh-rt");
+  assert.equal(await pg.locator(".lg-sheet .lh-rt").count(), 5, "pide el porcentaje de los 5 entrenadores sin equipo");
+  assert.match(await pg.innerText(".lg-sheet"), /Antes de repartir/);
+  await pg.click(".lg-sheet [data-x]");                                                     // cancelar: no reparte nada
+  await pg.click('.lh-tc:has-text("Beto")'); assert.equal(await pg.locator(".lh-mon").count(), 0, "al cancelar no se reparte"); await pg.click("#lhBackList");
+  await pg.click("#lhSortear"); await pg.waitForSelector(".lg-sheet .lh-rt");
+  await setRange(pg, '.lg-sheet .lh-rt:has-text("Beto")', 95); await setRange(pg, '.lg-sheet .lh-rt:has-text("Carla")', 5);
+  assert.match(await pg.innerText('.lg-sheet .lh-rt:has-text("Beto")'), /Élite/); assert.match(await pg.innerText('.lg-sheet .lh-rt:has-text("Carla")'), /Humilde/);
   await pg.screenshot({ path: S + "/liga-sorteo.png", fullPage: true });
-  await pg.click("#lhSortear");
+  await pg.click(".lg-sheet [data-ok]");
   const bst = await pg.evaluate(() => { const d = JSON.parse(localStorage.getItem("liga.v1")); const avg = n => { const p = d.parts.find(x => x.name === n), tm = Object.values(p.teams)[0]; const l = tm.map(s => { const b = PKMN.Dex.species.get(s.species).baseStats; return b.hp + b.atk + b.def + b.spa + b.spd + b.spe; }); return l.reduce((x, y) => x + y, 0) / l.length; }; return [avg("Beto"), avg("Carla")]; });
   assert.ok(bst[0] > bst[1] + 100, `con 95% salen Pokémon más fuertes que con 5%: ${bst.map(Math.round)}`);
   await pg.click('.lh-tc:has-text("Beto")'); await pg.waitForSelector(".lh-dh");
@@ -99,14 +119,12 @@ const TEAM8 = ["Pikachu", "Bulbasaur", "Charmander", "Squirtle", "Gengar", "Snor
   assert.equal(await pg.evaluate(() => JSON.parse(localStorage.getItem(Object.keys(localStorage).find(k => /\.team$/.test(k))) || "[]").length), 2, "editar equipos de la liga no cambia el equipo del jugador");
 
   // ---- Equipo: plantilla de 8, 6 titulares y 2 suplentes ----
-  await pg.click("#lhBackList"); await pg.click('.lh-tc:has-text("Eva")'); await pg.waitForSelector(".lh-dh");
-  await pg.click('[data-act="team"]'); await pg.waitForSelector("#scr-team.on");
-  if (!(await pg.locator("#ieText").isVisible())) await pg.click("#ieBtn"); await pg.fill("#ieText", TEAM8); await pg.click("#ieImport");
-  assert.equal(await pg.locator("#slots .slot").count(), 12, "la plantilla de la liga admite hasta 12");
-  await pg.click("#teamOk"); await pg.waitForSelector(".lh-mon");
+  await pg.click("#lhBackList"); await setTeam(pg, "Eva", EVA);
+  await pg.click('.lh-tc:has-text("Eva")'); await pg.waitForSelector(".lh-dh");
   assert.equal(await pg.locator(".lh-mon").count(), 8);
   assert.match(await pg.innerText('.lh-card:has(.lh-ch b:has-text("Equipo en")) .lh-ch'), /6 titulares \+ 2 suplentes/);
   await pg.click('[data-tab="equipo"]'); await pg.selectOption("#lhEqP", { label: "Eva" });
+  assert.equal(await pg.locator("[data-eqedit]").count(), 0, "ya no hay «Editar plantilla»"); assert.equal(await pg.locator("[data-eqdraw]").count(), 1, "pero sí «Sortear»");
   const tit = pg.locator('.lh-card:has(.lh-ch b:text-is("Titulares"))'), ban = pg.locator('.lh-card:has(.lh-ch b:text-is("Banquillo"))');
   assert.equal(await tit.locator(".lh-mon").count(), 6); assert.equal(await ban.locator(".lh-mon").count(), 2);
   assert.match(await tit.locator(".lh-mon >> nth=0").innerText(), /Titular 1/); assert.match(await tit.locator(".lh-mon >> nth=0").innerText(), /habilidad[\s\S]*naturaleza[\s\S]*objeto|objeto[\s\S]*naturaleza/i);

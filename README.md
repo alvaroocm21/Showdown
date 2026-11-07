@@ -110,6 +110,7 @@ los equipos de la jornada elegida. Los combates se juegan en el juego.
   Pokémon enseña también sus cifras en la ficha del entrenador. Todo se calcula repasando los combates, así que borrar o corregir uno lo recalcula bien.
 - **📅 Calendario:** elige quién eres («⭐ Este soy yo») y verás tus próximos partidos de **todas** las competiciones, con su fecha, y tu racha (victorias/empates/derrotas seguidas,
   últimos 5, mejor racha). «Gané / Empate / Perdí» lo anota y da las monedas.
+- **Flujo de Pokémon:** 1) «🎲 Sortear» (en Equipo, en la ficha, en el sorteo general o al crear una competición) **pide primero el porcentaje de calidad** de cada entrenador al que se va a repartir; 2) reparte 12 Pokémon (6 titulares + 6 suplentes); 3) en la pestaña Equipo eliges qué 6 juegan en cada jornada.
 - **🎲 Sorteo de equipos:** reparte Pokémon al azar entre los participantes (solo a los que no tienen equipo, o a todos) para la jornada actual, y al crear una competición hay una casilla para sortear
   en el momento. Se elige cuántos Pokémon por equipo (hasta 12 = 6 titulares + 6 suplentes; 12 por defecto), el nivel, hasta qué generación, si solo totalmente evolucionados, si entran legendarios y míticos, y si se repiten entre entrenadores.
   «Azar total» da habilidad, objeto, naturaleza y ataques al azar (entre todo lo que hay en el juego; con al menos 2 de daño); «Coherente» usa una habilidad de su especie y ataques sugeridos.
@@ -122,7 +123,7 @@ los equipos de la jornada elegida. Los combates se juegan en el juego.
 - **Tu equipo de «Elegir equipo» en la Liga:** si un entrenador no tiene equipo propio en la liga, se usa el que ese jugador ya tenía en «Elegir equipo» (los 6 primeros son los titulares). En cuanto lo edites en la
   liga, la liga guarda el suyo y el de «Elegir equipo» no cambia.
 - **Escudos:** cada entrenador y cada competición puede llevar una imagen (de la galería, se guarda reducida a 96 px) o solo un color (paleta o color libre); sin imagen se ve el emoji sobre el color.
-- **🛡 Equipo:** tu plantilla (hasta 12 Pokémon por competición y jornada, que se edita con el editor de equipos de la app) con cada Pokémon al detalle (habilidad, objeto, naturaleza, ataques, estadísticas,
+- **🛡 Equipo:** tu plantilla de 12 Pokémon, que sale del **sorteo** (no hay editor en la Liga: primero te pide el porcentaje de calidad y luego reparte los 12) con cada Pokémon al detalle (habilidad, objeto, naturaleza, ataques, estadísticas,
   partidos jugados y tarjetas) y la **elección de tus 6 titulares**: los 6 primeros son los que juegan y el resto el banquillo; con «Hacer titular» / «Cambiar por un suplente» los intercambias.
   Si un titular está sancionado (2 🟨), no juega y entra un suplente, tanto en el marcador como al exportar a la ROM (que siempre escribe solo los 6 que juegan). Se puede ver el equipo de cualquier entrenador.
 - **👥 Entrenadores:** tarjetas con récord, forma y competiciones; la ficha enseña cada Pokémon al detalle (tipos, habilidad, objeto, naturaleza, ataques, estadísticas, EVs/IVs).

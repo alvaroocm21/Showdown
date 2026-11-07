@@ -337,3 +337,11 @@
 .lh-nmt{min-width:0;display:flex;flex-direction:column}
 .lh-cl .lh-nmc .lh-av{width:30px;height:30px;font-size:16px;border-width:2px;flex:none}
 .lh-cl .lh-nm b{max-width:86px}
+
+.lh-rtsheet{overflow:auto;max-height:45vh;margin:6px 0}
+.lg-sheet .lh-rt{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:8px 0;border-bottom:1px solid #ffffff14}
+.lg-sheet .lh-rt .lh-av{width:30px;height:30px;font-size:16px;border-width:2px}
+.lg-sheet .lh-rt b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lg-sheet .lh-rt output{font-weight:900;min-width:30px;text-align:right}
+.lg-sheet .lh-rt .lh-rtl{width:64px;text-align:right}
+.lg-sheet .lh-rt [data-r]{flex:1 1 100%;accent-color:#ffd24a;width:100%}
