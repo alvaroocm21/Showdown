@@ -189,6 +189,8 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   await ban.locator('[data-eq="up"]').nth(1).click();                                                          // y entra otro suplente
   assert.equal((await tit.locator(".lh-mon >> nth=5").locator(".lh-mi b").innerText()).trim(), firstBench, "el suplente pasa a titular");
   assert.equal(await tit.locator(".lh-mon").count(), 6); assert.equal(await ban.locator(".lh-mon").count(), 2);
+  assert.match(await pg.locator(".lh-mon >> nth=0").textContent(), /Físico|Especial|Estado/, "cada ataque dice si es físico, especial o de estado");
+  assert.equal(await pg.evaluate(() => document.querySelector("#dl-moves option") ? /Físico|Especial|Estado/.test(document.querySelector("#dl-moves option").label) : true), true);
   // pestaña Objetos: se le da a cada Pokémon el que se quiera, con imagen
   await pg.click('[data-tab="objetos"]');
   assert.equal(await pg.locator(".lh-orow").count(), 8, "salen todos los Pokémon de la plantilla");

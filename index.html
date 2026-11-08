@@ -458,6 +458,8 @@ const SS='https://play.pokemonshowdown.com/sprites/';
 const TYPES={Normal:['Normal','#a8a878'],Fire:['Fuego','#f08030'],Water:['Agua','#6890f0'],Electric:['Eléctrico','#e8b800'],Grass:['Planta','#78c850'],Ice:['Hielo','#7cc8c8'],Fighting:['Lucha','#c03028'],Poison:['Veneno','#a040a0'],Ground:['Tierra','#c8a040'],Flying:['Volador','#8f78e8'],Psychic:['Psíquico','#f85888'],Bug:['Bicho','#a8b820'],Rock:['Roca','#b8a038'],Ghost:['Fantasma','#705898'],Dragon:['Dragón','#7038f8'],Dark:['Siniestro','#705848'],Steel:['Acero','#8a8aa8'],Fairy:['Hada','#e87a95'],Stellar:['Astral','#44a8d8']};
 const tES=t=>TYPES[t]?TYPES[t][0]:t,tCol=t=>TYPES[t]?TYPES[t][1]:'#888';
 const tchip=t=>`<span class="tchip" style="background:${tCol(t)}">${tES(t)}</span>`;
+Object.assign(NAMES.m,{vicegrip:'Agarre'});
+const catES=m=>{const o=typeof m==='string'?Dex.moves.get(m):m;return o.category==='Status'?'🌀 Estado':o.category==='Physical'?'💥 Físico':'✨ Especial'};
 const nmMove=m=>{const o=typeof m==='string'?Dex.moves.get(m):m;return NAMES.m[o.id]||o.name};
 const nmAb=a=>{const o=Dex.abilities.get(a);return NAMES.a[o.id]||o.name||a};
 const nmItem=i=>{const o=Dex.items.get(i);return NAMES.i[o.id]||o.name||i};
@@ -598,7 +600,7 @@ function renderSlots(){
     s.append(e)}}
 function fillMovesDL(sp){
   const L=LEARN?learnable(sp):null;
-  $('#dl-moves').innerHTML=MOVES.filter(m=>!L||L.has(m.id)).map(m=>`<option value="${nmMove(m)}" label="${m.name} · ${tES(m.type)}${m.basePower?' '+m.basePower:''}"></option>`).join('')}
+  $('#dl-moves').innerHTML=MOVES.filter(m=>!L||L.has(m.id)).map(m=>`<option value="${nmMove(m)}" label="${catES(m)} · ${tES(m.type)}${m.basePower?' '+m.basePower:''}"></option>`).join('')}
 function moveTags(id){const m=Dex.moves.get(id);if(!m.exists)return '';return `${tchip(m.type)} ${m.category==='Status'?'Estado':m.category==='Physical'?'Físico':'Especial'}${m.basePower?' · Pod '+m.basePower:''}${m.accuracy===true?'':' · Prec '+m.accuracy} · PP ${m.pp}`}
 function renderEditor(){
   const el=$('#editor'),m=MY[sel];
@@ -2029,7 +2031,7 @@ function renderRunSide(el){
     saveRun();renderRun()});
   $('#rAb').onclick=()=>{if(confirm('¿Abandonar la aventura? Se perderá el progreso.')){run=null;store.set(pk('run'),null);renderRun()}}}
 $('#goRun').onclick=()=>show('run');
-Liga.init({dAb,dMove,dItem,itemUrls,ITEMLIST,PCOLORS,profileTeam:id=>store.get(`zaf3.${id}.team`,[]).filter(s=>s&&Dex.species.get(s.species).exists),getProfiles:profiles,setProfiles:l=>store.set('zaf3.profiles',l),removeProfile:id=>{['team','beat','run'].forEach(k=>{try{localStorage.removeItem(`zaf3.${id}.${k}`)}catch{}});store.set('zaf3.profiles',profiles().filter(x=>x.id!==id))},Dex,Teams,NAMES,store,esc,nmSp,nmMove,nmAb,nmItem,tchip,tCol,tES,iconEl,POOL,defaultSet,TYPE_NAMES:Object.keys(TYPES).filter(t=>t!=='Stellar'),show,editTeam:editExternalTeam,learnable,MOVES,ABILS,NATURES,RITEMS,
+Liga.init({catES,dAb,dMove,dItem,itemUrls,ITEMLIST,PCOLORS,profileTeam:id=>store.get(`zaf3.${id}.team`,[]).filter(s=>s&&Dex.species.get(s.species).exists),getProfiles:profiles,setProfiles:l=>store.set('zaf3.profiles',l),removeProfile:id=>{['team','beat','run'].forEach(k=>{try{localStorage.removeItem(`zaf3.${id}.${k}`)}catch{}});store.set('zaf3.profiles',profiles().filter(x=>x.id!==id))},Dex,Teams,NAMES,store,esc,nmSp,nmMove,nmAb,nmItem,tchip,tCol,tES,iconEl,POOL,defaultSet,TYPE_NAMES:Object.keys(TYPES).filter(t=>t!=='Stellar'),show,editTeam:editExternalTeam,learnable,MOVES,ABILS,NATURES,RITEMS,
   profileTeams:()=>profiles().map(p=>({id:p.id,name:p.name,emoji:p.emoji,team:store.get(`zaf3.${p.id}.team`,[])}))});
 $('#goLiga').onclick=()=>show('liga');
 $('#goRom').onclick=()=>show('rom');
