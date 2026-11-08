@@ -99,8 +99,19 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   assert.equal(await pg.locator('[data-ctl]').count(), 3, "tres formas de control: yo, su jugador o la IA");
   await pg.click('[data-ctl="ia"]'); assert.equal(await pg.locator('[data-ctl="ia"].gold').count(), 1);
   assert.match(await pg.innerText(".lh-body"), /La IA elige su alineación según la jornada, su rival y el siguiente rival/);
-  assert.equal(await pg.locator("[data-eqdraw]").count(), 0, "nadie le toca el equipo a la IA");
+  assert.equal(await pg.locator("[data-eqdraw]").count(), 1, "al organizador sí le deja sortearle los Pokémon a la IA");
+  assert.match(await pg.innerText(".lh-body"), /Sortear Pokémon/); assert.equal(await pg.locator('[data-act="inherit"], [data-act="prof"]').count(), 0, "pero no tocarle el equipo a mano");
   await pg.click("#lhBackList"); assert.match(await pg.innerText('.lh-tc:has-text("Fran")'), /🤖/, "la tarjeta lo marca");
+  await pg.click('[data-tab="equipo"]'); await pg.selectOption("#lhEqP", { label: "Fran" });
+  assert.match(await pg.innerText(".lh-body"), /La IA se sortea sola su plantilla/, "el texto de la IA sin Pokémon es el correcto");
+  assert.equal(await pg.locator("[data-eqdraw]").count(), 1, "y hay botón para dárselos ya");
+  await pg.click("[data-eqdraw]"); await pg.waitForSelector(".lg-sheet .lh-rt"); assert.equal(await pg.locator(".lg-sheet .lh-rt").count(), 1);
+  await setRange(pg, ".lg-sheet .lh-rt", 40); await pg.click(".lg-sheet [data-ok]");
+  assert.equal(await pg.locator('.lh-card:has(.lh-ch b:text-is("Titulares")) .lh-mon').count(), 6, "la IA recibe sus 12 Pokémon");
+  assert.equal(await pg.locator('.lh-card:has(.lh-ch b:text-is("Banquillo")) .lh-mon').count(), 6);
+  await pg.selectOption("#lhEqP", { label: "Ana" });
+  assert.equal(await pg.locator("[data-eqdraw]").count(), 0, "a un entrenador de su jugador no se le sortea");
+  assert.match(await pg.innerText(".lh-body"), /solo Ana puede elegir|Solo Ana puede sortearlos/);
   await pg.click('[data-tab="ajustes"]'); assert.equal(await pg.locator("[data-ctlp]").count(), 7, "Ajustes lista a todos con su control");
   assert.equal(await pg.locator("[data-ctlp].on").count(), 2, "Ana (su jugador) y Fran (IA) no son «míos»");
   await pg.click('[data-tab="entrenadores"]');
@@ -123,7 +134,7 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   assert.equal(await pg.locator('[data-so="rating"], [data-rt], #lhRtRand').count(), 0, "los porcentajes ya no se ponen en la tarjeta: se piden al repartir");
   await pg.selectOption('[data-so="size"]', "3"); await pg.fill('[data-so="level"]', "40"); await pg.press('[data-so="level"]', "Enter");
   await pg.click("#lhSortear"); await pg.waitForSelector(".lg-sheet .lh-rt");
-  assert.equal(await pg.locator(".lg-sheet .lh-rt").count(), 5, "pide el porcentaje de los 5 entrenadores sin equipo");
+  assert.equal(await pg.locator(".lg-sheet .lh-rt").count(), 4, "pide el porcentaje de los 4 entrenadores sin equipo");
   assert.match(await pg.innerText(".lg-sheet"), /Antes de repartir/);
   await pg.click(".lg-sheet [data-x]");                                                     // cancelar: no reparte nada
   await pg.click('.lh-tc:has-text("Beto")'); assert.equal(await pg.locator(".lh-mon").count(), 0, "al cancelar no se reparte"); await pg.click("#lhBackList");
@@ -206,7 +217,7 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   await pg.click('[data-tab="calendario"]');
   await pg.click("#lhAiPrep"); await pg.click('[data-tab="equipo"]'); await pg.selectOption("#lhEqP", { label: "Fran" });
   assert.match(await pg.innerText(".lh-body"), /La IA eligió esta jornada contra Ana/, "la IA ve quién es su rival");
-  assert.match(await pg.innerText(".lh-body"), /Titulares:/); assert.equal(await pg.locator("[data-eqdraw], [data-eq], [data-mega]").count(), 0, "y nadie le toca el equipo");
+  assert.match(await pg.innerText(".lh-body"), /Titulares:/); assert.equal(await pg.locator("[data-eq], [data-mega]").count(), 0, "y nadie le toca titulares ni megapiedras");
   assert.match(await pg.innerText(".lh-body"), /Gestiona su dinero/); assert.match(await pg.innerText(".lh-body"), /esta vez gastó en/, "la IA ha comprado mejoras con su dinero");
   await pg.click('[data-tab="tienda"]'); await pg.selectOption("#lhSP", { index: 6 });
   assert.doesNotMatch(await pg.innerText("#lhSP"), /Fran · 🪙2000/, "y su dinero ha bajado");
@@ -217,7 +228,7 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   assert.match(await pg.innerText(".lh-body"), /Tú/, "salen mis próximos partidos");
   await pg.locator('.lh-fx [data-w]').first().click();                                // “Gané”
   assert.match(await pg.innerText(".lg-sheet"), /Marcador/);
-  assert.equal(await pg.locator('.lg-sheet input[data-side="b"]:checked').count(), 3, "al ganar, por defecto caen los 3 Pokémon del rival");
+  assert.equal(await pg.locator('.lg-sheet input[data-side="b"]:checked').count(), 6, "al ganar, por defecto caen los 6 titulares del rival");
   await pg.click('.lg-sheet input[data-side="a"] >> nth=0'); await pg.click(".lg-sheet [data-ok]");   // gana 3–1: cae el Pikachu de Ana
   assert.match(await pg.innerText(".lh-streak"), /1 victoria seguida/);
   assert.match(await pg.innerText(".lh-hero"), /Ana · .*victoria/);
@@ -229,10 +240,10 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   assert.ok(await pg.locator(".lh-cl tbody tr .lh-av").count() >= 7, "cada fila de la clasificación lleva el escudo del entrenador");
   assert.equal(await pg.locator(".lh-cl tbody tr:has-text(\"Ana\") .lh-av img").count(), 1, "y se ve la imagen de Ana");
   assert.match(await pg.innerText(".lh-cl thead"), /GF[\s\S]*GC/, "la tabla tiene GF y GC");
-  assert.match(await pg.innerText(".lh-cl tbody tr:first-child"), /Ana[\s\S]*\t1\t1\t0\t0\t3\t1\t3/, "Ana: 1 PJ, 1 V, GF 3, GC 1, 3 pts");
-  await pg.click('[data-tab="calendario"]'); assert.match(await pg.innerText(".lh-body"), /3–1/, "el combate muestra su marcador");
+  assert.match(await pg.innerText(".lh-cl tbody tr:first-child"), /Ana[\s\S]*\t1\t1\t0\t0\t6\t1\t3/, "Ana: 1 PJ, 1 V, GF 6, GC 1, 3 pts");
+  await pg.click('[data-tab="calendario"]'); assert.match(await pg.innerText(".lh-body"), /6–1/, "el combate muestra su marcador");
   await pg.click(".lh-edit >> nth=0"); await pg.click('.lg-sheet input[data-side="b"] >> nth=0'); await pg.click(".lg-sheet [data-ok]");   // ahora 2–1
-  await pg.click('[data-tab="comp"]'); assert.match(await pg.innerText(".lh-cl tbody tr:first-child"), /Ana[\s\S]*\t2\t1\t3/, "se puede corregir el marcador");
+  await pg.click('[data-tab="comp"]'); assert.match(await pg.innerText(".lh-cl tbody tr:first-child"), /Ana[\s\S]*\t5\t1\t3/, "se puede corregir el marcador");
   // estadísticas: Pikachu de Ana jugó 1 partido y tiene 1 amarilla
   await pg.click('[data-tab="stats"]');
   assert.match(await pg.innerText(".lh-stt tbody"), /Pikachu\s*Ana\s*1\t1\t0\t/, "PJ 1 y 🟨 1");
