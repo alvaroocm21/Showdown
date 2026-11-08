@@ -156,6 +156,10 @@
 .lh-mv{display:grid;grid-template-columns:1fr 1fr;gap:5px}
 .lh-mvp{border-left:4px solid var(--c);background:#ffffff10;border-radius:6px;padding:4px 8px;display:flex;flex-direction:column;min-width:0}
 .lh-mvp b{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lh-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:6px 0}
+.lh-slot{min-width:0;border:1px dashed #ffffff30;border-radius:10px;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:#ffffff08;color:inherit;padding:2px;font:inherit}
+.lh-slot.on{border:1px solid var(--gold,#f5c518);background:#ffffff14}
+.lh-slot small{font-size:9px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.8}
 .lh-mvp small{font-size:10px;opacity:.7}
 .lh-mvp .lh-md{opacity:.55;line-height:1.25;margin-top:2px}
 .lh-st{display:flex;flex-direction:column;gap:3px}

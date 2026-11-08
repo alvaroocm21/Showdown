@@ -35,7 +35,7 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
     const ctx = await br.newContext({ viewport: { width: 390, height: 844 }, acceptDownloads: true });
     await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());   // los sprites vienen de internet: no hacen falta
     if (init) await ctx.addInitScript(init);
-    const pg = await ctx.newPage(); pg.errors = []; pg.on("pageerror", e => pg.errors.push(String(e))); pg.on("dialog", d => d.accept());
+    const pg = await ctx.newPage(); pg.errors = []; pg.on("pageerror", e => pg.errors.push(String(e))); pg.lastDialog = ""; pg.on("dialog", d => { pg.lastDialog = d.message(); d.accept(); });
     await pg.goto(URL); await pg.waitForSelector("#pname", { timeout: 60000 });
     await pg.fill("#pname", "Álvaro"); await pg.click("#pcreate"); await pg.waitForSelector("#goLiga");
     return pg;
@@ -74,8 +74,11 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   assert.equal(await pg.locator(".lg-sheet .lh-rt").count(), 1, "solo me pide mi porcentaje");
   await setRange(pg, ".lg-sheet .lh-rt", 90); assert.match(await pg.innerText(".lg-sheet .lh-rt"), /Élite/);
   await pg.click(".lg-sheet [data-ok]");
-  assert.equal(await pg.locator('.lh-card:has(.lh-ch b:text-is("Titulares")) .lh-mon').count(), 6, "6 titulares");
-  assert.equal(await pg.locator('.lh-card:has(.lh-ch b:text-is("Banquillo")) .lh-mon').count(), 6, "y 6 suplentes: salen los 12 en el equipo");
+  assert.equal(await pg.locator('.lh-card:has(.lh-ch b:text-is("Plantilla")) .lh-mon').count(), 12, "salen los 12 en la plantilla");
+  assert.equal(await pg.locator(".lh-strip .lh-slot.on").count(), 0, "arriba los 6 titulares empiezan vacíos");
+  assert.equal(await pg.locator(".lh-strip .lh-slot").count(), 6);
+  await pg.locator('[data-eq="up"]').first().click(); assert.equal(await pg.locator(".lh-strip .lh-slot.on").count(), 1, "al hacer titular entra arriba");
+  await pg.locator(".lh-strip .lh-slot.on").first().click(); assert.equal(await pg.locator(".lh-strip .lh-slot.on").count(), 0, "y tocándolo sale");
   await pg.click('[data-tab="entrenadores"]');
   for (const n of ["Ana", "Beto", "Carla", "Dani", "Eva", "Fran"]) { await pg.fill("#lhNew", n); await pg.click("#lhAdd"); }
   assert.equal(await pg.locator(".lh-tc").count(), 7, "los 6 entrenadores y el jugador con el que entré");
@@ -108,8 +111,7 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   assert.equal(await pg.locator("[data-eqdraw]").count(), 1, "y hay botón para dárselos ya");
   await pg.click("[data-eqdraw]"); await pg.waitForSelector(".lg-sheet .lh-rt"); assert.equal(await pg.locator(".lg-sheet .lh-rt").count(), 1);
   await setRange(pg, ".lg-sheet .lh-rt", 40); await pg.click(".lg-sheet [data-ok]");
-  assert.equal(await pg.locator('.lh-card:has(.lh-ch b:text-is("Titulares")) .lh-mon').count(), 6, "la IA recibe sus 12 Pokémon");
-  assert.equal(await pg.locator('.lh-card:has(.lh-ch b:text-is("Banquillo")) .lh-mon').count(), 6);
+  assert.equal(await pg.locator('.lh-card:has(.lh-ch b:text-is("Plantilla")) .lh-mon').count(), 12, "la IA recibe sus 12 Pokémon");
   await pg.selectOption("#lhEqP", { label: "Ana" });
   assert.equal(await pg.locator("[data-eqdraw]").count(), 0, "a un entrenador de su jugador no se le sortea");
   assert.match(await pg.innerText(".lh-body"), /solo Ana puede elegir|Solo Ana puede sortearlos/);
@@ -174,11 +176,18 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   await pg.click('[data-tab="equipo"]'); await pg.selectOption("#lhEqP", { label: "Eva" });
   assert.equal(await pg.locator("[data-eqedit]").count(), 0, "ya no hay «Editar plantilla»"); assert.equal(await pg.locator("[data-eqdraw]").count(), 1, "pero sí «Sortear»");
   const tit = pg.locator('.lh-card:has(.lh-ch b:text-is("Titulares"))'), ban = pg.locator('.lh-card:has(.lh-ch b:text-is("Banquillo"))');
+  const pla = pg.locator('.lh-card:has(.lh-ch b:text-is("Plantilla"))');
+  assert.equal(await pla.locator(".lh-mon").count(), 8, "al empezar no hay titulares elegidos");
+  for (let i = 0; i < 6; i++) await pg.locator('[data-eq="up"]').first().click();
+  assert.equal(await pg.locator(".lh-strip .lh-slot.on").count(), 6, "los 6 elegidos salen arriba");
+  assert.equal(await pg.locator('[data-eq="up"]').count(), 2); await pg.locator('[data-eq="up"]').first().click(); const dlg = pg.lastDialog;
+  assert.match(dlg, /6 titulares/, "no deja pasar de 6");
   assert.equal(await tit.locator(".lh-mon").count(), 6); assert.equal(await ban.locator(".lh-mon").count(), 2);
   assert.match(await tit.locator(".lh-mon >> nth=0").innerText(), /Titular 1/); assert.match(await tit.locator(".lh-mon >> nth=0").innerText(), /habilidad[\s\S]*naturaleza[\s\S]*objeto|objeto[\s\S]*naturaleza/i);
-  const firstBench = (await ban.locator(".lh-mon >> nth=0").locator(".lh-mi b").innerText()).trim();
-  await ban.locator('[data-eq="up"]').first().click(); await pg.click(".lg-opt >> nth=0");              // el primer suplente sustituye al titular 1
-  assert.equal((await tit.locator(".lh-mon >> nth=0").locator(".lh-mi b").innerText()).trim(), firstBench, "el suplente pasa a titular");
+  await tit.locator('[data-eq="down"]').first().click();                                                       // quito uno de los titulares
+  const firstBench = (await ban.locator(".lh-mon >> nth=1").locator(".lh-mi b").innerText()).trim();
+  await ban.locator('[data-eq="up"]').nth(1).click();                                                          // y entra otro suplente
+  assert.equal((await tit.locator(".lh-mon >> nth=5").locator(".lh-mi b").innerText()).trim(), firstBench, "el suplente pasa a titular");
   assert.equal(await tit.locator(".lh-mon").count(), 6); assert.equal(await ban.locator(".lh-mon").count(), 2);
   // megas: no se sortean; se equipa la megapiedra a un Pokémon cuando se quiera
   assert.equal(await pg.locator('.lh-mon:has-text("Pikachu") [data-mega], .lh-mon:has-text("Bulbasaur") [data-mega]').count(), 0, "solo los Pokémon que megaevolucionan ofrecen megapiedra");
