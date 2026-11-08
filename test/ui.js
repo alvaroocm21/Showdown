@@ -68,6 +68,7 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   await pg.click('[data-tab="equipo"]');
   assert.equal(await pg.locator(".lh-mon").count(), 2, "mi equipo de «Elegir equipo» sale en la pestaña Equipo");
   assert.match(await pg.innerText(".lh-mon >> nth=0"), /Gengar/); assert.match(await pg.innerText(".lh-mon >> nth=0"), /Cursed Body|Cuerpo Maldito/i);
+  { const t = await pg.locator(".lh-mon >> nth=0").textContent(); assert.doesNotMatch(t, /[A-Za-z]+ing the |When this Pokemon/, "las descripciones no están en inglés"); assert.ok(await pg.evaluate(() => Object.keys(window.DESC_ES.a).length > 200 && /Ataque/.test(window.DESC_ES.a.intimidate)), "hay descripciones en español"); }
   // «Sortear mis Pokémon»: pide mi porcentaje y me da 12 (6 titulares + 6 suplentes)
   await pg.click("[data-eqdraw]"); await pg.waitForSelector(".lg-sheet .lh-rt");
   assert.equal(await pg.locator(".lg-sheet .lh-rt").count(), 1, "solo me pide mi porcentaje");

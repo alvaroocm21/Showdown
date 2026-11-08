@@ -431,6 +431,7 @@ body.sv #result{background:#07050dd9}
 </section>
 
 <script src="lib/pkmn.bundle.js"></script>
+<script src="lib/desc-es.js"></script>
 <script src="lib/romcore.js"></script>
 <script src="lib/ligamap.js"></script>
 <script src="lib/ligashop.js"></script>
@@ -459,6 +460,11 @@ const tchip=t=>`<span class="tchip" style="background:${tCol(t)}">${tES(t)}</spa
 const nmMove=m=>{const o=typeof m==='string'?Dex.moves.get(m):m;return NAMES.m[o.id]||o.name};
 const nmAb=a=>{const o=Dex.abilities.get(a);return NAMES.a[o.id]||o.name||a};
 const nmItem=i=>{const o=Dex.items.get(i);return NAMES.i[o.id]||o.name||i};
+// descripciones en español (si falta alguna, se usa la inglesa de Showdown)
+const DES=window.DESC_ES||{a:{},m:{},i:{}};
+const dAb=a=>{const o=Dex.abilities.get(a);return DES.a[o.id]||o.shortDesc||''};
+const dMove=m=>{const o=Dex.moves.get(m);return DES.m[o.id]||o.shortDesc||''};
+const dItem=i=>{const o=Dex.items.get(i);return o.exists?(DES.i[o.id]||o.shortDesc||''):''};
 function nmSp(name){
   const sp=Dex.species.get(name),base=NAMES.s[toID(sp.baseSpecies)];
   if(!base)return sp.name;if(!sp.forme)return base;
@@ -605,12 +611,12 @@ function renderEditor(){
      <label>Naturaleza<select id="eNat">${NATURES.map(n=>`<option value="${n.name}" ${n.name===m.nature?'selected':''}>${n.name}${n.plus?` (+${LB[n.plus]} −${LB[n.minus]})`:''}</option>`).join('')}</select></label>
      <label>Teratipo<select id="eTera">${Object.keys(TYPES).map(t=>`<option value="${t}" ${t===m.teraType?'selected':''}>${tES(t)}</option>`).join('')}</select></label></div>
    <div class="row"><label>Habilidad<select id="eAb"><optgroup label="De la especie">${own.map(a=>`<option value="${a}" ${a===m.ability?'selected':''}>${nmAb(a)}</option>`).join('')}</optgroup><optgroup label="Todas las demás">${others.map(a=>`<option value="${a.name}" ${a.name===m.ability?'selected':''}>${nmAb(a.name)}</option>`).join('')}</optgroup></select></label></div>
-   <div class="desc" id="abDesc">${Dex.abilities.get(m.ability).shortDesc||''}</div>
+   <div class="desc" id="abDesc">${esc(dAb(m.ability))}</div>
    <div class="row"><label>Objeto <input id="eItem" list="dl-items" value="${m.item?nmItem(m.item):''}" placeholder="Ninguno"></label>
      ${stones.length?`<button class="btn sm" id="eStone">✦ ${stones[0].name}</button>`:''}</div>
-   <div class="desc" id="itDesc">${itemDesc.exists?itemDesc.shortDesc:''}</div>
+   <div class="desc" id="itDesc">${esc(dItem(m.item))}</div>
    <p style="margin-top:8px;font-weight:700">Movimientos <label class="toggle" style="display:inline-flex;margin-left:8px"><input type="checkbox" id="eLearn" ${LEARN?'checked':''}>solo los que aprende</label> <button class="btn sm ghost" id="eSug" style="margin-left:6px">✨ Sugerir</button></p>
-   ${[0,1,2,3].map(i=>`<div class="mvrow"><input class="mvin" data-i="${i}" list="dl-moves" value="${m.moves[i]?nmMove(m.moves[i]):''}" placeholder="Movimiento ${i+1}"><div class="tags">${m.moves[i]?moveTags(m.moves[i]):''}</div></div>`).join('')}
+   ${[0,1,2,3].map(i=>`<div class="mvrow"><input class="mvin" data-i="${i}" list="dl-moves" value="${m.moves[i]?nmMove(m.moves[i]):''}" placeholder="Movimiento ${i+1}"><div class="tags">${m.moves[i]?moveTags(m.moves[i]):''}</div>${m.moves[i]?`<div class="desc">${esc(dMove(m.moves[i]))}</div>`:''}</div>`).join('')}
    <p style="margin-top:8px;font-weight:700">EVs / IVs</p>
    <div class="evgrid"><span></span>${KS.map(k=>`<span class="hd">${LB[k]}</span>`).join('')}
      <span class="hd">EV</span>${KS.map(k=>`<input type="number" min="0" max="252" step="4" data-ev="${k}" value="${m.evs[k]}">`).join('')}
@@ -621,8 +627,8 @@ function renderEditor(){
   $('#eLv').onchange=e=>{m.level=Math.max(1,Math.min(100,+e.target.value||50));upd()};
   $('#eNat').onchange=e=>{m.nature=e.target.value;upd()};
   $('#eTera').onchange=e=>{m.teraType=e.target.value;saveTeam()};
-  $('#eAb').onchange=e=>{m.ability=e.target.value;$('#abDesc').textContent=Dex.abilities.get(m.ability).shortDesc||'';saveTeam()};
-  const setItem=v=>{const id=ITEMIDX[toID(v)];if(!v){m.item='';$('#eItem').classList.remove('bad');$('#itDesc').textContent=''}else if(id){m.item=Dex.items.get(id).name;$('#eItem').classList.remove('bad');$('#itDesc').textContent=Dex.items.get(id).shortDesc}else $('#eItem').classList.add('bad');saveTeam()};
+  $('#eAb').onchange=e=>{m.ability=e.target.value;$('#abDesc').textContent=dAb(m.ability);saveTeam()};
+  const setItem=v=>{const id=ITEMIDX[toID(v)];if(!v){m.item='';$('#eItem').classList.remove('bad');$('#itDesc').textContent=''}else if(id){m.item=Dex.items.get(id).name;$('#eItem').classList.remove('bad');$('#itDesc').textContent=dItem(id)}else $('#eItem').classList.add('bad');saveTeam()};
   $('#eItem').onchange=e=>setItem(e.target.value);
   const st=$('#eStone');if(st)st.onclick=()=>{m.item=stones[0].name;renderEditor()};
   $('#eLearn').onchange=e=>{LEARN=e.target.checked;fillMovesDL(sp)};
@@ -1983,7 +1989,7 @@ function renderRun(){
   if(run.view==='shop'){
     main.innerHTML=`<h3>🛒 Tienda</h3><p style="opacity:.8;font-size:13px">Dinero: <b>$${run.money}</b>. El stock cambia en cada tienda.</p><div id="shopl"></div><button class="btn gold" id="shopOk" style="margin-top:10px">Salir de la tienda</button>`;
     run.stock.forEach((it,i)=>{const d=Dex.items.get(it.name),r=document.createElement('div');r.className='shopi';
-      r.innerHTML=`<div><b>${nmItem(it.name)}</b>${it.mega?` <span class="tchip" style="background:#8a4bff">✦ Mega para ${nmSp(it.mega)}</span>`:''}<small>${esc(d.shortDesc||'')}</small></div><button class="btn sm ${it.sold?'ghost':'gold'}" ${it.sold||run.money<it.price?'disabled':''}>${it.sold?'Vendido':'$'+it.price}</button>`;
+      r.innerHTML=`<div><b>${nmItem(it.name)}</b>${it.mega?` <span class="tchip" style="background:#8a4bff">✦ Mega para ${nmSp(it.mega)}</span>`:''}<small>${esc(dItem(it.name)||d.shortDesc||'')}</small></div><button class="btn sm ${it.sold?'ghost':'gold'}" ${it.sold||run.money<it.price?'disabled':''}>${it.sold?'Vendido':'$'+it.price}</button>`;
       r.querySelector('button').onclick=()=>{if(it.sold||run.money<it.price)return;run.money-=it.price;it.sold=true;run.bag.push(it.name);saveRun();renderRun()};
       $('#shopl').append(r)});
     $('#shopOk').onclick=()=>{run.stock=null;run.view='hub';run.sj++;if(run.sj>=st.steps.length)advanceStage();saveRun();renderRun()};
@@ -2020,7 +2026,7 @@ function renderRunSide(el){
     saveRun();renderRun()});
   $('#rAb').onclick=()=>{if(confirm('¿Abandonar la aventura? Se perderá el progreso.')){run=null;store.set(pk('run'),null);renderRun()}}}
 $('#goRun').onclick=()=>show('run');
-Liga.init({PCOLORS,profileTeam:id=>store.get(`zaf3.${id}.team`,[]).filter(s=>s&&Dex.species.get(s.species).exists),getProfiles:profiles,setProfiles:l=>store.set('zaf3.profiles',l),removeProfile:id=>{['team','beat','run'].forEach(k=>{try{localStorage.removeItem(`zaf3.${id}.${k}`)}catch{}});store.set('zaf3.profiles',profiles().filter(x=>x.id!==id))},Dex,Teams,NAMES,store,esc,nmSp,nmMove,nmAb,nmItem,tchip,tCol,tES,iconEl,POOL,defaultSet,TYPE_NAMES:Object.keys(TYPES).filter(t=>t!=='Stellar'),show,editTeam:editExternalTeam,learnable,MOVES,ABILS,NATURES,RITEMS,
+Liga.init({dAb,dMove,dItem,PCOLORS,profileTeam:id=>store.get(`zaf3.${id}.team`,[]).filter(s=>s&&Dex.species.get(s.species).exists),getProfiles:profiles,setProfiles:l=>store.set('zaf3.profiles',l),removeProfile:id=>{['team','beat','run'].forEach(k=>{try{localStorage.removeItem(`zaf3.${id}.${k}`)}catch{}});store.set('zaf3.profiles',profiles().filter(x=>x.id!==id))},Dex,Teams,NAMES,store,esc,nmSp,nmMove,nmAb,nmItem,tchip,tCol,tES,iconEl,POOL,defaultSet,TYPE_NAMES:Object.keys(TYPES).filter(t=>t!=='Stellar'),show,editTeam:editExternalTeam,learnable,MOVES,ABILS,NATURES,RITEMS,
   profileTeams:()=>profiles().map(p=>({id:p.id,name:p.name,emoji:p.emoji,team:store.get(`zaf3.${p.id}.team`,[])}))});
 $('#goLiga').onclick=()=>show('liga');
 $('#goRom').onclick=()=>show('rom');

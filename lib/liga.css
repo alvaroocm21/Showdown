@@ -157,6 +157,7 @@
 .lh-mvp{border-left:4px solid var(--c);background:#ffffff10;border-radius:6px;padding:4px 8px;display:flex;flex-direction:column;min-width:0}
 .lh-mvp b{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lh-mvp small{font-size:10px;opacity:.7}
+.lh-mvp .lh-md{opacity:.55;line-height:1.25;margin-top:2px}
 .lh-st{display:flex;flex-direction:column;gap:3px}
 .lh-sr{display:grid;grid-template-columns:30px 1fr 34px;gap:6px;align-items:center;font-size:11px}
 .lh-sr b{text-align:right;font-variant-numeric:tabular-nums}
