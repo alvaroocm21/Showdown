@@ -35,4 +35,18 @@ order = IA.pick(Dex, big, { n: 3 }); assert.ok(order.slice(0, 3).map(i => big[i]
 const names = ["Pikachu", "Gengar", "Snorlax", "Charizard", "Blastoise", "Venusaur", "Gyarados", "Alakazam", "Machamp", "Dragonite", "Lapras", "Arcanine"];
 const sq12 = names.map(n => mon(n, ["Tackle"])); order = IA.pick(Dex, sq12, { n: 6, rivals: [mon("Charizard", ["Flamethrower"])] });
 assert.equal(new Set(order).size, 12); assert.equal(order.slice(0, 6).length, 6);
+// dinero: mejoras que compraría la IA
+const moves = Dex.moves.all().filter(m => m.exists && !m.isZ && !m.isMax);
+const ch = { species: "Charizard", level: 50, nature: "Hardy", item: "", moves: ["Roost", "Growl", "Tackle", "Ember"], ivs: { hp: 31, atk: 31, def: 31, spa: 20, spd: 31, spe: 31 } };
+let up = IA.upgrades(Dex, ch, { moves });
+assert.deepEqual(up.map(u => u.kind), ["nat", "iv", "mv", "itR"], "naturaleza, IVs, ataque y objeto, en ese orden");
+assert.equal(up[0].arg.nature, "Timid", "Charizard es especial y rápido: Miedosa/Timid");
+const mv = Dex.moves.get(up[2].arg.move); assert.ok(mv.basePower >= 80 && ["Fire", "Flying"].includes(mv.type) && mv.category === "Special" && !mv.flags.recharge, "ataque especial fuerte de su tipo: " + mv.name);
+assert.ok(["Roost", "Growl", "Tackle"].includes(ch.moves[up[2].arg.slot]), "sustituye a uno flojo: " + ch.moves[up[2].arg.slot]);
+const good = { species: "Charizard", nature: "Timid", item: "Leftovers", moves: ["Flamethrower", "Air Slash"], ivs: { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 } };
+assert.deepEqual(IA.upgrades(Dex, good, { moves }), [], "si ya está bien, no compra nada");
+const phys = { species: "Machamp", nature: "Modest", item: "x", moves: ["Tackle"], ivs: {} }; // Machamp es físico y lento: Firme/Adamant
+assert.equal(IA.upgrades(Dex, phys, { moves })[0].arg.nature, "Adamant");
+assert.ok(!IA.upgrades(Dex, { ...phys, moves: ["Close Combat"] }, { moves }).some(u => u.kind === "mv"), "ya tiene un ataque de su tipo fuerte");
+const none = IA.upgrades(Dex, ch, { moves, ok: (k, o) => false }); assert.ok(!none.some(u => u.kind === "mv"), "respeta lo que existe en la ROM");
 console.log("IA OK");

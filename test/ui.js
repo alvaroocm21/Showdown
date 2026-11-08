@@ -198,9 +198,20 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   await pg.selectOption("#lhVueltas", "2"); await pg.click("#lhGenLiga");
   assert.equal(await pg.locator(".lh-chip[data-j]").count(), 14, "7 entrenadores a 2 vueltas = 14 jornadas");
   // la IA prepara las alineaciones de Fran según su rival de la jornada (Ana) y el siguiente
+  // dinero de la IA: se le dan 2000 monedas y, al preparar sus alineaciones, las gasta en mejorar a sus Pokémon
+  await pg.click('[data-tab="tienda"]'); await pg.selectOption("#lhSP", { index: 6 });
+  await pg.fill("#lhCoinN", "2000"); await pg.click("#lhCoinGive");
+  assert.match(await pg.innerText("#lhSP"), /Fran · 🪙2000/, "Fran tiene 2000 monedas");
+  assert.equal(await pg.locator("[data-shop]").count(), 0, "y nadie las gasta por ella en la tienda");
+  await pg.click('[data-tab="calendario"]');
   await pg.click("#lhAiPrep"); await pg.click('[data-tab="equipo"]'); await pg.selectOption("#lhEqP", { label: "Fran" });
   assert.match(await pg.innerText(".lh-body"), /La IA eligió esta jornada contra Ana/, "la IA ve quién es su rival");
   assert.match(await pg.innerText(".lh-body"), /Titulares:/); assert.equal(await pg.locator("[data-eqdraw], [data-eq], [data-mega]").count(), 0, "y nadie le toca el equipo");
+  assert.match(await pg.innerText(".lh-body"), /Gestiona su dinero/); assert.match(await pg.innerText(".lh-body"), /esta vez gastó en/, "la IA ha comprado mejoras con su dinero");
+  await pg.click('[data-tab="tienda"]'); await pg.selectOption("#lhSP", { index: 6 });
+  assert.doesNotMatch(await pg.innerText("#lhSP"), /Fran · 🪙2000/, "y su dinero ha bajado");
+  assert.match(await pg.locator(".lh-body").textContent(), /🤖 IA ·/, "queda anotado en su historial de monedas");
+  await pg.click('[data-tab="equipo"]'); await pg.selectOption("#lhEqP", { label: "Fran" });
   await pg.click('[data-tab="calendario"]');
   await pg.selectOption("#lhMe", { label: "Ana" });
   assert.match(await pg.innerText(".lh-body"), /Tú/, "salen mis próximos partidos");
