@@ -160,6 +160,15 @@
 .lh-slot{min-width:0;border:1px dashed #ffffff30;border-radius:10px;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:#ffffff08;color:inherit;padding:2px;font:inherit}
 .lh-slot.on{border:1px solid var(--gold,#f5c518);background:#ffffff14}
 .lh-slot small{font-size:9px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.8}
+.lh-orow{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-bottom:1px solid #ffffff14}
+.lh-orow:last-child{border-bottom:0}
+.lh-ob{display:flex;align-items:center;gap:8px}.lh-ob small,.lh-oi small{display:block;font-size:11px;opacity:.7}
+.lh-oi{display:flex;align-items:center;gap:10px;background:#ffffff0d;border-radius:10px;padding:6px 8px}
+.lh-ip{width:40px;height:40px;object-fit:contain;image-rendering:pixelated;flex:none;display:inline-flex;align-items:center;justify-content:center}
+.lh-ip.none{font-size:22px;opacity:.5}
+.lg-opt{flex-direction:row;align-items:center;gap:10px}.lg-ot{display:flex;flex-direction:column;gap:2px;min-width:0}
+.lg-opt .lh-ip{width:32px;height:32px}
+.lg-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
 .lh-mvp small{font-size:10px;opacity:.7}
 .lh-mvp .lh-md{opacity:.55;line-height:1.25;margin-top:2px}
 .lh-st{display:flex;flex-direction:column;gap:3px}

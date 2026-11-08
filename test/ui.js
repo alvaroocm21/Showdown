@@ -189,6 +189,18 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   await ban.locator('[data-eq="up"]').nth(1).click();                                                          // y entra otro suplente
   assert.equal((await tit.locator(".lh-mon >> nth=5").locator(".lh-mi b").innerText()).trim(), firstBench, "el suplente pasa a titular");
   assert.equal(await tit.locator(".lh-mon").count(), 6); assert.equal(await ban.locator(".lh-mon").count(), 2);
+  // pestaña Objetos: se le da a cada Pokémon el que se quiera, con imagen
+  await pg.click('[data-tab="objetos"]');
+  assert.equal(await pg.locator(".lh-orow").count(), 8, "salen todos los Pokémon de la plantilla");
+  await pg.locator("[data-item]").first().click(); await pg.waitForSelector(".lg-sheet .lg-opt");
+  assert.ok(await pg.locator(".lg-sheet .lg-chips [data-chip]").count() >= 4, "hay filtros");
+  assert.ok(await pg.locator(".lg-sheet .lg-opt img.lh-ip").count() > 5, "los objetos salen con su imagen");
+  await pg.fill(".lg-sheet input", "restos"); assert.match(await pg.innerText(".lg-sheet .lg-ul"), /Restos/i);
+  await pg.locator(".lg-sheet .lg-opt").first().click();
+  assert.match(await pg.innerText(".lh-orow >> nth=0"), /Restos/i, "el Pokémon lleva el objeto");
+  assert.ok(await pg.locator(".lh-orow >> nth=0 >> img.lh-ip").count() === 1, "y se ve su imagen");
+  await pg.locator("[data-itemx]").first().click(); assert.equal(await pg.locator("[data-itemx]").count(), 0, "se puede quitar");
+  await pg.click('[data-tab="equipo"]');
   // megas: no se sortean; se equipa la megapiedra a un Pokémon cuando se quiera
   assert.equal(await pg.locator('.lh-mon:has-text("Pikachu") [data-mega], .lh-mon:has-text("Bulbasaur") [data-mega]').count(), 0, "solo los Pokémon que megaevolucionan ofrecen megapiedra");
   const gen = tit.locator('.lh-mon:has-text("Gengar")'); await gen.locator("[data-mega]").click();

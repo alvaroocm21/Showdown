@@ -432,6 +432,7 @@ body.sv #result{background:#07050dd9}
 
 <script src="lib/pkmn.bundle.js"></script>
 <script src="lib/desc-es.js"></script>
+<script src="lib/item-ids.js"></script>
 <script src="lib/romcore.js"></script>
 <script src="lib/ligamap.js"></script>
 <script src="lib/ligashop.js"></script>
@@ -462,6 +463,8 @@ const nmAb=a=>{const o=Dex.abilities.get(a);return NAMES.a[o.id]||o.name||a};
 const nmItem=i=>{const o=Dex.items.get(i);return NAMES.i[o.id]||o.name||i};
 // descripciones en español (si falta alguna, se usa la inglesa de Showdown)
 const DES=window.DESC_ES||{a:{},m:{},i:{}};
+// imagen del objeto (sprites de PokeAPI); devuelve las direcciones a probar, o [] si no hay
+const itemUrls=i=>{const o=Dex.items.get(i),n=o.exists&&(window.ITEM_IDS||{})[o.id];return n?['https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/'+n+'.png','https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master/sprites/items/'+n+'.png']:[]};
 const dAb=a=>{const o=Dex.abilities.get(a);return DES.a[o.id]||o.shortDesc||''};
 const dMove=m=>{const o=Dex.moves.get(m);return DES.m[o.id]||o.shortDesc||''};
 const dItem=i=>{const o=Dex.items.get(i);return o.exists?(DES.i[o.id]||o.shortDesc||''):''};
@@ -2026,7 +2029,7 @@ function renderRunSide(el){
     saveRun();renderRun()});
   $('#rAb').onclick=()=>{if(confirm('¿Abandonar la aventura? Se perderá el progreso.')){run=null;store.set(pk('run'),null);renderRun()}}}
 $('#goRun').onclick=()=>show('run');
-Liga.init({dAb,dMove,dItem,PCOLORS,profileTeam:id=>store.get(`zaf3.${id}.team`,[]).filter(s=>s&&Dex.species.get(s.species).exists),getProfiles:profiles,setProfiles:l=>store.set('zaf3.profiles',l),removeProfile:id=>{['team','beat','run'].forEach(k=>{try{localStorage.removeItem(`zaf3.${id}.${k}`)}catch{}});store.set('zaf3.profiles',profiles().filter(x=>x.id!==id))},Dex,Teams,NAMES,store,esc,nmSp,nmMove,nmAb,nmItem,tchip,tCol,tES,iconEl,POOL,defaultSet,TYPE_NAMES:Object.keys(TYPES).filter(t=>t!=='Stellar'),show,editTeam:editExternalTeam,learnable,MOVES,ABILS,NATURES,RITEMS,
+Liga.init({dAb,dMove,dItem,itemUrls,ITEMLIST,PCOLORS,profileTeam:id=>store.get(`zaf3.${id}.team`,[]).filter(s=>s&&Dex.species.get(s.species).exists),getProfiles:profiles,setProfiles:l=>store.set('zaf3.profiles',l),removeProfile:id=>{['team','beat','run'].forEach(k=>{try{localStorage.removeItem(`zaf3.${id}.${k}`)}catch{}});store.set('zaf3.profiles',profiles().filter(x=>x.id!==id))},Dex,Teams,NAMES,store,esc,nmSp,nmMove,nmAb,nmItem,tchip,tCol,tES,iconEl,POOL,defaultSet,TYPE_NAMES:Object.keys(TYPES).filter(t=>t!=='Stellar'),show,editTeam:editExternalTeam,learnable,MOVES,ABILS,NATURES,RITEMS,
   profileTeams:()=>profiles().map(p=>({id:p.id,name:p.name,emoji:p.emoji,team:store.get(`zaf3.${p.id}.team`,[])}))});
 $('#goLiga').onclick=()=>show('liga');
 $('#goRom').onclick=()=>show('rom');
