@@ -112,8 +112,11 @@ los equipos de la jornada elegida. Los combates se juegan en el juego.
   últimos 5, mejor racha). «Gané / Empate / Perdí» lo anota y da las monedas.
 - **Sin emojis en los avatares:** el avatar de cada jugador es su imagen (escudo) o, si no la tiene, solo su color; ya no hay gorra, trébol ni más emojis para elegir.
 - **Tarjetas sobre los Pokémon:** en las listas de equipos, en la ficha del Pokémon y en las estadísticas se ve una **tarjeta amarilla** (1 amarilla), **doble amarilla** (2) o **roja** (sancionado por haber llegado a dos).
-- **Quién controla a cada entrenador:** cada entrenador se marca como **«🎮 Lo controlo yo»** (cualquiera que use la app gestiona su equipo) o **«🔒 Lo controla su jugador»** (solo se puede sortear, elegir titulares, equipar
-  megapiedras y retocar con monedas entrando con ese jugador; los demás ven su equipo pero no lo tocan). Se elige al añadirlo, en su ficha o en Ajustes (con botones para marcar a todos de una vez). El sorteo general solo reparte a los que controlas tú.
+- **Quién controla a cada entrenador:** cada entrenador es **«🎮 Lo controlo yo»** (cualquiera que use la app gestiona su equipo), **«🔒 Lo controla su jugador»** (solo se puede sortear, elegir titulares, equipar megapiedras y
+  retocar con monedas entrando con ese jugador) o **«🤖 La controla la IA»**. Se elige al añadirlo, en su ficha o en Ajustes (tocando el nombre cambia de uno a otro; hay botones para marcar a todos). El sorteo general reparte a los míos y a los de la IA.
+- **🤖 IA:** para los entrenadores de la IA, el ordenador sortea su plantilla de 12 (con su porcentaje) si no la tiene y **elige sus 6 titulares en cada jornada** según su rival (tipos de sus ataques, resistencias, estadísticas),
+  las amarillas y sanciones de sus Pokémon (evita arriesgar a los amonestados) y el siguiente rival (si es más duro, guarda a sus dos Pokémon más fuertes). Lo hace sola al exportar a la ROM y al anotar un combate (deja listas las
+  alineaciones de la jornada siguiente), y también con el botón «Preparar las alineaciones de la IA» del Calendario. En su ficha y en Equipo se ve a quién se enfrenta y qué eligió. Lógica en `lib/ligaia.js`.
 - **Porcentajes de 1 a 100 y megas:** el porcentaje de calidad se escribe o se mueve de 1 en 1 (cualquier número del 1 al 100). El sorteo **no reparte megas** (ni la especie mega ni la megapiedra): en la pestaña Equipo, los Pokémon que megaevolucionan
   tienen un botón **💎 Equipar megapiedra** para ponérsela cuando quieras (y quitarla); a la ROM va el Pokémon base con su megapiedra y megaevoluciona en combate.
 - **Flujo de Pokémon:** 1) «🎲 Sortear» (en Equipo, en la ficha, en el sorteo general o al crear una competición) **pide primero el porcentaje de calidad** de cada entrenador al que se va a repartir; 2) reparte 12 Pokémon (6 titulares + 6 suplentes); 3) en la pestaña Equipo eliges qué 6 juegan en cada jornada.
@@ -141,7 +144,7 @@ los equipos de la jornada elegida. Los combates se juegan en el juego.
 Notas: en ORAS la ROM no guarda naturaleza ni EVs de los entrenadores (USUM sí). La APK (v1.1) permite elegir la ROM y guarda los .zip en Descargas
 (sin probar en dispositivo real). Código: `lib/romcore.js` (lectura/escritura de ROM, GARC, entrenadores), `lib/ligamap.js` (Showdown → ROM), `lib/liga.js`
 (datos comunes y Editor ROM), `lib/ligahub.js` (pantalla Liga), `lib/ligacal.js` (calendarios, rachas y eliminatorias), `lib/ligashop.js` (tienda), `lib/liga.css`.
-Pruebas: `python3 test/make_rom.py test/out/fake.3ds oras && python3 test/make_rom.py test/out/um.3ds usum && node test/liga.test.js test/out && node test/shop.test.js && node test/cal.test.js && node test/sorteo.test.js && node test/ui.js test/out`
+Pruebas: `python3 test/make_rom.py test/out/fake.3ds oras && python3 test/make_rom.py test/out/um.3ds usum && node test/liga.test.js test/out && node test/shop.test.js && node test/ia.test.js && node test/cal.test.js && node test/sorteo.test.js && node test/ui.js test/out`
 (la última necesita `playwright`).
 
 ## Reconstruir el paquete (opcional)

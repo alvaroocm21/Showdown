@@ -94,8 +94,15 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   await pg.selectOption("#lhEqP", { label: "Beto" }); assert.equal(await pg.locator("[data-eqdraw]").count(), 1, "pero el de Beto (que controlo yo) sí");
   await pg.selectOption("#lhEqP", { label: "⭐ Álvaro" }); assert.equal(await pg.locator("[data-eqdraw]").count(), 1, "y el propio también");
   await pg.click('[data-tab="tienda"]'); await pg.selectOption("#lhSP", { index: 1 }); assert.equal(await pg.locator("[data-shop]").count(), 0, "ni retocar los Pokémon de Ana");
+  // la IA: a Fran lo dirige el ordenador
+  await pg.click('[data-tab="entrenadores"]'); await pg.click('.lh-tc:has-text("Fran")'); await pg.waitForSelector(".lh-dh");
+  assert.equal(await pg.locator('[data-ctl]').count(), 3, "tres formas de control: yo, su jugador o la IA");
+  await pg.click('[data-ctl="ia"]'); assert.equal(await pg.locator('[data-ctl="ia"].gold').count(), 1);
+  assert.match(await pg.innerText(".lh-body"), /La IA elige su alineación según la jornada, su rival y el siguiente rival/);
+  assert.equal(await pg.locator("[data-eqdraw]").count(), 0, "nadie le toca el equipo a la IA");
+  await pg.click("#lhBackList"); assert.match(await pg.innerText('.lh-tc:has-text("Fran")'), /🤖/, "la tarjeta lo marca");
   await pg.click('[data-tab="ajustes"]'); assert.equal(await pg.locator("[data-ctlp]").count(), 7, "Ajustes lista a todos con su control");
-  assert.equal(await pg.locator("[data-ctlp].on").count(), 1, "solo Ana está marcada como de su jugador");
+  assert.equal(await pg.locator("[data-ctlp].on").count(), 2, "Ana (su jugador) y Fran (IA) no son «míos»");
   await pg.click('[data-tab="entrenadores"]');
   await setTeam(pg, "Ana", ANA);
   await pg.click('.lh-tc:has-text("Ana")'); await pg.waitForSelector(".lh-dh");
@@ -182,6 +189,7 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   assert.match(await pg.innerText(".lg-opt"), /N\./, "se ve el equipo del entrenador"); await pg.click(".lg-opt");
   assert.equal(await pg.locator(".lg-slot.ok").count(), 2);
   const [dl] = await Promise.all([pg.waitForEvent("download"), pg.click("#lgExp")]);
+  assert.match(await pg.locator('.lg-steps:has-text("Alineaciones de la IA")').textContent(), /Fran/, "al exportar, la IA prepara sus alineaciones y el informe las lista");
   await dl.saveAs(S + "/liga-out.zip"); console.log("descarga:", dl.suggestedFilename(), "|", await pg.innerText(".lg-ok >> nth=1"));
 
   // ---- 3. Liga a 2 vueltas ----
@@ -189,6 +197,11 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   await pg.click('[data-tab="calendario"]');
   await pg.selectOption("#lhVueltas", "2"); await pg.click("#lhGenLiga");
   assert.equal(await pg.locator(".lh-chip[data-j]").count(), 14, "7 entrenadores a 2 vueltas = 14 jornadas");
+  // la IA prepara las alineaciones de Fran según su rival de la jornada (Ana) y el siguiente
+  await pg.click("#lhAiPrep"); await pg.click('[data-tab="equipo"]'); await pg.selectOption("#lhEqP", { label: "Fran" });
+  assert.match(await pg.innerText(".lh-body"), /La IA eligió esta jornada contra Ana/, "la IA ve quién es su rival");
+  assert.match(await pg.innerText(".lh-body"), /Titulares:/); assert.equal(await pg.locator("[data-eqdraw], [data-eq], [data-mega]").count(), 0, "y nadie le toca el equipo");
+  await pg.click('[data-tab="calendario"]');
   await pg.selectOption("#lhMe", { label: "Ana" });
   assert.match(await pg.innerText(".lh-body"), /Tú/, "salen mis próximos partidos");
   await pg.locator('.lh-fx [data-w]').first().click();                                // “Gané”
