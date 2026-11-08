@@ -79,16 +79,24 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   for (const n of ["Ana", "Beto", "Carla", "Dani", "Eva", "Fran"]) { await pg.fill("#lhNew", n); await pg.click("#lhAdd"); }
   assert.equal(await pg.locator(".lh-tc").count(), 7, "los 6 entrenadores y el jugador con el que entré");
   assert.match(await pg.innerText(".lh-hero"), /Álvaro/, "«tú» es el jugador con el que entré");
-  // ---- bloqueo: cada entrenador elige su equipo (nadie controla los de los demás) ----
-  assert.equal(await pg.locator("#lhSorteo").count(), 0, "con el bloqueo no hay sorteo general");
-  assert.match(await pg.innerText(".lh-body"), /Cada entrenador sortea y elige su equipo/);
+  // ---- quién controla a cada entrenador: a Ana la controla su jugador; a los demás, yo ----
+  assert.equal(await pg.locator('.lh-tc:has-text("Ana") [data-ctl]').count(), 0);
+  await pg.click('.lh-tc:has-text("Ana")'); await pg.waitForSelector(".lh-dh");
+  assert.equal(await pg.locator('[data-ctl="mine"].gold').count(), 1, "por defecto lo controlo yo");
+  await pg.click('[data-ctl="self"]'); assert.equal(await pg.locator('[data-ctl="self"].gold').count(), 1, "pasa a «lo controla su jugador»");
+  assert.match(await pg.innerText(".lh-body"), /Lo controla su jugador: solo Ana puede elegir su equipo/);
+  assert.equal(await pg.locator("[data-eqdraw]").count(), 0, "no puedo sortearle los Pokémon");
+  await pg.click("#lhBackList"); assert.match(await pg.innerText('.lh-tc:has-text("Ana")'), /🔒/, "la tarjeta lo marca");
+  assert.equal(await pg.locator("#lhSorteo").count(), 1, "el sorteo general sigue para los que controlo");
+  await pg.click("#lhSorteo > summary"); assert.match(await pg.innerText("#lhSorteo"), /1 entrenador lo controla su jugador/); await pg.click("#lhSorteo > summary");
   await pg.click('[data-tab="equipo"]'); await pg.selectOption("#lhEqP", { label: "Ana" });
-  assert.equal(await pg.locator("[data-eqdraw], [data-eq], [data-mega]").count(), 0, "no se puede tocar el equipo de otro");
-  assert.match(await pg.innerText(".lh-body"), /Solo Ana puede elegir su equipo/);
-  await pg.selectOption("#lhEqP", { label: "⭐ Álvaro" }); assert.equal(await pg.locator("[data-eqdraw]").count(), 1, "pero sí el propio");
-  await pg.click('[data-tab="tienda"]'); await pg.selectOption("#lhSP", { index: 2 }); assert.equal(await pg.locator("[data-shop]").count(), 0, "ni retocar sus Pokémon");
-  await pg.click('[data-tab="ajustes"]'); await pg.uncheck("[data-lock]");                  // modo organizador para el resto de la prueba
-  await pg.click('[data-tab="entrenadores"]'); assert.equal(await pg.locator("#lhSorteo").count(), 1, "sin el bloqueo vuelve el sorteo general");
+  assert.equal(await pg.locator("[data-eqdraw], [data-eq], [data-mega]").count(), 0, "el equipo de Ana lo ve pero no lo toca");
+  await pg.selectOption("#lhEqP", { label: "Beto" }); assert.equal(await pg.locator("[data-eqdraw]").count(), 1, "pero el de Beto (que controlo yo) sí");
+  await pg.selectOption("#lhEqP", { label: "⭐ Álvaro" }); assert.equal(await pg.locator("[data-eqdraw]").count(), 1, "y el propio también");
+  await pg.click('[data-tab="tienda"]'); await pg.selectOption("#lhSP", { index: 1 }); assert.equal(await pg.locator("[data-shop]").count(), 0, "ni retocar los Pokémon de Ana");
+  await pg.click('[data-tab="ajustes"]'); assert.equal(await pg.locator("[data-ctlp]").count(), 7, "Ajustes lista a todos con su control");
+  assert.equal(await pg.locator("[data-ctlp].on").count(), 1, "solo Ana está marcada como de su jugador");
+  await pg.click('[data-tab="entrenadores"]');
   await setTeam(pg, "Ana", ANA);
   await pg.click('.lh-tc:has-text("Ana")'); await pg.waitForSelector(".lh-dh");
   assert.equal(await pg.locator('[data-act="team"]').count(), 0, "ya no hay botón de editar el equipo");
