@@ -317,7 +317,6 @@ body.sv #result{background:#07050dd9}
     <div class="panel" id="newp">
       <b>Nuevo jugador</b>
       <input type="text" id="pname" maxlength="16" placeholder="Nombre del jugador">
-      <div class="emo" id="pemo"></div>
       <div class="emo col" id="pcol"></div>
       <button class="btn gold" id="pcreate">Crear jugador</button>
     </div>
@@ -1768,7 +1767,7 @@ const pk=k=>`zaf3.${PID}.${k}`;
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const EMOJIS=['🧢','🔥','💧','🌿','⚡','🌙','⭐','🐉','👾','🎮','🦊','🐱'];
 const PCOLORS=['#2f7bff','#e8590c','#2fa84f','#a040a0','#d4a600','#e84a8a','#2ab7c9','#6b7a90','#e03131','#f08c00','#94d82d','#12b886','#1c7ed6','#7048e8','#d6336c','#862e9c','#495057','#0b7285','#5c940d','#c92a2a','#ffd43b','#74c0fc','#b197fc','#ff8787'];
-const pavIn=p=>p.img?`<img class="lh-img" src="${p.img}" alt="">`:p.emoji;
+const pavIn=p=>p.img?`<img class="lh-img" src="${p.img}" alt="">`:'';   // solo el escudo (imagen) o, si no hay, el color
 const profiles=()=>store.get('zaf3.profiles',[]);
 const curProfile=()=>profiles().find(p=>p.id===PID);
 let newEmo=EMOJIS[0],newCol=PCOLORS[0];
@@ -1786,16 +1785,14 @@ function showProfiles(){
           Liga.removePlayer(p.id);showProfiles()}}
       else pickProfile(p.id)};
     el.append(d)});
-  $('#pemo').innerHTML=EMOJIS.map(e=>`<span data-e="${e}" class="${e===newEmo?'on':''}">${e}</span>`).join('');
   $('#pcol').innerHTML=PCOLORS.map(c=>`<span data-c="${c}" style="background:${c}" class="${c===newCol?'on':''}"></span>`).join('')+`<label class="lh-cpick" title="Otro color"><input type="color" id="pcc" value="${/^#[0-9a-f]{6}$/i.test(newCol)?newCol:'#2f7bff'}"></label>`;
-  $$('#pemo span').forEach(x=>x.onclick=()=>{newEmo=x.dataset.e;showProfiles()});
   $$('#pcol span').forEach(x=>x.onclick=()=>{newCol=x.dataset.c;showProfiles()});
   $('#pcc').onchange=e=>{newCol=e.target.value;const n=$('#pname').value;showProfiles();$('#pname').value=n};
   show('profile')}
 $('#pcreate').onclick=()=>{
   const name=$('#pname').value.trim();if(!name){$('#pname').focus();return}
   const list=profiles(),id=Date.now().toString(36)+Math.random().toString(36).slice(2,5);
-  list.push({id,name,emoji:newEmo,color:newCol});store.set('zaf3.profiles',list);
+  list.push({id,name,emoji:'',color:newCol});store.set('zaf3.profiles',list);
   if(list.length===1){ // migrar datos de versiones anteriores
     const t=store.get('zaf2.team',null),b=store.get('zaf2.beat',null);
     if(t)store.set(`zaf3.${id}.team`,t);if(b)store.set(`zaf3.${id}.beat`,b)}
@@ -1959,7 +1956,7 @@ const monRow=(m,kind)=>{
    <div style="display:flex;flex-direction:column;gap:4px"><select data-it="${m.uid}" ${kind==='box'?'disabled':''}>${opts.map(o=>`<option value="${esc(o[0])}" ${o[0]===(m.item||'')?'selected':''}>${esc(o[1])}</option>`).join('')}</select>
    <button data-mv="${m.uid}">${kind==='team'?'→ Caja':'→ Equipo'}</button></div></div>`};
 function renderRun(){
-  const p=curProfile();$('#runInfo').textContent=p?`${p.emoji} ${p.name}`:'';
+  const p=curProfile();$('#runInfo').textContent=p?p.name:'';
   const main=$('#runMain'),side=$('#runTeam');
   if(!run){
     main.innerHTML=`<h3>Nueva aventura Randomlocke</h3><ul class="runmenu"><li>Empiezas con un inicial aleatorio (eliges entre 3).</li><li>En cada ruta combatirás a un entrenador y a un Pokémon salvaje: al derrotarlo lo capturas (uno por ruta, sin repetir familia).</li><li>Todos tus Pokémon tienen <b>habilidad, objeto y naturaleza aleatorios</b>.</li><li>Tras cada gimnasio hay una <b>tienda con objetos aleatorios</b>.</li><li>Tu equipo sube de nivel y evoluciona solo al avanzar; se cura tras cada combate.</li><li>Los líderes mantienen su tipo; el resto de rivales son aleatorios.</li><li>Llega hasta el Campeón de Hoenn: 31 etapas.</li></ul>

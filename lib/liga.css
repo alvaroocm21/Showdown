@@ -350,3 +350,15 @@
 .lh-rtrow{display:flex;align-items:center;gap:10px}
 .lh-rtrow .lh-range{flex:1}
 .lh-rtnum{width:70px;background:#04122f;color:#fff;border:2px solid #5aa6ff88;border-radius:8px;padding:6px;text-align:center}
+
+/* tarjetas sobre los Pokémon: una amarilla, dos amarillas o roja */
+.lg-pk{position:relative;display:inline-block}
+[data-card]{position:relative}
+.lg-cd{position:absolute;right:0;top:0;width:11px;height:15px;border-radius:2px;border:1px solid #0009;transform:rotate(10deg);box-shadow:0 1px 4px #000a;display:block;z-index:2}
+.lg-cd.y1,.lg-cd.y2{background:#ffd43b}
+.lg-cd.y2::after{content:"";position:absolute;left:-5px;top:2px;width:11px;height:15px;border-radius:2px;border:1px solid #0009;background:#ffd43b;transform:rotate(-14deg)}
+.lg-cd.r{background:#e03131}
+.lh-st-ic{position:relative}
+
+.lh-lock{font-size:12px;opacity:.9;background:#ffffff12;border-radius:8px;padding:8px 10px;margin:6px 0;line-height:1.4}
+.lg-cd.r::after{content:"";position:absolute;left:1px;bottom:1px;width:3px;height:3px;background:#ffd43b;box-shadow:4px 0 0 #ffd43b}

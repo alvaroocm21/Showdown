@@ -79,6 +79,16 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   for (const n of ["Ana", "Beto", "Carla", "Dani", "Eva", "Fran"]) { await pg.fill("#lhNew", n); await pg.click("#lhAdd"); }
   assert.equal(await pg.locator(".lh-tc").count(), 7, "los 6 entrenadores y el jugador con el que entré");
   assert.match(await pg.innerText(".lh-hero"), /Álvaro/, "«tú» es el jugador con el que entré");
+  // ---- bloqueo: cada entrenador elige su equipo (nadie controla los de los demás) ----
+  assert.equal(await pg.locator("#lhSorteo").count(), 0, "con el bloqueo no hay sorteo general");
+  assert.match(await pg.innerText(".lh-body"), /Cada entrenador sortea y elige su equipo/);
+  await pg.click('[data-tab="equipo"]'); await pg.selectOption("#lhEqP", { label: "Ana" });
+  assert.equal(await pg.locator("[data-eqdraw], [data-eq], [data-mega]").count(), 0, "no se puede tocar el equipo de otro");
+  assert.match(await pg.innerText(".lh-body"), /Solo Ana puede elegir su equipo/);
+  await pg.selectOption("#lhEqP", { label: "⭐ Álvaro" }); assert.equal(await pg.locator("[data-eqdraw]").count(), 1, "pero sí el propio");
+  await pg.click('[data-tab="tienda"]'); await pg.selectOption("#lhSP", { index: 2 }); assert.equal(await pg.locator("[data-shop]").count(), 0, "ni retocar sus Pokémon");
+  await pg.click('[data-tab="ajustes"]'); await pg.uncheck("[data-lock]");                  // modo organizador para el resto de la prueba
+  await pg.click('[data-tab="entrenadores"]'); assert.equal(await pg.locator("#lhSorteo").count(), 1, "sin el bloqueo vuelve el sorteo general");
   await setTeam(pg, "Ana", ANA);
   await pg.click('.lh-tc:has-text("Ana")'); await pg.waitForSelector(".lh-dh");
   assert.equal(await pg.locator('[data-act="team"]').count(), 0, "ya no hay botón de editar el equipo");
@@ -194,11 +204,15 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   // estadísticas: Pikachu de Ana jugó 1 partido y tiene 1 amarilla
   await pg.click('[data-tab="stats"]');
   assert.match(await pg.innerText(".lh-stt tbody"), /Pikachu\s*Ana\s*1\t1\t0\t/, "PJ 1 y 🟨 1");
+  assert.equal(await pg.locator(".lh-stt tbody tr:has-text(\"Pikachu\"):has-text(\"Ana\") .lg-cd.y1").count(), 1, "una amarilla sobre el Pokémon");
+  await pg.locator('.lh-stt tbody tr:has-text("Pikachu"):has-text("Ana")').screenshot({ path: S + "/tarjeta-amarilla.png" });
   // 2.º partido: vuelve a caer Pikachu → 2 amarillas → sancionado
   await pg.click('[data-tab="calendario"]'); await pg.locator('.lh-fx [data-w]').first().click();
   await pg.click('.lg-sheet input[data-side="a"] >> nth=0'); await pg.click(".lg-sheet [data-ok]");
   await pg.click('[data-tab="stats"]');
   assert.match(await pg.innerText(".lh-body"), /Sancionados ahora/); assert.match(await pg.innerText(".lh-stt tbody"), /Pikachu\s*Ana\s*2\t2\t1\t.*Sancionado/, "2 amarillas = 🟥");
+  assert.equal(await pg.locator(".lh-stt tbody tr:has-text(\"Pikachu\"):has-text(\"Ana\") .lg-cd.r").count(), 1, "tarjeta roja sobre el sancionado");
+  await pg.locator('.lh-stt tbody tr:has-text("Pikachu"):has-text("Ana")').screenshot({ path: S + "/tarjeta-roja.png" });
   // la ROM no recibe al sancionado
   await pg.click("#lhBack"); await pg.click("#goRom"); await pg.waitForSelector("#lgExp");
   const [dl2] = await Promise.all([pg.waitForEvent("download"), pg.click("#lgExp")]);
@@ -210,6 +224,7 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   assert.equal(await pg.locator('.lg-sheet input[disabled][data-sp="Pikachu"]').count(), 1, "Pikachu no puede jugar este partido");
   await pg.click(".lg-sheet [data-skip]");
   await pg.click('[data-tab="stats"]'); assert.match(await pg.innerText(".lh-stt tbody"), /Pikachu\s*Ana\s*2\t2\t1\t—/, "cumple la sanción: sigue con 2 PJ y deja de estar sancionado");
+  await pg.locator('.lh-stt tbody tr:has-text("Pikachu"):has-text("Ana")').screenshot({ path: S + "/liga-stats-tabla.png" });
   await pg.screenshot({ path: S + "/liga-stats.png", fullPage: true });
   await pg.click('[data-tab="comp"]');
   assert.equal(await pg.locator(".lh-body > .lh-card").count(), 1, "la pestaña solo lleva la clasificación");
@@ -263,6 +278,8 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   await pg.reload(); await pg.waitForSelector("#pname", { timeout: 60000 });
   assert.equal(await pg.locator(".pcard").count(), 7, "la pantalla de entrada lista a los jugadores de la liga");
   assert.match(await pg.innerText("#plist"), /Ana[\s\S]*Fran/);
+  assert.equal(await pg.locator("#pemo").count(), 0, "ya no hay emojis (gorra, trébol…) para elegir");
+  assert.equal((await pg.locator('.pcard:has-text("Beto") .pav').innerText()).trim(), "", "el avatar es solo el color");
   assert.ok(await pg.locator("#pcol span").count() >= 24, "hay muchos colores"); assert.equal(await pg.locator("#pcc").count(), 1, "y un selector de color libre");
   assert.equal(await pg.locator("#plist .pcard .pav img").count(), 1, "el escudo de Ana sale en su tarjeta");
   await pg.screenshot({ path: S + "/entrada.png", fullPage: true });
