@@ -211,6 +211,15 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
     const [dls] = await Promise.all([pg.waitForEvent("download"), fc.setFiles({ name: "main", mimeType: "application/octet-stream", buffer: Buffer.from(fake) })]);
     const out = new Uint8Array(require("fs").readFileSync(await dls.path())); assert.equal(dls.suggestedFilename(), "main");
     assert.ok(SV.inspect(out).ok, "la partida sigue siendo válida"); assert.equal(960 - SV.freeSlots(out).length, 8, "los 8 Pokémon están en las cajas"); }
+  await pg.evaluate(() => { let cur = null; window.__dirs = {}; window.__w = {};
+    window.AndroidApp = { pickFolder: k => { window.__dirs[k] = "carpeta-" + k; setTimeout(() => window.__folderPicked(k, ""), 0); }, folderName: k => window.__dirs[k] || "",
+      dirStart: (k, rel) => { cur = k + ":" + rel; window.__w[cur] = 0; return true; }, saveChunk: b => { window.__w[cur] += b.length; return true; }, saveEnd: () => true }; });
+  { const fake = require("./fake_save.js")();
+    const [fc2] = await Promise.all([pg.waitForEvent("filechooser"), pg.click("[data-sav]")]);
+    await fc2.setFiles({ name: "00000001.sav", mimeType: "application/octet-stream", buffer: Buffer.from(fake) }); await pg.waitForFunction(() => window.__w && window.__w["save:00000001.sav"] != null, null, { timeout: 8000 }).catch(async e => { throw new Error("sin guardar: " + JSON.stringify(await pg.evaluate(() => [window.__w, window.__dirs])) + " | " + pg.lastDialog); });
+    const w = await pg.evaluate(() => window.__w); assert.ok(w["save:00000001.sav.bak"] > 0 && w["save:00000001.sav"] > 0, "main con su nombre original y copia .bak");
+    assert.ok(w["save:00000001.sav"] > 400000, "el archivo entero"); }
+  await pg.evaluate(() => { delete window.AndroidApp; });
   // megas: no se sortean; se equipa la megapiedra a un Pokémon cuando se quiera
   assert.equal(await pg.locator('.lh-mon:has-text("Pikachu") [data-mega], .lh-mon:has-text("Bulbasaur") [data-mega]').count(), 0, "solo los Pokémon que megaevolucionan ofrecen megapiedra");
   const gen = tit.locator('.lh-mon:has-text("Gengar")'); await gen.locator("[data-mega]").click();
@@ -299,6 +308,14 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   await pg.click("#lhBack"); await pg.click("#goRom"); await pg.waitForSelector("#lgExp");
   const [dl2] = await Promise.all([pg.waitForEvent("download"), pg.click("#lgExp")]);
   assert.match(await pg.innerText(".lg-warn[open]"), /Pikachu sancionado/, "al exportar se avisa de que el sancionado no se incluye");
+  // carpeta elegida (puente de la APK simulado): los mods se escriben como carpetas y el main con su nombre original
+  await pg.evaluate(() => { let cur = null; window.__dirs = {}; window.__w = {};
+    window.AndroidApp = { pickFolder: k => { window.__dirs[k] = "carpeta-" + k; setTimeout(() => window.__folderPicked(k, ""), 0); }, folderName: k => window.__dirs[k] || "",
+      dirStart: (k, rel) => { cur = k + ":" + rel; window.__w[cur] = 0; return true; }, saveChunk: b => { window.__w[cur] += b.length; return true; }, saveEnd: () => true }; });
+  await pg.evaluate(() => { let cur = null; window.__w = {}; window.__dirs = {}; window.AndroidApp = { pickFolder: k => { window.__dirs[k] = "carpeta-" + k; setTimeout(() => window.__folderPicked(k, ""), 0); }, folderName: k => window.__dirs[k] || "", dirStart: (k, rel) => { cur = k + ":" + rel; window.__w[cur] = 0; return true; }, saveChunk: b => { window.__w[cur] += b.length; return true; }, saveEnd: () => true }; });
+  await pg.click("#lgDir"); await pg.waitForFunction(() => /Guardado en la carpeta/.test(document.body.innerText), null, { timeout: 8000 }).catch(async e => { throw new Error("sin «Guardado»: " + (await pg.innerText(".lg-pan >> nth=2")).slice(0, 600) + " | " + pg.lastDialog); });
+  { const keys = await pg.evaluate(() => Object.keys(window.__w)); assert.ok(keys.some(k => /^mods:00040000001B5100\/romfs\/a\/1\/0\/\d$/.test(k)), "el mod se escribe como carpeta en la de mods: " + keys); }
+  await pg.evaluate(() => { delete window.AndroidApp; });
   await pg.click("#lgGoLiga"); await pg.click('[data-tab="calendario"]');
   // 3.er partido: Pikachu aparece sancionado y no puede jugar; al cumplirlo vuelve
   await pg.locator('.lh-fx [data-w]').first().click();

@@ -176,3 +176,10 @@ No marca la Pokédex. Código: `lib/ligasave.js`, pruebas: `test/save.test.js` (
 
 En Calendario, bajo cada partido mío, «🎮 Meter a <rival> en un entrenador de la ROM»: la primera vez eliges el entrenador del juego (el buscador
 sale con «tximo»); después el botón mete directamente al rival de cada partido en ese mismo entrenador, quitándoselo al anterior. Luego exporta la jornada.
+
+### Carpetas elegidas (solo APK)
+
+En el Editor ROM, «📁 Guardar en una carpeta» pide una vez la carpeta de mods de tu emulador (`load/mods`) y la recuerda: escribe ahí
+`<ID del juego>/romfs/…` sustituyendo los archivos. «Meter en mi partida» pide una vez la carpeta de la partida y escribe el archivo con su
+nombre original (`main`, `00000001.sav`) dejando una copia del original como `<nombre>.bak`. Hay botones para cambiar cada carpeta.
+Código nativo: `pickFolder` / `folderName` / `dirStart` en `MainActivity.java` (Storage Access Framework).

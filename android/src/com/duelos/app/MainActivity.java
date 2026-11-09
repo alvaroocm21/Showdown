@@ -5,6 +5,9 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.os.Environment;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.provider.DocumentsContract;
 import android.util.Base64;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
@@ -33,6 +36,8 @@ public class MainActivity extends Activity {
     private static final String HOST = "https://appassets.duelos.local/";
     private WebView web;
     private static final int REQ_FILE = 71;
+    private static final int REQ_DIR = 72;
+    private String pendingKey;
     private ValueCallback<Uri[]> fileCb;
     // Guardado de archivos en Descargas (la web los manda por trozos con saveStart / saveChunk / saveEnd)
     private OutputStream saveOut;
@@ -78,6 +83,51 @@ public class MainActivity extends Activity {
                         saveFile = new File(dir, safe);
                         saveOut = new FileOutputStream(saveFile);
                     }
+                    return saveOut != null;
+                } catch (Exception e) { closeSave(); return false; }
+            }
+            // ---- Carpetas elegidas por la persona (mods y partida): se recuerdan entre sesiones ----
+            @JavascriptInterface
+            public void pickFolder(final String key) {
+                runOnUiThread(new Runnable() { public void run() {
+                    pendingKey = key;
+                    Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                    i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                        | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
+                    try { startActivityForResult(i, REQ_DIR); } catch (Exception e) { sendFolder(key, ""); }
+                } });
+            }
+            @JavascriptInterface
+            public String folderName(String key) {
+                String u = getSharedPreferences("duelos", 0).getString("dir_" + key, "");
+                if (u.length() == 0) return "";
+                try { String id = DocumentsContract.getTreeDocumentId(Uri.parse(u)); int c = id.lastIndexOf(':'); return c >= 0 ? id.substring(c + 1) : id; }
+                catch (Exception e) { return ""; }
+            }
+            // Abre un archivo (ruta relativa con subcarpetas) dentro de la carpeta elegida, sustituyendo el que hubiera; luego saveChunk/saveEnd.
+            @JavascriptInterface
+            public boolean dirStart(String key, String rel) {
+                try {
+                    closeSave();
+                    String u = getSharedPreferences("duelos", 0).getString("dir_" + key, "");
+                    if (u.length() == 0) return false;
+                    Uri tree = Uri.parse(u);
+                    String doc = DocumentsContract.getTreeDocumentId(tree);
+                    String[] parts = rel.split("/");
+                    for (int k = 0; k < parts.length - 1; k++) {
+                        String c = child(tree, doc, parts[k]);
+                        if (c == null) {
+                            Uri n = DocumentsContract.createDocument(getContentResolver(), DocumentsContract.buildDocumentUriUsingTree(tree, doc), DocumentsContract.Document.MIME_TYPE_DIR, parts[k]);
+                            if (n == null) return false;
+                            c = DocumentsContract.getDocumentId(n);
+                        }
+                        doc = c;
+                    }
+                    String name = parts[parts.length - 1], old = child(tree, doc, name);
+                    if (old != null) DocumentsContract.deleteDocument(getContentResolver(), DocumentsContract.buildDocumentUriUsingTree(tree, old));
+                    Uri f = DocumentsContract.createDocument(getContentResolver(), DocumentsContract.buildDocumentUriUsingTree(tree, doc), "application/octet-stream", name);
+                    if (f == null) return false;
+                    saveOut = getContentResolver().openOutputStream(f);
                     return saveOut != null;
                 } catch (Exception e) { closeSave(); return false; }
             }
@@ -164,6 +214,22 @@ public class MainActivity extends Activity {
         hideSystemUi();
     }
 
+    private String child(Uri tree, String parentDoc, String name) {
+        Cursor c = null;
+        try {
+            c = getContentResolver().query(DocumentsContract.buildChildDocumentsUriUsingTree(tree, parentDoc),
+                new String[]{ DocumentsContract.Document.COLUMN_DOCUMENT_ID, DocumentsContract.Document.COLUMN_DISPLAY_NAME }, null, null, null);
+            while (c != null && c.moveToNext()) if (name.equals(c.getString(1))) return c.getString(0);
+        } catch (Exception e) { } finally { if (c != null) c.close(); }
+        return null;
+    }
+
+    private void sendFolder(final String key, final String name) {
+        runOnUiThread(new Runnable() { public void run() {
+            web.evaluateJavascript("window.__folderPicked&&window.__folderPicked(" + org.json.JSONObject.quote(key) + "," + org.json.JSONObject.quote(name) + ")", null);
+        } });
+    }
+
     private void closeSave() {
         try { if (saveOut != null) saveOut.close(); } catch (Exception e) { }
         saveOut = null; saveUri = null; saveFile = null;
@@ -171,6 +237,16 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onActivityResult(int req, int res, Intent data) {
+        if (req == REQ_DIR) {
+            String key = pendingKey == null ? "" : pendingKey;
+            if (res == RESULT_OK && data != null && data.getData() != null) {
+                Uri u = data.getData();
+                try { getContentResolver().takePersistableUriPermission(u, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION); } catch (Exception e) { }
+                getSharedPreferences("duelos", 0).edit().putString("dir_" + key, u.toString()).apply();
+            }
+            sendFolder(key, "");
+            return;
+        }
         if (req != REQ_FILE) { super.onActivityResult(req, res, data); return; }
         if (fileCb == null) return;
         Uri[] out = null;
