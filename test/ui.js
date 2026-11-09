@@ -258,6 +258,13 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   await pg.click('[data-tab="calendario"]');
   await pg.selectOption("#lhMe", { label: "Ana" });
   assert.match(await pg.innerText(".lh-body"), /Tú/, "salen mis próximos partidos");
+  await pg.locator("[data-rivslot]:not([data-chg])").first().click(); await pg.waitForSelector(".lg-sheet input");
+  assert.equal(await pg.inputValue(".lg-sheet input"), "tximo", "el buscador sale con el entrenador de la foto");
+  await pg.fill(".lg-sheet input", ""); await pg.locator(".lg-opt:not([disabled])").last().click();   // un entrenador que nadie tenga
+  assert.equal(await pg.locator("[data-rivslot][data-chg]").count() >= 1, true, "queda fijado y se puede cambiar");
+  assert.doesNotMatch(await pg.locator("[data-rivslot]:not([data-chg])").first().innerText(), /un entrenador de la ROM/, "el botón nombra al entrenador fijo");
+  await pg.locator("[data-rivslot]:not([data-chg])").first().click();                                        // otra vez: ya no pregunta
+  assert.equal(await pg.locator(".lg-sheet").count(), 0, "con el entrenador fijo lo mete directamente");
   await pg.locator('.lh-fx [data-w]').first().click();                                // “Gané”
   assert.match(await pg.innerText(".lg-sheet"), /Marcador/);
   assert.equal(await pg.locator('.lg-sheet input[data-side="b"]:checked').count(), 6, "al ganar, por defecto caen los 6 titulares del rival");

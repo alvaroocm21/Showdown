@@ -171,3 +171,8 @@ los de la Pokédex y sin objetos. Código: `lib/ligapk.js`, prueba: `test/pk.tes
 los Pokémon a huecos libres de las cajas, recalcula la suma de comprobación del bloque de cajas y devuelve un `main` nuevo
 (a Descargas en la APK). Copia el archivo original antes. Los Pokémon llevan tu entrenador, TID/SID e idioma, leídos de tu equipo.
 No marca la Pokédex. Código: `lib/ligasave.js`, pruebas: `test/save.test.js` (con `SAVE_MAIN=ruta` prueba con una partida real).
+
+### El rival de mi próximo partido, siempre en el mismo entrenador
+
+En Calendario, bajo cada partido mío, «🎮 Meter a <rival> en un entrenador de la ROM»: la primera vez eliges el entrenador del juego (el buscador
+sale con «tximo»); después el botón mete directamente al rival de cada partido en ese mismo entrenador, quitándoselo al anterior. Luego exporta la jornada.
