@@ -203,6 +203,9 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   assert.ok(await pg.locator(".lh-orow >> nth=0 >> img.lh-ip").count() === 1, "y se ve su imagen");
   await pg.locator("[data-itemx]").first().click(); assert.equal(await pg.locator("[data-itemx]").count(), 0, "se puede quitar");
   await pg.click('[data-tab="equipo"]');
+  { const [dlb] = await Promise.all([pg.waitForEvent("download"), pg.click("[data-box]")]);
+    const buf = require("fs").readFileSync(await dlb.path()); assert.match(dlb.suggestedFilename(), /^caja-.*\.zip$/);
+    assert.ok((buf.toString("latin1").match(/\.pk[67]/g) || []).length >= 16, "el zip lleva los 8 Pokémon (titulares y banquillo)"); }
   // megas: no se sortean; se equipa la megapiedra a un Pokémon cuando se quiera
   assert.equal(await pg.locator('.lh-mon:has-text("Pikachu") [data-mega], .lh-mon:has-text("Bulbasaur") [data-mega]').count(), 0, "solo los Pokémon que megaevolucionan ofrecen megapiedra");
   const gen = tit.locator('.lh-mon:has-text("Gengar")'); await gen.locator("[data-mega]").click();

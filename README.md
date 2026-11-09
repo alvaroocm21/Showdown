@@ -157,3 +157,10 @@ node build.js
 # nombres en español (PokeAPI): descarga los CSV de PokeAPI y
 node names.js <carpeta con pokemon_species(_names).csv, moves/move_names, abilities/ability_names, items/item_names>
 ```
+
+## Pasar los Pokémon a la caja (.pk7 / .pk6)
+
+En Liga → Equipo, «📦 Pasar los N a la caja» descarga un .zip con **todos** los Pokémon de la plantilla (titulares y banquillo) como archivos
+.pk7 (Ultra Sol/Luna) o .pk6 (Rubí Omega/Zafiro Alfa) de 232 bytes sin cifrar, el formato de PKHeX. Se meten en la caja de la partida con PKHeX
+y se elige en el juego cuáles llevar. Con la ROM abierta se usan los números de ataques, habilidades y objetos de la ROM; sin ella,
+los de la Pokédex y sin objetos. Código: `lib/ligapk.js`, prueba: `test/pk.test.js`.
