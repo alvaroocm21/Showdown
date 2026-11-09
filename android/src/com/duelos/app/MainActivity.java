@@ -67,7 +67,7 @@ public class MainActivity extends Activity {
                     if (android.os.Build.VERSION.SDK_INT >= 29) {
                         ContentValues v = new ContentValues();
                         v.put("_display_name", safe);
-                        v.put("mime_type", safe.endsWith(".zip") ? "application/zip" : "text/plain");
+                        v.put("mime_type", safe.endsWith(".zip") ? "application/zip" : "application/octet-stream");
                         v.put("relative_path", "Download/");
                         saveUri = getContentResolver().insert(Uri.parse("content://media/external/downloads"), v);
                         if (saveUri == null) return false;
