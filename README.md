@@ -164,3 +164,10 @@ En Liga → Equipo, «📦 Pasar los N a la caja» descarga un .zip con **todos*
 .pk7 (Ultra Sol/Luna) o .pk6 (Rubí Omega/Zafiro Alfa) de 232 bytes sin cifrar, el formato de PKHeX. Se meten en la caja de la partida con PKHeX
 y se elige en el juego cuáles llevar. Con la ROM abierta se usan los números de ataques, habilidades y objetos de la ROM; sin ella,
 los de la Pokédex y sin objetos. Código: `lib/ligapk.js`, prueba: `test/pk.test.js`.
+
+### Meter los Pokémon directamente en la partida
+
+«💾 Meter los N en mi partida» (Liga → Equipo) pide el archivo `main` (o `00000001.sav`) de Ultra Sol/Luna (0x6CC00 bytes), añade
+los Pokémon a huecos libres de las cajas, recalcula la suma de comprobación del bloque de cajas y devuelve un `main` nuevo
+(a Descargas en la APK). Copia el archivo original antes. Los Pokémon llevan tu entrenador, TID/SID e idioma, leídos de tu equipo.
+No marca la Pokédex. Código: `lib/ligasave.js`, pruebas: `test/save.test.js` (con `SAVE_MAIN=ruta` prueba con una partida real).

@@ -206,6 +206,11 @@ const setRange = (pg, row, v) => pg.locator(`${row} [data-r]`).evaluate((e, v) =
   { const [dlb] = await Promise.all([pg.waitForEvent("download"), pg.click("[data-box]")]);
     const buf = require("fs").readFileSync(await dlb.path()); assert.match(dlb.suggestedFilename(), /^caja-.*\.zip$/);
     assert.ok((buf.toString("latin1").match(/\.pk[67]/g) || []).length >= 16, "el zip lleva los 8 Pokémon (titulares y banquillo)"); }
+  { const SV = require("../lib/ligasave.js"), fake = require("./fake_save.js")();
+    const [fc] = await Promise.all([pg.waitForEvent("filechooser"), pg.click("[data-sav]")]);
+    const [dls] = await Promise.all([pg.waitForEvent("download"), fc.setFiles({ name: "main", mimeType: "application/octet-stream", buffer: Buffer.from(fake) })]);
+    const out = new Uint8Array(require("fs").readFileSync(await dls.path())); assert.equal(dls.suggestedFilename(), "main");
+    assert.ok(SV.inspect(out).ok, "la partida sigue siendo válida"); assert.equal(960 - SV.freeSlots(out).length, 8, "los 8 Pokémon están en las cajas"); }
   // megas: no se sortean; se equipa la megapiedra a un Pokémon cuando se quiera
   assert.equal(await pg.locator('.lh-mon:has-text("Pikachu") [data-mega], .lh-mon:has-text("Bulbasaur") [data-mega]').count(), 0, "solo los Pokémon que megaevolucionan ofrecen megapiedra");
   const gen = tit.locator('.lh-mon:has-text("Gengar")'); await gen.locator("[data-mega]").click();
