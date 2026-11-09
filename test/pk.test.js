@@ -15,6 +15,10 @@ const iv = dv.getUint32(0x74, true); assert.equal(iv & 31, 31); assert.equal((iv
 let sum = 0; for (let o = 8; o < 232; o += 2) sum = (sum + dv.getUint16(o, true)) & 0xFFFF; assert.equal(dv.getUint16(6, true), sum, "suma de comprobación");
 assert.equal(String.fromCharCode(d[0xB0]), "A");
 assert.equal(dv.getUint16(0x0A, true), 236, "sin ROM se usa el número estándar del objeto (Bola Luminosa)"); assert.ok(!r.warns.some(x => /Light Ball/.test(x)));
+// con ROM: el número de habilidad sale de la tabla de la ROM (aquí el mod pone Static en la 3ª casilla = oculta)
+const rom = { ...res, offline: false, data: { personal: Object.assign([], { 25: { abilities: [1, 2, 9], gender: 127, expGroup: 0 } }) }, formEntry: (p, s) => s };
+const rr = PK.build({ ...set }, rom, { rand: () => 0.5 }); assert.equal(rr.data[0x15], 4, "habilidad oculta según la tabla de la ROM"); assert.deepStrictEqual(rr.warns.filter(x => /no es una habilidad/.test(x)), []);
+const rb = PK.build({ ...set, ability: "Intimidate" }, rom, { rand: () => 0.5 }); assert.ok(rb.warns.some(x => /no es una habilidad de esta especie/.test(x)));
 // brillo: TID ^ SID ^ PID alto ^ PID bajo < 16
 const sh = PK.build({ ...set, shiny: true }, res, { tid: 111, sid: 222, rand: () => 0.77 }).data, sv = new DataView(sh.buffer), pid = sv.getUint32(0x18, true);
 assert.ok(((111 ^ 222 ^ (pid >>> 16) ^ (pid & 0xFFFF)) & 0xFFFF) < 16, "brillante");
